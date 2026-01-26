@@ -64,14 +64,14 @@ The pipeline is organized into **7 sequential Jupyter Notebooks**.
     -   **Distance:** Computes Euclidean distance to the assigned centroid.
     -   *Note:* Distance is used to derive **soft archetype affiliation strength** (inverse relationship) for the fuzzy reasoning layer.
 
-### 6. ANFIS Preparation (`06_ANFIS_Preparation.ipynb`)
+### 6. Preparation for Surrogate Modeling (`06_ANFIS_Preparation.ipynb`)
 **Goal:** Construct the training dataset for the adaptive model.
 -   **Logic:**
     -   Constructs input vectors: Archetype Percentages + Deltas.
     -   **Target Generation:** Calculates a **Heuristic Proxy Target** ($M = 1.0 - 0.1 \times Deaths + 0.05 \times Intensity$).
     -   *Reasoning:* The target multiplier is a heuristic proxy used to approximate desired adaptive behaviour in the absence of explicit designer-labelled difficulty targets.
 
-### 7. ANFIS Training (`07_ANFIS_Training.ipynb`)
+### 7. Surrogate Model Training (`07_ANFIS_Training.ipynb`)
 **Goal:** Train the runtime inference model.
 -   **Logic:**
     -   Trains an **MLPRegressor** (Multi-Layer Perceptron) as a **Neuro-Fuzzy–inspired neural surrogate**.
