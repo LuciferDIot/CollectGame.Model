@@ -1,6 +1,6 @@
 # CollectGame AURA Pipeline
 
-This repository contains the **AURA (Adaptive Unified Response Agent)** data processing and modelling pipeline. It transforms raw gameplay telemetry into a trained Neuro-Fuzzy inference model for dynamic difficulty adjustment (DDA).
+This repository implements the **AURA (Adaptive Unified Response Agent)** data processing and modelling pipeline. It transforms raw gameplay telemetry into a trained **Neuro-Fuzzy–inspired neural surrogate model** for dynamic difficulty adjustment (DDA).
 
 The pipeline is organized into **7 sequential Jupyter Notebooks**.
 
@@ -10,10 +10,10 @@ The pipeline is organized into **7 sequential Jupyter Notebooks**.
 
 ```
 ├── data/
-│   ├── *.telemetries.csv       # Raw Gameplay Data (Multiple files)
-│   ├── *.deathevents.csv       # Raw Death Event Data
-│   ├── processed/              # Intermediate and Final CSV outputs
-│   └── models/                 # Exported AI Models (JSON/PKL)
+│   ├── *.telemetries.csv       # Raw Gameplay Data
+│   ├── *.deathevents.csv       # Raw Death Data
+│   ├── processed/              # Intermediate Outputs
+│   └── models/                 # Exported Model Parameters
 ├── 01_Data_Loading_and_Merging.ipynb
 ├── 02_Gameplay_Summary.ipynb
 ├── 03_Normalization.ipynb
@@ -26,70 +26,57 @@ The pipeline is organized into **7 sequential Jupyter Notebooks**.
 
 ---
 
-## 🚀 Pipeline Steps
+## 🚀 Pipeline Steps & Academic Validation
 
 ### 1. Data Loading & Merging (`01_Data_Loading_and_Merging.ipynb`)
-**Goal:** Consolidate raw data and attribute player deaths to specific gameplay windows.
+**Goal:** Consolidate data and perform causal death alignment.
 -   **Logic:**
-    -   Globs all `*.telemetries.csv` files and merges them.
-    -   **Strict Sorting:** Sorts by `userId` and `timestamp` to ensure temporal integrity.
-    -   **Death Integration:** Uses `pandas.merge_asof(direction='forward')` to map each death event to the *single* nearest subsequent telemetry window (within 30s).
--   **Output:** `data/processed/1_telemetry_with_deaths.csv`
+    -   Merges multiple telemetry logs.
+    -   Sorts strictly by timestamp.
+    -   **Death Integration:** Maps each death event to the single nearest subsequent telemetry window (within 30s) using `merge_asof(direction='forward')`.
+-   **Validation:** 1-to-1 mapping ensures no duplication of rows and preserves causal integrity.
 
 ### 2. Gameplay Summary & Filtering (`02_Gameplay_Summary.ipynb`)
-**Goal:** Clean the dataset by removing outliers and normalizing session durations.
+**Goal:** Ensure data quality and prevent fatigue bias.
 -   **Logic:**
-    -   Computes total gameplay duration per player.
-    -   **Filter:** Excludes players with **< 20 minutes** of data.
-    -   **Cap:** Trims players with **> 45 minutes** of data (keeps only the first 45 minutes).
-    -   Outputs a summary table of player statistics.
--   **Output:** `data/processed/2_cleaned_telemetry_for_modelling.csv`
+    -   **Filter:** Excludes players with < 20 mins (insufficient data).
+    -   **Cap:** Trims players > 45 mins to the first 45 mins.
+    -   *Reasoning:* Capping avoids **fatigue-induced behavioral drift** influencing the archetype definitions.
 
 ### 3. Normalization (`03_Normalization.ipynb`)
-**Goal:** Scale features to a standard range for fair comparison.
+**Goal:** Scale features for archetype modelling.
 -   **Logic:**
-    -   Applies **Min-Max Scaling (0-1)** to all numeric gameplay features.
-    -   **Per-Player Normalization:** Scaling is calculated based on *each player's own* min/max values to capture relative behavioral emphasis rather than absolute skill.
--   **Output:** `data/processed/3_normalized_telemetry.csv`
+    -   Applies **Min-Max Scaling (0-1)** per player.
+    -   *Reasoning:* Captures **relative behavioral emphasis rather than absolute skill**, preventing high-magnitude features (e.g., Distance) from overpowering low-magnitude ones (e.g., Kills).
 
-### 4. Activity Contribution Analysis (`04_Activity_Contributions.ipynb`)
-**Goal:** Quantify player focus (Combat vs. Collection vs. Exploration).
+### 4. Activity Contributions (`04_Activity_Contributions.ipynb`)
+**Goal:** Quantify behavioral focus.
 -   **Logic:**
-    -   Maps features to three categories:
-        -   **Combat:** `enemiesHit`, `damageDone`, `timeInCombat`, `kills`
-        -   **Collection:** `itemsCollected`, `pickupAttempts`, `timeNearInteractables`
-        -   **Exploration:** `distanceTraveled`, `timeSprinting`, `timeOutOfCombat`
-    -   **Scores:** Sums the *normalized* features for each category.
-    -   **Percentages:** Calculates the % contribution of each category to the total score.
-    -   **Deltas:** Computes the rate of change ($\Delta Pct$) from the previous window to the current window (Per-Player).
--   **Output:** `data/processed/4_activity_contributions.csv`
+    -   Aggregates normalized features into **Combat**, **Collection**, and **Exploration** scores.
+    -   Computes **Percentage Contributions** per window.
+    -   Computes **Deltas** ($\Delta Pct$) per player to capture temporal adaptation.
 
 ### 5. Clustering (`05_Clustering.ipynb`)
-**Goal:** Classify behavior into distinct archetypes.
+**Goal:** Define behavioral archetypes.
 -   **Logic:**
-    -   **K-Means (K=3):** Clusters the Activity Percentages (`pct_combat`, `pct_collect`, `pct_explore`).
-    -   **Automated Labeling:** Assigns labels ("Combat", "Collection", "Exploration") to clusters based on the dominant feature of the cluster centroid.
-    -   **Distance Calculation:** Computes the Euclidean distance of each point to its assigned centroid (measure of archetype strength).
-    -   Generates per-player archetype profiles.
--   **Output:** `data/processed/5_clustered_telemetry.csv`
+    -   **K-Means (K=3):** Clusters activity percentages.
+    -   **labeling:** Automatically maps clusters to labeled Archetypes based on centroids.
+    -   **Distance:** Computes Euclidean distance to the assigned centroid.
+    -   *Note:* Distance is used to derive **soft archetype affiliation strength** (inverse relationship) for the fuzzy reasoning layer.
 
 ### 6. ANFIS Preparation (`06_ANFIS_Preparation.ipynb`)
-**Goal:** Construct the training dataset for the Neuro-Fuzzy system.
+**Goal:** Construct the training dataset for the adaptive model.
 -   **Logic:**
-    -   **Inputs:** Archetype Percentages + Delta Values.
-    -   **Target Generation (heuristic):**
-        -   Calculates an **Adaptation Multiplier** ($M$).
-        -   **Formula:** $M = 1.0 - (0.1 \times Deaths) + (0.05 \times Intensity)$.
-        -   *Interpretation:* Deaths lower the multiplier (Eases difficulty). High activity raises it.
--   **Output:** `data/processed/6_anfis_dataset.csv`
+    -   Constructs input vectors: Archetype Percentages + Deltas.
+    -   **Target Generation:** Calculates a **Heuristic Proxy Target** ($M = 1.0 - 0.1 \times Deaths + 0.05 \times Intensity$).
+    -   *Reasoning:* The target multiplier is a heuristic proxy used to approximate desired adaptive behaviour in the absence of explicit designer-labelled difficulty targets.
 
 ### 7. ANFIS Training (`07_ANFIS_Training.ipynb`)
 **Goal:** Train the runtime inference model.
 -   **Logic:**
-    -   Uses an **MLPRegressor** (Multi-Layer Perceptron) as a surrogate for the Neuro-Fuzzy reasoning layer.
-    -   Architecture: 6 Inputs -> Hidden Layers [16, 8] -> 1 Output (Multiplier).
-    -   **Export:** Saves the model weights and biases to a JSON file for easy import into the C#/Unity game engine.
--   **Output:** `data/models/anfis_params.json`
+    -   Trains an **MLPRegressor** (Multi-Layer Perceptron) as a **Neuro-Fuzzy–inspired neural surrogate**.
+    -   *Reasoning:* While a classical ANFIS consists of explicit membership functions and fuzzy rules, this surrogate neural model learns a smooth mapping that emulates the same reasoning behaviour for real-time deployment.
+-   **Output:** `data/models/anfis_params.json` containing learned parameters for the runtime game engine inference layer.
 
 ---
 
