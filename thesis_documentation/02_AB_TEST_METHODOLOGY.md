@@ -1,3 +1,9 @@
+---
+**Document**: 02_AB_TEST_METHODOLOGY.md
+**Last Updated**: January 27, 2026, 2:07 PM IST
+**Project**: ANFIS Adaptive Difficulty System
+---
+
 # A/B Experiment Framework: Baseline vs Feature-Aware Preprocessing
 
 **Created**: January 27, 2026, 1:24 PM IST  
@@ -267,3 +273,4 @@ This A/B framework ensures:
 - **No assumptions**: Let data decide
 
 **Status**: Framework complete, ready for execution
+
