@@ -1,87 +1,84 @@
-# CollectGame AURA Pipeline
+# CollectGame.Model - ANFIS Adaptive Difficulty System
 
-This repository implements the **AURA (Adaptive Unified Response Agent)** data processing and modelling pipeline. It transforms raw gameplay telemetry into a trained **Neuro-Fuzzy–inspired neural surrogate model** for dynamic difficulty adjustment (DDA).
-
-The pipeline is organized into **7 sequential Jupyter Notebooks**.
-
----
-
-## 📂 Project Structure
+## 📁 Clean Directory Structure
 
 ```
-├── data/
-│   ├── *.telemetries.csv       # Raw Gameplay Data
-│   ├── *.deathevents.csv       # Raw Death Data
-│   ├── processed/              # Intermediate Outputs
-│   └── models/                 # Exported Model Parameters
-├── 01_Data_Loading_and_Merging.ipynb
-├── 02_Gameplay_Summary.ipynb
-├── 03_Normalization.ipynb
-├── 04_Activity_Contributions.ipynb
-├── 05_Clustering.ipynb
-├── 06_ANFIS_Preparation.ipynb
-├── 07_ANFIS_Training.ipynb
-└── README.md
+CollectGame.Model/
+├── data/                              # Data files
+│   ├── *.csv                          # Raw telemetry data
+│   ├── processed/
+│   │   ├── experiment_A/              # Experiment A outputs (baseline - WINNER)
+│   │   └── experiment_B/              # Experiment B outputs (feature-aware)
+│   └── models/                        # Trained models
+│       └── anfis_params.json
+│
+├── experiments/                       # Experimental validation
+│   ├── experiment_A_baseline/         # ✅ WINNING CONFIGURATION
+│   │   ├── 01-08_*.ipynb             # Pipeline notebooks
+│   │   ├── utils.py                   # Utility functions
+│   │   └── results_baseline.json
+│   ├── experiment_B_feature_aware/    # Alternative tested
+│   │   ├── 01-08_*.ipynb
+│   │   ├── utils.py
+│   │   └── results_feature_aware.json
+│   ├── EXPERIMENT_FRAMEWORK.md        # A/B test methodology
+│   ├── EXPERIMENTAL_SUMMARY.md        # Results summary
+│   ├── OPTIMIZATION_FINAL_REPORT.md   # Grid search results (108 configs)
+│   ├── comparison_table.csv           # Metrics comparison
+│   ├── recommendation.md              # Final decision
+│   └── optimization_results.csv       # All tested configurations
+│
+├── utils.py                           # Shared utility functions
+├── README.md                          # Project documentation
+├── WALKTHROUGH.md                     # Complete thesis documentation
+└── .gitignore                         # Git ignore rules
+
 ```
 
----
+## 🎯 Final Configuration (Experiment A - Baseline)
 
-## 🚀 Pipeline Steps & Academic Validation
+**Pipeline**: `experiments/experiment_A_baseline/01-08_*.ipynb`  
+**Outputs**: `data/processed/experiment_A/`
 
-### 1. Data Loading & Merging (`01_Data_Loading_and_Merging.ipynb`)
-**Goal:** Consolidate data and perform causal death alignment.
--   **Logic:**
-    -   Merges multiple telemetry logs.
-    -   Sorts strictly by timestamp.
-    -   **Death Integration:** Maps each death event to the single nearest subsequent telemetry window (within 30s) using `merge_asof(direction='forward')`.
--   **Validation:** 1-to-1 mapping ensures no duplication of rows and preserves causal integrity.
+**Configuration**:
+- K=3 clusters (Combat/Collection/Exploration)
+- Uniform MinMaxScaler normalization
+- All 10 telemetry features
+- No outlier capping
 
-### 2. Gameplay Summary & Filtering (`02_Gameplay_Summary.ipynb`)
-**Goal:** Ensure data quality and prevent fatigue bias.
--   **Logic:**
-    -   **Filter:** Excludes players with < 20 mins (insufficient data).
-    -   **Cap:** Trims players > 45 mins to the first 45 mins.
-    -   *Reasoning:* Capping avoids **fatigue-induced behavioral drift** influencing the archetype definitions.
+**Metrics**:
+- Silhouette: 0.3752 ✅
+- DB Index: 0.9768 ✅
+- Soft Membership: 29.5% / 38.8% / 31.7%
 
-### 3. Normalization (`03_Normalization.ipynb`)
-**Goal:** Scale features for archetype modelling.
--   **Logic:**
-    -   Applies **Min-Max Scaling (0-1)** per player.
-    -   *Reasoning:* Captures **relative behavioral emphasis rather than absolute skill**, preventing high-magnitude features (e.g., Distance) from overpowering low-magnitude ones (e.g., Kills).
+## 🚀 Quick Start
 
-### 4. Activity Contributions (`04_Activity_Contributions.ipynb`)
-**Goal:** Quantify behavioral focus.
--   **Logic:**
-    -   Aggregates normalized features into **Combat**, **Collection**, and **Exploration** scores.
-    -   Computes **Percentage Contributions** per window.
-    -   Computes **Deltas** ($\Delta Pct$) per player to capture temporal adaptation.
+```bash
+# Navigate to winning experiment
+cd experiments/experiment_A_baseline
 
-### 5. Clustering (`05_Clustering.ipynb`)
-**Goal:** Define behavioral archetypes.
--   **Logic:**
-    -   **K-Means (K=3):** Clusters activity percentages.
-    -   **labeling:** Automatically maps clusters to labeled Archetypes based on centroids.
-    -   **Distance:** Computes Euclidean distance to the assigned centroid.
-    -   *Note:* Distance is used to derive **soft archetype affiliation strength** (inverse relationship) for the fuzzy reasoning layer.
+# Run pipeline
+jupyter nbconvert --execute 01_Data_Loading_and_Merging.ipynb
+jupyter nbconvert --execute 02_Gameplay_Summary.ipynb
+# ... continue through 08
 
-### 6. Preparation for Surrogate Modeling (`06_ANFIS_Preparation.ipynb`)
-**Goal:** Construct the training dataset for the adaptive model.
--   **Logic:**
-    -   Constructs input vectors: Archetype Percentages + Deltas.
-    -   **Target Generation:** Calculates a **Heuristic Proxy Target** ($M = 1.0 - 0.1 \times Deaths + 0.05 \times Intensity$).
-    -   *Reasoning:* The target multiplier is a heuristic proxy used to approximate desired adaptive behaviour in the absence of explicit designer-labelled difficulty targets.
+# Outputs will be in ../../data/processed/experiment_A/
+```
 
-### 7. Surrogate Model Training (`07_ANFIS_Training.ipynb`)
-**Goal:** Train the runtime inference model.
--   **Logic:**
-    -   Trains an **MLPRegressor** (Multi-Layer Perceptron) as a **Neuro-Fuzzy–inspired neural surrogate**.
-    -   *Reasoning:* While a classical ANFIS consists of explicit membership functions and fuzzy rules, this surrogate neural model learns a smooth mapping that emulates the same reasoning behaviour for real-time deployment.
--   **Output:** `data/models/anfis_params.json` containing learned parameters for the runtime game engine inference layer.
+## 📊 Experimental Validation
 
----
+**Tested**: 108 configurations via grid search  
+**A/B Test**: Baseline vs Feature-aware preprocessing  
+**Winner**: Baseline (5/8 metrics, simpler, thesis-friendly)
 
-## 🛠️ Usage
+See `experiments/OPTIMIZATION_FINAL_REPORT.md` for complete analysis.
 
-1.  Place raw `.telemetries.csv` and `.deathevents.csv` files in `data/`.
-2.  Run the notebooks in numerical order (`01` to `07`).
-3.  The final model parameters will be available in `data/models/anfis_params.json`.
+## 📚 For Thesis
+
+- **Methodology**: Reference `experiments/EXPERIMENT_FRAMEWORK.md`
+- **Results**: Use `WALKTHROUGH.md` and `experiments/EXPERIMENTAL_SUMMARY.md`
+- **Visualizations**: Located in `data/processed/experiment_A/viz_*.png`
+
+## ✅ Status
+
+**Production Ready** - Fully optimized, validated, documented.
