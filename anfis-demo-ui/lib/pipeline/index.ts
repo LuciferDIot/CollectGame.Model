@@ -41,8 +41,8 @@ export class ANFISPipeline {
    * Execute the full pipeline on a telemetry window
    */
   process(telemetry: TelemetryWindow, deaths?: DeathEvent): PipelineOutput {
-    const duration_minutes = (telemetry.duration ?? 30) / 60;
-    this.validateDuration(duration_minutes);
+    const duration_seconds = telemetry.duration ?? 30;
+    this.validateDuration(duration_seconds);
 
     // Step 2-5: Feature Processing & Clustering
     const cleanedFeatures = { ...telemetry.features };
@@ -78,7 +78,7 @@ export class ANFISPipeline {
 
     // Final Validation & Return
     return {
-      filtering: { passed: true, duration_minutes },
+      filtering: { passed: true, duration_seconds },
       normalized_features: normalized,
       activity_scores: activityScores,
       soft_membership: softMembership,
@@ -104,11 +104,13 @@ export class ANFISPipeline {
     };
   }
 
-  private validateDuration(minutes: number): void {
-    const { duration_min_minutes, duration_cap_minutes } = this.manifest.hard_constraints;
-    if (minutes < duration_min_minutes || minutes > duration_cap_minutes) {
+  private validateDuration(seconds: number): void {
+    const DEMO_MIN_SECONDS = 20;
+    const DEMO_MAX_SECONDS = 300; // 5 minutes
+
+    if (seconds < DEMO_MIN_SECONDS || seconds > DEMO_MAX_SECONDS) {
       console.warn(
-        `Duration ${minutes.toFixed(1)}min outside production range [${duration_min_minutes}, ${duration_cap_minutes}] - allowing for demo`
+        `Duration ${seconds}s outside demo range [${DEMO_MIN_SECONDS}s, ${DEMO_MAX_SECONDS}s]`
       );
     }
   }
