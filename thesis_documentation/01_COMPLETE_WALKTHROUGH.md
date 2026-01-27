@@ -1,3 +1,9 @@
+---
+**Document**: 01_COMPLETE_WALKTHROUGH.md
+**Last Updated**: January 27, 2026, 2:07 PM IST
+**Project**: ANFIS Adaptive Difficulty System
+---
+
 # ANFIS-Based Adaptive Game Difficulty System - Complete Walkthrough
 
 **Project**: Adaptive Neuro-Fuzzy Inference System for Dynamic Game Difficulty Adjustment  
@@ -1103,3 +1109,4 @@ This work demonstrates the importance of:
 **Author**: [Your Name]  
 **Project**: Final Year Project - Adaptive Game Difficulty System  
 **Status**: ✅ Complete and Ready for Thesis Integration
+
