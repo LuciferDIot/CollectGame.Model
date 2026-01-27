@@ -94,7 +94,7 @@ export function AnalyticsSlideOver({ open, onOpenChange }: AnalyticsSlideOverPro
                     <span className="text-slate-500">Activity:</span>
                     <span className="font-mono text-slate-300">{cat.activityPercentage}%</span>
                     <span className="text-slate-600">|</span>
-                    <span className="text-slate-500">Conf:</span>
+                    <span className="text-slate-500 cursor-help" title="Heuristic confidence indicator (not probabilistic certainty)">Conf:</span>
                     <span className={`font-mono ${cat.confidence > 0.85 ? 'text-green-400' : 'text-amber-400'}`}>
                       {(cat.confidence * 100).toFixed(0)}%
                     </span>
@@ -385,9 +385,12 @@ export function AnalyticsSlideOver({ open, onOpenChange }: AnalyticsSlideOverPro
                 {/* Inference Rules */}
                 {pipelineState.rulesFired.length > 0 && (
                   <div>
-                    <h4 className="text-xs font-semibold text-amber-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <h4 
+                      className="text-xs font-semibold text-amber-400 uppercase tracking-wider mb-3 flex items-center gap-2 cursor-help" 
+                      title="Activation strength of hidden neurons in the neuro-fuzzy surrogate model"
+                    >
                       <span className="inline-block w-2 h-2 rounded-full bg-amber-400"></span>
-                      Rules Fired ({pipelineState.rulesFired.length})
+                      Hidden Unit Activations ({pipelineState.rulesFired.length})
                     </h4>
                     <Card className="bg-slate-800/50 border-slate-700">
                       <div className="p-4 space-y-2">

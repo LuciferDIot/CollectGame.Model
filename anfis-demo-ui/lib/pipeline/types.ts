@@ -80,7 +80,7 @@ export interface AdaptationResult {
 export interface PipelineOutput {
   filtering: {
     passed: boolean;
-    duration_minutes?: number;
+    duration_seconds?: number;
   };
   normalized_features: NormalizedFeatures;
   activity_scores: ActivityScores;
