@@ -1,0 +1,44 @@
+# Pipeline Configuration - LOCKED
+# Last Updated: January 27, 2026, 2:12 PM IST
+# Status: PRODUCTION
+
+preprocessing:
+  scaler: "MinMaxScaler"  # Uniform, no per-feature scaling
+  features:
+    - "enemiesHit"
+    - "damageDone"
+    - "timeInCombat"
+    - "kills"
+    - "itemsCollected"
+    - "pickupAttempts"
+    - "timeNearInteractables"
+    - "distanceTraveled"
+    - "timeSprinting"
+    - "timeOutOfCombat"
+  outlier_handling: "none"  # No capping
+
+clustering:
+  algorithm: "KMeans"
+  n_clusters: 3
+  random_state: 42
+  soft_membership_method: "inverse_distance"
+
+anfis:
+  inputs:
+    - "soft_combat"
+    - "soft_collect"
+    - "soft_explore"
+    - "delta_combat"      # ADDED: Temporal signal
+    - "delta_collect"     # ADDED: Temporal signal
+    - "delta_explore"     # ADDED: Temporal signal
+  delta_computation:
+    enabled: true
+    method: "sequential_diff"  # t - (t-1)
+    initial_value: 0.0  # First window has delta=0
+
+validation:
+  metrics:
+    - "silhouette_score"
+    - "davies_bouldin_index"
+    - "target_cv"
+    - "delta_correlation"

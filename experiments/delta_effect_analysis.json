@@ -1,0 +1,17 @@
+{
+  "combat_burst_count": 316,
+  "combat_burst_mean_target_change": -0.018296770007362326,
+  "combat_burst_std_target_change": 0.018535389640288738,
+  "target_variance_raw": 0.0005357623846224018,
+  "target_variance_delta": 0.0004087160351751253,
+  "variance_ratio": 0.7628681051641633,
+  "explore_dominant_combat_burst_count": 1,
+  "explore_dominant_combat_burst_delta_combat_mean": 1.1775203739468814,
+  "explore_dominant_combat_burst_delta_target_mean": 0.03079116949213101,
+  "explore_dominant_combat_burst_correlation": 0.0,
+  "correlation_delta_combat_target": -0.47056673169015534,
+  "correlation_delta_explore_target": 0.8081888793138915,
+  "p_value_delta_combat": 4.700704183980047e-174,
+  "p_value_delta_explore": 0.0,
+  "recommendation": "Add deltas"
+}

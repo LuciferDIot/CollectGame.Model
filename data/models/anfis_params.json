@@ -1,0 +1,15 @@
+{
+  "architecture": "6-16-8-1",
+  "metrics": {
+    "train_mae": 0.01117083789996909,
+    "test_mae": 0.011228839671947368
+  },
+  "features": [
+    "soft_combat",
+    "soft_collect",
+    "soft_explore",
+    "delta_combat",
+    "delta_collect",
+    "delta_explore"
+  ]
+}

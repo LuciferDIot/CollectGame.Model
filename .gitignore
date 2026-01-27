@@ -1,0 +1,26 @@
+# Ignore notebooks in root (all in experiments/)
+*.ipynb
+
+# Ignore processed data and models
+data/processed/*.csv
+data/processed/*.png
+data/processed/experiment_A/*.csv
+data/processed/experiment_A/*.png
+data/processed/experiment_B/*.csv
+data/processed/experiment_B/*.png
+data/models/*.json
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.ipynb_checkpoints/
+
+# Temporary files
+*.tmp
+*.log
+*.nbconvert.ipynb
+
+# OS
+.DS_Store
+Thumbs.db
