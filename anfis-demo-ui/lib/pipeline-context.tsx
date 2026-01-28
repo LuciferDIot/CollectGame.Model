@@ -254,15 +254,43 @@ export function PipelineProvider({ children }: { children: React.ReactNode }) {
         setSimulationResult(finalState);
 
         // Playback logic
+        // Playback logic
         if (!stepByStep) {
             setPipelineState(finalState);
         } else {
-            // Just reveal the first step
-             setPipelineState(prev => ({
-                ...prev,
-                steps: prev.steps.map((s, i) => i === 0 ? finalState.steps[0] : s),
-                normalizedFeatures: null // progressive reveal
-             }));
+            const DELAY = 800; // ms per step
+            const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+            // Reset to running
+            setPipelineState(prev => ({ ...prev, steps: initialSteps, isRunning: true }));
+
+            // Animate through steps
+            for (let i = 0; i < completedSteps.length; i++) {
+                await delay(DELAY);
+
+                setPipelineState(prev => {
+                    const nextSteps = prev.steps.map((s, idx) => {
+                         if (idx === i) return completedSteps[i]; // Complete current
+                         if (idx === i + 1 && i < 7) return { ...s, status: 'running' as const }; // Start next
+                         return s;
+                    });
+                    
+                    return {
+                        ...prev,
+                        steps: nextSteps,
+                        // Progressive State Reveal
+                        normalizedFeatures: i >= 1 ? finalState.normalizedFeatures : prev.normalizedFeatures,
+                        softMembership: i >= 2 ? finalState.softMembership : prev.softMembership,
+                        behaviorCategories: i >= 3 ? finalState.behaviorCategories : prev.behaviorCategories,
+                        adaptationDeltas: i >= 4 ? finalState.adaptationDeltas : prev.adaptationDeltas,
+                        validationChecks: i >= 6 ? finalState.validationChecks : prev.validationChecks,
+                        rulesFired: i >= 5 ? finalState.rulesFired : prev.rulesFired,
+                        isRunning: i < 7,
+                        executionTime: i === 7 ? executionTime : prev.executionTime,
+                        modelMetrics: i === 7 ? finalState.modelMetrics : undefined
+                    };
+                });
+            }
         }
 
     } catch (e) {
