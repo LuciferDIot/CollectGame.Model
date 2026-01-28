@@ -2,13 +2,13 @@
 
 import type { RoundAnalytics, SessionAnalytics } from '@/lib/analytics';
 import {
-    buildSessionAnalytics,
-    DEFAULT_ANALYTICS_CONFIG,
-    detectClampSaturation,
-    getDominantArchetype,
-    validateMembershipSum,
+  buildSessionAnalytics,
+  DEFAULT_ANALYTICS_CONFIG,
+  detectClampSaturation,
+  getDominantArchetype,
+  validateMembershipSum,
 } from '@/lib/analytics';
-import type { PipelineState } from '@/lib/pipeline/types';
+import type { PipelineState } from '@/lib/types';
 import { useEffect, useRef, useState } from 'react';
 
 /**

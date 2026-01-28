@@ -72,6 +72,20 @@ export interface PipelineState {
   };
   isRunning: boolean;
   executionTime: number;
+  // Added for Analytics compatibility
+  output?: {
+    adjustedMultiplier: number;
+    ruleActivations: any[]; // Using any to avoid circular dependency
+    confidence: number;
+  } | null;
+  metadata?: {
+    deltas?: {
+      combat: number;
+      collect: number;
+      explore: number;
+    };
+  };
+  error?: string | null;
 }
 
 export interface DashboardInputState {

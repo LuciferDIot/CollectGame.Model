@@ -13,6 +13,83 @@ import type {
 } from './types';
 import { DEFAULT_ANALYTICS_CONFIG } from './types';
 
+// ==========================================
+// CONSTANTS & CONFIGURATION
+// ==========================================
+
+export const OFFLINE_METRICS = {
+  trainR2: 0.9549,
+  testR2: 0.9566,
+  mae: 0.0128,
+  targetStd: 0.0625,
+  targetSpan: 0.4113,
+  // Comparative Baseline
+  originalR2: 0.12,
+  originalStd: 0.011,
+  originalSpan: 0.023
+};
+
+export const TRAINING_DISTRIBUTION = {
+  mean: 1.00,
+  std: 0.0625,
+  min: 0.6,
+  max: 1.4
+};
+
+// ==========================================
+// COMPUTATION FUNCTIONS
+// ==========================================
+
+/**
+ * Compute Pearson correlation coefficient over sliding window
+ */
+export function computeRollingCorrelation(
+  x: number[],
+  y: number[],
+  window: number
+): number | null {
+  if (x.length < window || y.length < window) return null;
+  
+  const xSlice = x.slice(-window);
+  const ySlice = y.slice(-window);
+  
+  const xMean = xSlice.reduce((a, b) => a + b, 0) / window;
+  const yMean = ySlice.reduce((a, b) => a + b, 0) / window;
+  
+  let numerator = 0;
+  let denomX = 0;
+  let denomY = 0;
+  
+  for (let i = 0; i < window; i++) {
+    const diffX = xSlice[i] - xMean;
+    const diffY = ySlice[i] - yMean;
+    numerator += diffX * diffY;
+    denomX += diffX * diffX;
+    denomY += diffY * diffY;
+  }
+  
+  if (denomX === 0 || denomY === 0) return 0; // No variance
+  
+  return numerator / Math.sqrt(denomX * denomY);
+}
+
+/**
+ * Check if value is within training distribution bounds (consistency check)
+ */
+export function checkDistributionConsistency(
+  value: number,
+  mean: number,
+  std: number,
+  sigma: number = 2
+): 'consistent' | 'edge' | 'ood' {
+  const diff = Math.abs(value - mean);
+  const threshold = std * sigma;
+  
+  if (diff <= threshold) return 'consistent';
+  if (diff <= threshold * 1.5) return 'edge';
+  return 'ood'; // Out-of-distribution
+}
+
 /**
  * Compute rolling statistics over a sliding window
  */
@@ -233,6 +310,22 @@ export function buildSessionAnalytics(
   const responsiveness = computeResponsiveness(rounds, config.deltaNoiseThreshold);
   const archetypeDistribution = computeArchetypeDistribution(rounds);
   
+  // Compute rolling correlation for responsiveness accuracy
+  // Correlate |Delta Behavior| with |Delta Multiplier|
+  // Needs arrays of magnitudes
+  const deltaBehaviorMagnitudes = rounds.map(r => 
+    Math.abs(r.deltas.combat) + Math.abs(r.deltas.collect) + Math.abs(r.deltas.explore)
+  );
+  const deltaMultiplierMagnitudes = rounds.map(r => 
+    r.deltaFromPrevious !== null ? Math.abs(r.deltaFromPrevious) : 0
+  );
+  
+  const responsivenessCorrelation = computeRollingCorrelation(
+    deltaBehaviorMagnitudes, 
+    deltaMultiplierMagnitudes, 
+    Math.min(rounds.length, config.rollingWindow)
+  );
+
   // Overall statistics
   const avgMultiplier =
     multipliers.length > 0
@@ -249,6 +342,7 @@ export function buildSessionAnalytics(
   
   return {
     rounds,
+    history: rounds, // Populate the alias
     currentRound: rounds.length,
     rollingMean: rollingStats?.mean ?? null,
     rollingStd: rollingStats?.std ?? null,
@@ -257,6 +351,7 @@ export function buildSessionAnalytics(
     clampPercentage: clampStats,
     dominantArchetypeDistribution: archetypeDistribution,
     avgDeltaMagnitude: avgMagnitude,
-    responsivenessScore: responsiveness,
+    responsivenessScore: responsiveness, // Keep legacy heuristic for fallback/simplified view
+    responsivenessCorrelation: responsivenessCorrelation ?? 0, // New rigorous metric
   };
 }
