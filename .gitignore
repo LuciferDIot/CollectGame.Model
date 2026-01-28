@@ -1,5 +1,5 @@
-# Ignore notebooks in root (all in experiments/)
-*.ipynb
+# Track all Jupyter notebooks for thesis reproducibility
+# (Only ignore checkpoint files)
 
 # Ignore processed data and models
 data/processed/*.csv
