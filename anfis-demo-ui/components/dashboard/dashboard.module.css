@@ -1,0 +1,153 @@
+.dashboardRoot {
+  display: grid;
+  grid-template-rows: 80px 1fr;
+  grid-template-columns: 340px 1fr 420px;
+  min-height: 100vh;
+  width: 100%;
+  background: #0f1419;
+  font-family: 'Geist', sans-serif;
+  overflow: auto;
+}
+
+.topBar {
+  grid-column: 1 / -1;
+  border-bottom: 1px solid rgba(100, 200, 255, 0.08);
+  background: rgba(15, 20, 25, 0.6);
+  backdrop-filter: blur(12px);
+  overflow: hidden;
+  z-index: 10;
+}
+
+.contentWrapper {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 0;
+  overflow: hidden;
+}
+
+.leftPanel {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid rgba(100, 200, 255, 0.08);
+  background: rgba(15, 20, 25, 0.3);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.centerPanel {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid rgba(100, 200, 255, 0.08);
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: rgba(10, 15, 20, 0.2);
+}
+
+.rightPanel {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: rgba(10, 15, 20, 0.15);
+}
+
+.topBar {
+  border-bottom: 1px solid rgba(100, 200, 255, 0.1);
+  background: rgba(15, 20, 25, 0.8);
+  backdrop-filter: blur(10px);
+  flex-shrink: 0;
+}
+
+.contentWrapper {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.leftPanel {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid rgba(100, 200, 255, 0.1);
+  background: rgba(15, 20, 25, 0.5);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.centerPanel {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid rgba(100, 200, 255, 0.1);
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: rgba(10, 15, 20, 0.3);
+}
+
+.rightPanel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: rgba(10, 15, 20, 0.2);
+}
+
+/* Resizable handle styles */
+.react-resizable-hide {
+  display: none;
+}
+
+.react-resizable {
+  position: relative;
+}
+
+.react-resizable-handle {
+  background: rgba(100, 200, 255, 0.2);
+  background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAiIGhlaWdodD0iMTAiIHZpZXdCb3g9IjAgMCAxMCAxMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSI1IiBjeT0iNSIgcj0iMSIgZmlsbD0icmdiYSgxMDAsMjAwLDI1NSwwLjUpIi8+PC9zdmc+');
+  background-position: center;
+  background-repeat: no-repeat;
+  cursor: col-resize;
+  transition: background-color 0.2s ease;
+}
+
+.react-resizable-handle:hover {
+  background-color: rgba(100, 200, 255, 0.4);
+}
+
+.react-resizable-handle-sw {
+  cursor: sw-resize;
+}
+
+.react-resizable-handle-se {
+  cursor: se-resize;
+}
+
+.react-resizable-handle-nw {
+  cursor: nw-resize;
+}
+
+.react-resizable-handle-ne {
+  cursor: ne-resize;
+}
+
+.react-resizable-handle-w {
+  cursor: w-resize;
+}
+
+.react-resizable-handle-e {
+  background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNiIgaGVpZ2h0PSI0MCIgdmlld0JveD0iMCAwIDYgNDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMyIgY3k9IjEwIiByPSIxIiBmaWxsPSJyZ2JhKDEwMCwyMDAsMjU1LDAuNSkiLz48Y2lyY2xlIGN4PSIzIiBjeT0iMjAiIHI9IjEiIGZpbGw9InJnYmEoMTAwLDIwMCwyNTUsMC41KSIvPjxjaXJjbGUgY3g9IjMiIGN5PSIzMCIgcj0iMSIgZmlsbD0icmdiYSgxMDAsMjAwLDI1NSwwLjUpIi8+PC9zdmc+');
+  background-repeat: repeat-y;
+  background-position: center;
+  width: 6px;
+  cursor: col-resize;
+}
+
+.react-resizable-handle-n {
+  cursor: n-resize;
+}
+
+.react-resizable-handle-s {
+  background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNiIgdmlld0JveD0iMCAwIDQwIDYiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMTAiIGN5PSIzIiByPSIxIiBmaWxsPSJyZ2JhKDEwMCwyMDAsMjU1LDAuNSkiLz48Y2lyY2xlIGN4PSIyMCIgY3k9IjMiIHI9IjEiIGZpbGw9InJnYmEoMTAwLDIwMCwyNTU LDAuNSkiLz48Y2lyY2xlIGN4PSIzMCIgY3k9IjMiIHI9IjEiIGZpbGw9InJnYmEoMTAwLDIwMCwyNTUsMC41KSIvPjwvc3ZnPg==');
+  background-repeat: repeat-x;
+  background-position: center;
+  height: 6px;
+  cursor: row-resize;
+}
