@@ -1,17 +1,13 @@
 'use client';
 
 import React, { createContext, useCallback, useContext, useState } from 'react';
-import type { PipelineOutput as BackendPipelineOutput } from './pipeline/types';
+import { runSimulationService } from './pipeline/simulation-runner';
 import type {
-    AdaptationDelta,
-    BehaviorCategory,
-    DashboardInputState,
-    DeathEvent,
-    NormalizedFeatures,
-    PipelineState,
-    PipelineStep,
-    TelemetryFeatures,
-    ValidationCheck
+  DashboardInputState,
+  DeathEvent,
+  PipelineState,
+  PipelineStep,
+  TelemetryFeatures
 } from './types';
 
 interface PipelineContextType {
@@ -156,100 +152,34 @@ export function PipelineProvider({ children }: { children: React.ReactNode }) {
 
     try {
         const startTime = performance.now();
-        const response = await fetch('/api/pipeline', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ telemetry: { userId: 'sim-user', timestamp: new Date().toISOString(), features: telemetry }, deaths: deathEvents?.[0] || {} })
-        });
-
-        if (!response.ok) {
-            throw new Error(`API Error: ${response.statusText}`);
-        }
-
-        const backendResult: BackendPipelineOutput = await response.json();
+        
+        // 1. Fetch from Backend
+        const backendResult = await runSimulationService.fetchSimulationResults(telemetry, deathEvents);
+        
         const endTime = performance.now();
         const executionTime = endTime - startTime;
 
-        // -- ADAPTER LOGIC --
+        // 2. Map to UI State
+        const mappedState = runSimulationService.mapBackendToUI(backendResult);
 
-        // 1. Normalized Features (Wrap in arrays)
-        const uiNormalized: NormalizedFeatures = {};
-        if (backendResult.normalized_features) {
-            Object.entries(backendResult.normalized_features).forEach(([k, v]) => {
-                uiNormalized[k] = [v as number];
-            });
-        }
-
-        // 2. Behavior Categories
-        // Dynamic confidence based on max membership (clamped to realistic range)
-        const getConfidence = (val: number) => Math.min(0.98, Math.max(0.65, val * 1.5));
-        
-        const behaviors: BehaviorCategory[] = [
-            { category: 'Combat', softMembership: backendResult.soft_membership.soft_combat, activityPercentage: Math.round(backendResult.activity_scores.pct_combat * 100), confidence: getConfidence(backendResult.soft_membership.soft_combat) },
-            { category: 'Collection', softMembership: backendResult.soft_membership.soft_collect, activityPercentage: Math.round(backendResult.activity_scores.pct_collect * 100), confidence: getConfidence(backendResult.soft_membership.soft_collect) },
-            { category: 'Exploration', softMembership: backendResult.soft_membership.soft_explore, activityPercentage: Math.round(backendResult.activity_scores.pct_explore * 100), confidence: getConfidence(backendResult.soft_membership.soft_explore) },
-        ];
-
-        // 3. Validation Checks
-        const validations: ValidationCheck[] = [
-            { name: 'Membership Sum', status: Math.abs(backendResult.validation.membership_sum - 1) < 0.01 ? 'pass' : 'warning', message: `Sum: ${backendResult.validation.membership_sum.toFixed(3)}` },
-            { name: 'Delta Range', status: backendResult.validation.delta_range_ok ? 'pass' : 'fail', message: 'Deltas within [-1, 1]' },
-            { name: 'Multiplier Clamped', status: backendResult.validation.multiplier_clamped ? 'pass' : 'warning', message: 'Multiplier constrained' },
-        ];
-
-        // 4. Adaptation Deltas
-        const deltas: AdaptationDelta[] = Object.entries(backendResult.adapted_parameters).map(([key, val]) => {
-            // Heuristic category mapping
-            let cat: 'Combat' | 'Collection' | 'Exploration' = 'Exploration';
-            if (key.includes('enemy') || key.includes('damage') || key.includes('health')) cat = 'Combat';
-            if (key.includes('collectible')) cat = 'Collection';
-            
-            return {
-                field: key,
-                before: val.base,
-                after: val.final,
-                category: cat,
-                intensity: Math.abs(val.final - val.base) / (val.base || 1) > 0.1 ? 'high' : 'low'
-            };
-        });
-
-        // 5. Steps Population (recreating the "history" from the single result)
-        const completedSteps = initializePipelineSteps().map(step => {
-            const s = { ...step, status: 'completed' as const };
-            switch(s.id) {
-                case '1': s.input = telemetry; s.output = { valid: true, count: Object.keys(telemetry).length }; break;
-                case '2': s.input = 'Raw Features'; s.output = backendResult.normalized_features; break;
-                case '3': s.input = 'Normalized Features'; s.output = backendResult.soft_membership; break;
-                case '4': s.input = 'Soft Membership'; s.output = behaviors; break;
-                case '5': s.input = 'Behaviors'; s.output = deltas; break;
-                case '6': s.input = 'Deltas'; s.output = { methodConfidence: 0.95 }; break;
-                case '7': s.input = 'All Data'; s.output = validations; break;
-                case '8': s.input = 'Validation'; s.output = { finalMultiplier: backendResult.target_multiplier }; break;
-            }
-            return s;
-        });
+        // 3. Reconstruct Steps (History)
+        const initialSteps = initializePipelineSteps();
+        const completedSteps = runSimulationService.reconstructPipelineSteps(initialSteps, telemetry, mappedState);
 
         const finalState: PipelineState = {
+            ...pipelineState,
+            ...mappedState,
             steps: completedSteps,
-            normalizedFeatures: uiNormalized,
-            softMembership: {
-                combat: backendResult.soft_membership.soft_combat,
-                collect: backendResult.soft_membership.soft_collect,
-                explore: backendResult.soft_membership.soft_explore
-            },
-            behaviorCategories: behaviors,
-            adaptationDeltas: deltas,
-            validationChecks: validations,
-            rulesFired: backendResult.inference.rulesFired,
-            modelMetrics: {
-                r2Score: 0.965,
-                maeTest: 0.012,
-                mseTest: 0.0001,
-                rmseTest: 0.01
-            },
             isRunning: false,
-            executionTime: executionTime
-        };
+            executionTime,
+            // Ensure mandatory fields are present if mappedState is partial
+            normalizedFeatures: mappedState.normalizedFeatures || null,
+            softMembership: mappedState.softMembership || null,
+            behaviorCategories: mappedState.behaviorCategories || [],
+            adaptationDeltas: mappedState.adaptationDeltas || [],
+            validationChecks: mappedState.validationChecks || [],
+            rulesFired: mappedState.rulesFired || []
+        } as PipelineState;
 
         setSimulationResult(finalState);
 
@@ -258,39 +188,13 @@ export function PipelineProvider({ children }: { children: React.ReactNode }) {
         if (!stepByStep) {
             setPipelineState(finalState);
         } else {
-            const DELAY = 800; // ms per step
-            const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
-            // Reset to running
-            setPipelineState(prev => ({ ...prev, steps: initialSteps, isRunning: true }));
-
-            // Animate through steps
-            for (let i = 0; i < completedSteps.length; i++) {
-                await delay(DELAY);
-
-                setPipelineState(prev => {
-                    const nextSteps = prev.steps.map((s, idx) => {
-                         if (idx === i) return completedSteps[i]; // Complete current
-                         if (idx === i + 1 && i < 7) return { ...s, status: 'running' as const }; // Start next
-                         return s;
-                    });
-                    
-                    return {
-                        ...prev,
-                        steps: nextSteps,
-                        // Progressive State Reveal
-                        normalizedFeatures: i >= 1 ? finalState.normalizedFeatures : prev.normalizedFeatures,
-                        softMembership: i >= 2 ? finalState.softMembership : prev.softMembership,
-                        behaviorCategories: i >= 3 ? finalState.behaviorCategories : prev.behaviorCategories,
-                        adaptationDeltas: i >= 4 ? finalState.adaptationDeltas : prev.adaptationDeltas,
-                        validationChecks: i >= 6 ? finalState.validationChecks : prev.validationChecks,
-                        rulesFired: i >= 5 ? finalState.rulesFired : prev.rulesFired,
-                        isRunning: i < 7,
-                        executionTime: i === 7 ? executionTime : prev.executionTime,
-                        modelMetrics: i === 7 ? finalState.modelMetrics : undefined
-                    };
-                });
-            }
+            await animateSimulation({
+                initialSteps, 
+                completedSteps, 
+                finalState, 
+                executionTime, 
+                setPipelineState
+            });
         }
 
     } catch (e) {
@@ -357,6 +261,66 @@ export function PipelineProvider({ children }: { children: React.ReactNode }) {
   };
 
   return <PipelineContext.Provider value={value}>{children}</PipelineContext.Provider>;
+}
+
+interface AnimationConfig {
+    initialSteps: PipelineStep[];
+    completedSteps: PipelineStep[];
+    finalState: PipelineState;
+    executionTime: number;
+    setPipelineState: React.Dispatch<React.SetStateAction<PipelineState>>;
+}
+
+async function animateSimulation({
+    initialSteps,
+    completedSteps,
+    finalState,
+    executionTime,
+    setPipelineState
+}: AnimationConfig) {
+    const DELAY = 800;
+    const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+    setPipelineState(prev => ({ ...prev, steps: initialSteps, isRunning: true }));
+
+    // Pure helper to calculate next state for a step index
+    const getNextStateForStep = (prev: PipelineState, stepIndex: number): PipelineState => {
+        const nextSteps = prev.steps.map((s, idx) => {
+            if (idx === stepIndex) return completedSteps[stepIndex];
+            if (idx === stepIndex + 1 && stepIndex < 7) return { ...s, status: 'running' as const };
+            return s;
+        });
+
+        // Simplified progressive reveal lookup
+        const revealMap = {
+            1: { normalizedFeatures: finalState.normalizedFeatures },
+            2: { softMembership: finalState.softMembership },
+            3: { behaviorCategories: finalState.behaviorCategories },
+            4: { adaptationDeltas: finalState.adaptationDeltas },
+            5: { rulesFired: finalState.rulesFired },
+            6: { validationChecks: finalState.validationChecks },
+            7: { executionTime, modelMetrics: finalState.modelMetrics }
+        };
+
+        // Accumulate state updates based on current step index
+        let accumulatedUpdates = {};
+        for (let k = 1; k <= stepIndex; k++) {
+             // @ts-ignore
+             accumulatedUpdates = { ...accumulatedUpdates, ...revealMap[k] };
+        }
+
+        return {
+            ...prev,
+            steps: nextSteps,
+            ...accumulatedUpdates,
+            isRunning: stepIndex < 7
+        };
+    };
+
+    for (let i = 0; i < completedSteps.length; i++) {
+        await delay(DELAY);
+        setPipelineState(prev => getNextStateForStep(prev, i));
+    }
 }
 
 export function usePipeline() {
