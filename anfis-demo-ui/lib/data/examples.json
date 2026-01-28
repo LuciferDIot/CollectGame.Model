@@ -1,0 +1,1692 @@
+[
+  {
+    "sessionId": "unreal_1769328599804",
+    "userId": "69759b30547a2b541d1151be",
+    "timestamp": "2026-01-25 13:39:59.804000+00:00",
+    "features": {
+      "enemiesHit": 0.0,
+      "damageDone": 0.0,
+      "timeInCombat": 0.0,
+      "kills": 0.0,
+      "itemsCollected": 0.0,
+      "pickupAttempts": 0.0,
+      "timeNearInteractables": 0.0,
+      "distanceTraveled": 0.0,
+      "timeSprinting": 0.0,
+      "timeOutOfCombat": 29.5
+    },
+    "deaths": []
+  },
+  {
+    "sessionId": "unreal_1769335672447",
+    "userId": "69757efd2890de71026a214a",
+    "timestamp": "2026-01-25 15:37:52.447000+00:00",
+    "features": {
+      "enemiesHit": 3.0,
+      "damageDone": 55.99999999999999,
+      "timeInCombat": 5.0,
+      "kills": 0.0,
+      "itemsCollected": 3.0,
+      "pickupAttempts": 4.0,
+      "timeNearInteractables": 2.0,
+      "distanceTraveled": 9853.8664374264,
+      "timeSprinting": 6.5,
+      "timeOutOfCombat": 25.5
+    },
+    "deaths": [
+      {
+        "timestamp": "2026-01-25 15:51:17.805000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      }
+    ]
+  },
+  {
+    "sessionId": "unreal_1769489747808",
+    "userId": "6975d4f7547a2b541d12d86e",
+    "timestamp": "2026-01-27 10:25:47.809000+00:00",
+    "features": {
+      "enemiesHit": 0.0,
+      "damageDone": 0.0,
+      "timeInCombat": 0.0,
+      "kills": 0.0,
+      "itemsCollected": 0.0,
+      "pickupAttempts": 0.0,
+      "timeNearInteractables": 2.0,
+      "distanceTraveled": 11391.439418344848,
+      "timeSprinting": 0.0,
+      "timeOutOfCombat": 30.0
+    },
+    "deaths": [
+      {
+        "timestamp": "2026-01-27 10:08:13.140000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-27 10:11:03.274000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-27 10:15:01.805000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-27 10:19:23.309000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-27 10:26:06.985000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      }
+    ]
+  },
+  {
+    "sessionId": "unreal_1769342047409",
+    "userId": "69760118547a2b541d143012",
+    "timestamp": "2026-01-25 17:24:07.409000+00:00",
+    "features": {
+      "enemiesHit": 0.0,
+      "damageDone": 0.0,
+      "timeInCombat": 0.0,
+      "kills": 0.0,
+      "itemsCollected": 0.0,
+      "pickupAttempts": 3.0,
+      "timeNearInteractables": 5.0,
+      "distanceTraveled": 3878.428500073061,
+      "timeSprinting": 0.5,
+      "timeOutOfCombat": 29.5
+    },
+    "deaths": [
+      {
+        "timestamp": "2026-01-25 17:12:55.123000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 17:18:37.335000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 17:24:16.839000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 17:29:04.471000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 17:34:54.409000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 17:41:49.318000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 17:47:14.363000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 17:53:30.328000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      }
+    ]
+  },
+  {
+    "sessionId": "unreal_1769341674103",
+    "userId": "69760118547a2b541d143012",
+    "timestamp": "2026-01-25 17:17:54.103000+00:00",
+    "features": {
+      "enemiesHit": 0.0,
+      "damageDone": 0.0,
+      "timeInCombat": 0.0,
+      "kills": 0.0,
+      "itemsCollected": 0.0,
+      "pickupAttempts": 10.0,
+      "timeNearInteractables": 1.0,
+      "distanceTraveled": 8477.273309761102,
+      "timeSprinting": 0.0,
+      "timeOutOfCombat": 29.5
+    },
+    "deaths": [
+      {
+        "timestamp": "2026-01-25 17:12:55.123000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 17:18:37.335000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 17:24:16.839000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 17:29:04.471000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 17:34:54.409000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 17:41:49.318000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 17:47:14.363000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      }
+    ]
+  },
+  {
+    "sessionId": "unreal_1769339410304",
+    "userId": "6975de91547a2b541d1316de",
+    "timestamp": "2026-01-25 16:40:10.304000+00:00",
+    "features": {
+      "enemiesHit": 0.0,
+      "damageDone": 0.0,
+      "timeInCombat": 0.0,
+      "kills": 0.0,
+      "itemsCollected": 0.0,
+      "pickupAttempts": 0.0,
+      "timeNearInteractables": 0.0,
+      "distanceTraveled": 0.0,
+      "timeSprinting": 0.0,
+      "timeOutOfCombat": 30.0
+    },
+    "deaths": [
+      {
+        "timestamp": "2026-01-25 14:45:05.890000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 14:52:08.219000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 14:55:26.108000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 14:58:52.760000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 15:03:44.577000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 15:05:37.050000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 15:12:33.273000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 15:15:23.109000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 15:52:44.606000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 15:56:46.558000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      }
+    ]
+  },
+  {
+    "sessionId": "unreal_1769468686582",
+    "userId": "6974acd8315a39e91bc1e52f",
+    "timestamp": "2026-01-27 04:34:46.582000+00:00",
+    "features": {
+      "enemiesHit": 0.0,
+      "damageDone": 0.0,
+      "timeInCombat": 0.0,
+      "kills": 0.0,
+      "itemsCollected": 6.0,
+      "pickupAttempts": 17.0,
+      "timeNearInteractables": 2.0,
+      "distanceTraveled": 15533.775144227546,
+      "timeSprinting": 24.5,
+      "timeOutOfCombat": 30.0
+    },
+    "deaths": []
+  },
+  {
+    "sessionId": "unreal_1769272847702",
+    "userId": "6974f3cc5d8e98b89f0a5d07",
+    "timestamp": "2026-01-24 22:10:47.702000+00:00",
+    "features": {
+      "enemiesHit": 6.0,
+      "damageDone": 111.99999999999996,
+      "timeInCombat": 15.0,
+      "kills": 1.0,
+      "itemsCollected": 1.0,
+      "pickupAttempts": 4.0,
+      "timeNearInteractables": 4.0,
+      "distanceTraveled": 8151.535263606255,
+      "timeSprinting": 9.0,
+      "timeOutOfCombat": 15.0
+    },
+    "deaths": []
+  },
+  {
+    "sessionId": "unreal_1769444374844",
+    "userId": "69747994eb8c4eacdf21a48d",
+    "timestamp": "2026-01-26 21:49:34.844000+00:00",
+    "features": {
+      "enemiesHit": 0.0,
+      "damageDone": 0.0,
+      "timeInCombat": 0.0,
+      "kills": 0.0,
+      "itemsCollected": 3.0,
+      "pickupAttempts": 3.0,
+      "timeNearInteractables": 3.0,
+      "distanceTraveled": 4660.481447212544,
+      "timeSprinting": 8.0,
+      "timeOutOfCombat": 8.0
+    },
+    "deaths": [
+      {
+        "timestamp": "2026-01-26 21:49:14.987000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      }
+    ]
+  },
+  {
+    "sessionId": "unreal_1769468930654",
+    "userId": "6974acd8315a39e91bc1e52f",
+    "timestamp": "2026-01-27 04:38:50.654000+00:00",
+    "features": {
+      "enemiesHit": 0.0,
+      "damageDone": 0.0,
+      "timeInCombat": 0.0,
+      "kills": 0.0,
+      "itemsCollected": 7.0,
+      "pickupAttempts": 15.0,
+      "timeNearInteractables": 3.0,
+      "distanceTraveled": 15543.512430036237,
+      "timeSprinting": 23.0,
+      "timeOutOfCombat": 30.0
+    },
+    "deaths": []
+  },
+  {
+    "sessionId": "unreal_1769482360720",
+    "userId": "69778c326b155f362f1f80a3",
+    "timestamp": "2026-01-27 08:22:40.720000+00:00",
+    "features": {
+      "enemiesHit": 0.0,
+      "damageDone": 0.0,
+      "timeInCombat": 0.0,
+      "kills": 0.0,
+      "itemsCollected": 2.0,
+      "pickupAttempts": 19.0,
+      "timeNearInteractables": 0.0,
+      "distanceTraveled": 16443.13001614142,
+      "timeSprinting": 30.0,
+      "timeOutOfCombat": 30.0
+    },
+    "deaths": []
+  },
+  {
+    "sessionId": "unreal_1769345891686",
+    "userId": "69760ebe547a2b541d14aa2d",
+    "timestamp": "2026-01-25 18:28:11.686000+00:00",
+    "features": {
+      "enemiesHit": 0.0,
+      "damageDone": 0.0,
+      "timeInCombat": 0.0,
+      "kills": 0.0,
+      "itemsCollected": 3.0,
+      "pickupAttempts": 8.0,
+      "timeNearInteractables": 7.0,
+      "distanceTraveled": 8344.41806643237,
+      "timeSprinting": 0.0,
+      "timeOutOfCombat": 29.5
+    },
+    "deaths": [
+      {
+        "timestamp": "2026-01-25 18:17:40.997000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 18:25:38.599000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 18:31:24.314000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 18:38:00.893000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 18:47:23.277000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      }
+    ]
+  },
+  {
+    "sessionId": "unreal_1769279018339",
+    "userId": "697508c85d8e98b89f0aa5f3",
+    "timestamp": "2026-01-24 23:53:38.339000+00:00",
+    "features": {
+      "enemiesHit": 13.0,
+      "damageDone": 143.99999999999997,
+      "timeInCombat": 10.5,
+      "kills": 1.0,
+      "itemsCollected": 1.0,
+      "pickupAttempts": 1.0,
+      "timeNearInteractables": 25.0,
+      "distanceTraveled": 6470.268226815978,
+      "timeSprinting": 0.0,
+      "timeOutOfCombat": 20.0
+    },
+    "deaths": [
+      {
+        "timestamp": "2026-01-24 23:35:14.430000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-24 23:38:43.239000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-24 23:43:01.008000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-24 23:49:10.967000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-24 23:55:05.185000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 00:04:17.096000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 00:11:04.982000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      }
+    ]
+  },
+  {
+    "sessionId": "unreal_1769468716577",
+    "userId": "6974acd8315a39e91bc1e52f",
+    "timestamp": "2026-01-27 04:35:16.577000+00:00",
+    "features": {
+      "enemiesHit": 0.0,
+      "damageDone": 0.0,
+      "timeInCombat": 0.0,
+      "kills": 0.0,
+      "itemsCollected": 5.0,
+      "pickupAttempts": 13.0,
+      "timeNearInteractables": 2.0,
+      "distanceTraveled": 14383.594987783168,
+      "timeSprinting": 20.0,
+      "timeOutOfCombat": 29.5
+    },
+    "deaths": []
+  },
+  {
+    "sessionId": "unreal_1769405153797",
+    "userId": "6976f80091363da66295382d",
+    "timestamp": "2026-01-26 10:55:53.797000+00:00",
+    "features": {
+      "enemiesHit": 6.0,
+      "damageDone": 93.33333333333331,
+      "timeInCombat": 14.5,
+      "kills": 1.0,
+      "itemsCollected": 0.0,
+      "pickupAttempts": 0.0,
+      "timeNearInteractables": 0.0,
+      "distanceTraveled": 6740.008049974871,
+      "timeSprinting": 0.0,
+      "timeOutOfCombat": 15.5
+    },
+    "deaths": [
+      {
+        "timestamp": "2026-01-26 10:48:23.559000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-26 10:51:30.556000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-26 11:19:29.870000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      }
+    ]
+  },
+  {
+    "sessionId": "unreal_1769248436057",
+    "userId": "6974892348d53c4152cf1421",
+    "timestamp": "2026-01-24 15:23:56.057000+00:00",
+    "features": {
+      "enemiesHit": 0.0,
+      "damageDone": 0.0,
+      "timeInCombat": 0.0,
+      "kills": 0.0,
+      "itemsCollected": 0.0,
+      "pickupAttempts": 0.0,
+      "timeNearInteractables": 0.0,
+      "distanceTraveled": 10903.56103673208,
+      "timeSprinting": 0.0,
+      "timeOutOfCombat": 30.0
+    },
+    "deaths": [
+      {
+        "timestamp": "2026-01-24 14:35:31.981000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-24 14:47:12.375000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-24 15:02:00.581000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-24 15:02:58.769000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-24 15:05:09.065000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-24 15:14:23.799000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-24 15:22:46.079000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-24 15:24:13.752000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      }
+    ]
+  },
+  {
+    "sessionId": "unreal_1769358661037",
+    "userId": "69763bb42a3f474ff67728f0",
+    "timestamp": "2026-01-25 22:01:01.037000+00:00",
+    "features": {
+      "enemiesHit": 9.0,
+      "damageDone": 149.3333333333333,
+      "timeInCombat": 12.0,
+      "kills": 2.0,
+      "itemsCollected": 0.0,
+      "pickupAttempts": 0.0,
+      "timeNearInteractables": 0.0,
+      "distanceTraveled": 9006.143403250153,
+      "timeSprinting": 13.5,
+      "timeOutOfCombat": 18.0
+    },
+    "deaths": [
+      {
+        "timestamp": "2026-01-25 21:31:32.335000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 21:37:30.349000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 22:01:39.690000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      }
+    ]
+  },
+  {
+    "sessionId": "unreal_1769345279347",
+    "userId": "6975de91547a2b541d1316de",
+    "timestamp": "2026-01-25 18:17:59.347000+00:00",
+    "features": {
+      "enemiesHit": 0.0,
+      "damageDone": 0.0,
+      "timeInCombat": 0.0,
+      "kills": 0.0,
+      "itemsCollected": 0.0,
+      "pickupAttempts": 0.0,
+      "timeNearInteractables": 0.0,
+      "distanceTraveled": 0.0,
+      "timeSprinting": 0.0,
+      "timeOutOfCombat": 30.0
+    },
+    "deaths": [
+      {
+        "timestamp": "2026-01-25 15:52:44.606000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 15:56:46.558000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      }
+    ]
+  },
+  {
+    "sessionId": "unreal_1769272757631",
+    "userId": "6974f3cc5d8e98b89f0a5d07",
+    "timestamp": "2026-01-24 22:09:17.631000+00:00",
+    "features": {
+      "enemiesHit": 0.0,
+      "damageDone": 0.0,
+      "timeInCombat": 0.0,
+      "kills": 0.0,
+      "itemsCollected": 2.0,
+      "pickupAttempts": 7.0,
+      "timeNearInteractables": 4.0,
+      "distanceTraveled": 13944.343415859174,
+      "timeSprinting": 19.5,
+      "timeOutOfCombat": 29.5
+    },
+    "deaths": []
+  },
+  {
+    "sessionId": "unreal_1769325217834",
+    "userId": "6975bb0f547a2b541d12403a",
+    "timestamp": "2026-01-25 12:43:37.834000+00:00",
+    "features": {
+      "enemiesHit": 0.0,
+      "damageDone": 0.0,
+      "timeInCombat": 0.0,
+      "kills": 0.0,
+      "itemsCollected": 0.0,
+      "pickupAttempts": 0.0,
+      "timeNearInteractables": 1.0,
+      "distanceTraveled": 15939.094590588618,
+      "timeSprinting": 22.0,
+      "timeOutOfCombat": 30.5
+    },
+    "deaths": [
+      {
+        "timestamp": "2026-01-25 12:24:37.412000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 12:56:14.770000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      }
+    ]
+  },
+  {
+    "sessionId": "unreal_1769483550309",
+    "userId": "69778c326b155f362f1f80a3",
+    "timestamp": "2026-01-27 08:42:30.309000+00:00",
+    "features": {
+      "enemiesHit": 0.0,
+      "damageDone": 0.0,
+      "timeInCombat": 0.0,
+      "kills": 0.0,
+      "itemsCollected": 11.0,
+      "pickupAttempts": 100.0,
+      "timeNearInteractables": 3.0,
+      "distanceTraveled": 16061.353501802576,
+      "timeSprinting": 30.0,
+      "timeOutOfCombat": 30.0
+    },
+    "deaths": []
+  },
+  {
+    "sessionId": "unreal_1769331984206",
+    "userId": "6975d4f7547a2b541d12d86e",
+    "timestamp": "2026-01-25 14:36:24.206000+00:00",
+    "features": {
+      "enemiesHit": 0.0,
+      "damageDone": 0.0,
+      "timeInCombat": 0.0,
+      "kills": 0.0,
+      "itemsCollected": 1.0,
+      "pickupAttempts": 1.0,
+      "timeNearInteractables": 1.0,
+      "distanceTraveled": 14778.262292655909,
+      "timeSprinting": 20.5,
+      "timeOutOfCombat": 30.0
+    },
+    "deaths": [
+      {
+        "timestamp": "2026-01-25 14:08:30.555000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 14:11:12.496000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 14:13:52.341000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 14:19:13.764000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 14:23:12.533000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 14:25:26.373000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 14:29:28.650000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 14:39:04.139000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      }
+    ]
+  },
+  {
+    "sessionId": "unreal_1769313149384",
+    "userId": "697591f4547a2b541d110076",
+    "timestamp": "2026-01-25 09:22:29.384000+00:00",
+    "features": {
+      "enemiesHit": 0.0,
+      "damageDone": 0.0,
+      "timeInCombat": 3.0,
+      "kills": 0.0,
+      "itemsCollected": 2.0,
+      "pickupAttempts": 4.0,
+      "timeNearInteractables": 9.0,
+      "distanceTraveled": 13673.40182419604,
+      "timeSprinting": 24.5,
+      "timeOutOfCombat": 27.0
+    },
+    "deaths": [
+      {
+        "timestamp": "2026-01-25 09:24:01.238000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 09:29:53.083000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      }
+    ]
+  },
+  {
+    "sessionId": "unreal_1769327669801",
+    "userId": "69759b30547a2b541d1151be",
+    "timestamp": "2026-01-25 13:24:29.801000+00:00",
+    "features": {
+      "enemiesHit": 0.0,
+      "damageDone": 0.0,
+      "timeInCombat": 0.0,
+      "kills": 0.0,
+      "itemsCollected": 0.0,
+      "pickupAttempts": 0.0,
+      "timeNearInteractables": 0.0,
+      "distanceTraveled": 0.0,
+      "timeSprinting": 0.0,
+      "timeOutOfCombat": 30.5
+    },
+    "deaths": []
+  },
+  {
+    "sessionId": "unreal_1769272667650",
+    "userId": "6974f3cc5d8e98b89f0a5d07",
+    "timestamp": "2026-01-24 22:07:47.650000+00:00",
+    "features": {
+      "enemiesHit": 6.0,
+      "damageDone": 111.99999999999996,
+      "timeInCombat": 14.0,
+      "kills": 2.0,
+      "itemsCollected": 1.0,
+      "pickupAttempts": 5.0,
+      "timeNearInteractables": 4.0,
+      "distanceTraveled": 7726.581190253908,
+      "timeSprinting": 9.0,
+      "timeOutOfCombat": 16.0
+    },
+    "deaths": []
+  },
+  {
+    "sessionId": "unreal_1769345113146",
+    "userId": "69760904547a2b541d146a9a",
+    "timestamp": "2026-01-25 18:15:13.146000+00:00",
+    "features": {
+      "enemiesHit": 2.0,
+      "damageDone": 37.33333333333333,
+      "timeInCombat": 3.0,
+      "kills": 0.0,
+      "itemsCollected": 4.0,
+      "pickupAttempts": 4.0,
+      "timeNearInteractables": 3.0,
+      "distanceTraveled": 10337.374081344122,
+      "timeSprinting": 17.0,
+      "timeOutOfCombat": 27.0
+    },
+    "deaths": [
+      {
+        "timestamp": "2026-01-25 17:54:27.503000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 18:04:09.820000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 18:07:57.579000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 18:11:59.195000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 18:16:08.109000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 18:23:02.342000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      }
+    ]
+  },
+  {
+    "sessionId": "unreal_1769343670371",
+    "userId": "6975de91547a2b541d1316de",
+    "timestamp": "2026-01-25 17:51:10.371000+00:00",
+    "features": {
+      "enemiesHit": 0.0,
+      "damageDone": 0.0,
+      "timeInCombat": 0.0,
+      "kills": 0.0,
+      "itemsCollected": 0.0,
+      "pickupAttempts": 0.0,
+      "timeNearInteractables": 0.0,
+      "distanceTraveled": 0.0,
+      "timeSprinting": 0.0,
+      "timeOutOfCombat": 29.5
+    },
+    "deaths": [
+      {
+        "timestamp": "2026-01-25 14:52:08.219000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 14:55:26.108000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 14:58:52.760000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 15:03:44.577000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 15:05:37.050000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 15:12:33.273000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 15:15:23.109000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 15:52:44.606000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 15:56:46.558000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      }
+    ]
+  },
+  {
+    "sessionId": "unreal_1769357354379",
+    "userId": "69763ab22a3f474ff67723b9",
+    "timestamp": "2026-01-25 21:39:14.379000+00:00",
+    "features": {
+      "enemiesHit": 3.0,
+      "damageDone": 55.99999999999999,
+      "timeInCombat": 8.5,
+      "kills": 1.0,
+      "itemsCollected": 0.0,
+      "pickupAttempts": 0.0,
+      "timeNearInteractables": 0.0,
+      "distanceTraveled": 8467.341904202654,
+      "timeSprinting": 0.0,
+      "timeOutOfCombat": 21.5
+    },
+    "deaths": [
+      {
+        "timestamp": "2026-01-25 21:24:54.468000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 21:26:56.395000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 21:54:22.264000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      }
+    ]
+  },
+  {
+    "sessionId": "unreal_1769445818441",
+    "userId": "69778c326b155f362f1f80a3",
+    "timestamp": "2026-01-26 22:13:38.441000+00:00",
+    "features": {
+      "enemiesHit": 0.0,
+      "damageDone": 0.0,
+      "timeInCombat": 0.0,
+      "kills": 0.0,
+      "itemsCollected": 1.0,
+      "pickupAttempts": 3.0,
+      "timeNearInteractables": 1.0,
+      "distanceTraveled": 9389.971486832455,
+      "timeSprinting": 17.0,
+      "timeOutOfCombat": 30.0
+    },
+    "deaths": [
+      {
+        "timestamp": "2026-01-26 21:20:12.185000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-26 21:30:28.033000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-26 22:01:02.822000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      }
+    ]
+  },
+  {
+    "sessionId": "unreal_1769468866662",
+    "userId": "6974acd8315a39e91bc1e52f",
+    "timestamp": "2026-01-27 04:37:46.662000+00:00",
+    "features": {
+      "enemiesHit": 25.0,
+      "damageDone": 392.00000000000006,
+      "timeInCombat": 15.0,
+      "kills": 2.0,
+      "itemsCollected": 4.0,
+      "pickupAttempts": 15.0,
+      "timeNearInteractables": 2.0,
+      "distanceTraveled": 7052.793935054685,
+      "timeSprinting": 6.5,
+      "timeOutOfCombat": 15.0
+    },
+    "deaths": []
+  },
+  {
+    "sessionId": "unreal_1769273027696",
+    "userId": "6974f3cc5d8e98b89f0a5d07",
+    "timestamp": "2026-01-24 22:13:47.696000+00:00",
+    "features": {
+      "enemiesHit": 3.0,
+      "damageDone": 55.99999999999999,
+      "timeInCombat": 4.5,
+      "kills": 1.0,
+      "itemsCollected": 2.0,
+      "pickupAttempts": 9.0,
+      "timeNearInteractables": 2.0,
+      "distanceTraveled": 11111.307953393583,
+      "timeSprinting": 13.0,
+      "timeOutOfCombat": 25.0
+    },
+    "deaths": []
+  },
+  {
+    "sessionId": "unreal_1769315650590",
+    "userId": "69759b30547a2b541d1151be",
+    "timestamp": "2026-01-25 10:04:10.590000+00:00",
+    "features": {
+      "enemiesHit": 4.0,
+      "damageDone": 74.66666666666666,
+      "timeInCombat": 12.0,
+      "kills": 0.0,
+      "itemsCollected": 0.0,
+      "pickupAttempts": 0.0,
+      "timeNearInteractables": 0.0,
+      "distanceTraveled": 6997.054350913148,
+      "timeSprinting": 0.0,
+      "timeOutOfCombat": 18.5
+    },
+    "deaths": [
+      {
+        "timestamp": "2026-01-25 10:07:00.422000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 10:12:46.952000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 10:16:00.181000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 10:21:27.108000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      }
+    ]
+  },
+  {
+    "sessionId": "unreal_1769494129973",
+    "userId": "697851afb8ecaf5b40156a22",
+    "timestamp": "2026-01-27 11:38:49.973000+00:00",
+    "features": {
+      "enemiesHit": 0.0,
+      "damageDone": 0.0,
+      "timeInCombat": 0.0,
+      "kills": 0.0,
+      "itemsCollected": 1.0,
+      "pickupAttempts": 5.0,
+      "timeNearInteractables": 32.0,
+      "distanceTraveled": 3662.5289494359367,
+      "timeSprinting": 0.0,
+      "timeOutOfCombat": 30.0
+    },
+    "deaths": [
+      {
+        "timestamp": "2026-01-27 11:24:22.943000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-27 11:31:09.713000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-27 11:35:31.637000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-27 11:43:14.587000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-27 11:50:46.137000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-27 11:55:04.490000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-27 12:00:12.869000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      }
+    ]
+  },
+  {
+    "sessionId": "unreal_1769316409510",
+    "userId": "69759b25547a2b541d115085",
+    "timestamp": "2026-01-25 10:16:49.510000+00:00",
+    "features": {
+      "enemiesHit": 0.0,
+      "damageDone": 0.0,
+      "timeInCombat": 0.0,
+      "kills": 0.0,
+      "itemsCollected": 1.0,
+      "pickupAttempts": 2.0,
+      "timeNearInteractables": 3.0,
+      "distanceTraveled": 6423.854998190216,
+      "timeSprinting": 4.0,
+      "timeOutOfCombat": 29.5
+    },
+    "deaths": [
+      {
+        "timestamp": "2026-01-25 09:58:06.594000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 10:00:01.029000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 10:01:46.591000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 10:03:29.775000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 10:05:04.639000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 10:06:39.253000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 10:07:53.023000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 10:14:15.886000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 10:22:46.931000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 10:29:11.354000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 10:31:01.939000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 10:36:41.758000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      }
+    ]
+  },
+  {
+    "sessionId": "unreal_1769481617022",
+    "userId": "69778c326b155f362f1f80a3",
+    "timestamp": "2026-01-27 08:10:17.022000+00:00",
+    "features": {
+      "enemiesHit": 0.0,
+      "damageDone": 0.0,
+      "timeInCombat": 0.0,
+      "kills": 0.0,
+      "itemsCollected": 0.0,
+      "pickupAttempts": 0.0,
+      "timeNearInteractables": 0.0,
+      "distanceTraveled": 671.3344466880001,
+      "timeSprinting": 0.0,
+      "timeOutOfCombat": 29.5
+    },
+    "deaths": []
+  },
+  {
+    "sessionId": "unreal_1769532102821",
+    "userId": "697784d86b155f362f1f7832",
+    "timestamp": "2026-01-27 22:11:42.821000+00:00",
+    "features": {
+      "enemiesHit": 0.0,
+      "damageDone": 0.0,
+      "timeInCombat": 0.0,
+      "kills": 0.0,
+      "itemsCollected": 0.0,
+      "pickupAttempts": 0.0,
+      "timeNearInteractables": 0.0,
+      "distanceTraveled": 6322.65297113294,
+      "timeSprinting": 0.0,
+      "timeOutOfCombat": 30.0
+    },
+    "deaths": [
+      {
+        "timestamp": "2026-01-27 21:57:12.006000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-27 21:59:58.792000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-27 22:02:34.864000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-27 22:16:49.896000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-27 22:23:44.020000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-27 22:27:28.927000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-27 22:32:05.683000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      }
+    ]
+  },
+  {
+    "sessionId": "unreal_1769469391403",
+    "userId": "6974acd8315a39e91bc1e52f",
+    "timestamp": "2026-01-27 04:46:31.403000+00:00",
+    "features": {
+      "enemiesHit": 5.0,
+      "damageDone": 37.33333333333333,
+      "timeInCombat": 4.5,
+      "kills": 5.0,
+      "itemsCollected": 4.0,
+      "pickupAttempts": 7.0,
+      "timeNearInteractables": 0.0,
+      "distanceTraveled": 12290.992070847642,
+      "timeSprinting": 18.0,
+      "timeOutOfCombat": 25.5
+    },
+    "deaths": []
+  },
+  {
+    "sessionId": "unreal_1769316985755",
+    "userId": "69750fec5d8e98b89f0ad5bf",
+    "timestamp": "2026-01-25 10:26:25.755000+00:00",
+    "features": {
+      "enemiesHit": 2.0,
+      "damageDone": 37.33333333333333,
+      "timeInCombat": 4.0,
+      "kills": 1.0,
+      "itemsCollected": 0.0,
+      "pickupAttempts": 5.0,
+      "timeNearInteractables": 2.0,
+      "distanceTraveled": 2376.971886824303,
+      "timeSprinting": 1.5,
+      "timeOutOfCombat": 26.0
+    },
+    "deaths": [
+      {
+        "timestamp": "2026-01-25 09:59:55.813000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 10:02:01.898000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 10:35:24.736000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      }
+    ]
+  },
+  {
+    "sessionId": "unreal_1769273425779",
+    "userId": "6974f3cc5d8e98b89f0a5d07",
+    "timestamp": "2026-01-24 22:20:25.779000+00:00",
+    "features": {
+      "enemiesHit": 0.0,
+      "damageDone": 0.0,
+      "timeInCombat": 0.0,
+      "kills": 0.0,
+      "itemsCollected": 1.0,
+      "pickupAttempts": 15.0,
+      "timeNearInteractables": 3.0,
+      "distanceTraveled": 15859.92209794497,
+      "timeSprinting": 22.5,
+      "timeOutOfCombat": 30.0
+    },
+    "deaths": []
+  },
+  {
+    "sessionId": "unreal_1769338716462",
+    "userId": "6975de91547a2b541d1316de",
+    "timestamp": "2026-01-25 16:28:36.462000+00:00",
+    "features": {
+      "enemiesHit": 0.0,
+      "damageDone": 0.0,
+      "timeInCombat": 0.0,
+      "kills": 0.0,
+      "itemsCollected": 0.0,
+      "pickupAttempts": 0.0,
+      "timeNearInteractables": 0.0,
+      "distanceTraveled": 0.0,
+      "timeSprinting": 0.0,
+      "timeOutOfCombat": 29.5
+    },
+    "deaths": [
+      {
+        "timestamp": "2026-01-25 14:45:05.890000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 14:52:08.219000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 14:55:26.108000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 14:58:52.760000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 15:03:44.577000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 15:05:37.050000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 15:12:33.273000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 15:15:23.109000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 15:52:44.606000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 15:56:46.558000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      }
+    ]
+  },
+  {
+    "sessionId": "unreal_1769482180594",
+    "userId": "69778c326b155f362f1f80a3",
+    "timestamp": "2026-01-27 08:19:40.594000+00:00",
+    "features": {
+      "enemiesHit": 0.0,
+      "damageDone": 0.0,
+      "timeInCombat": 0.0,
+      "kills": 0.0,
+      "itemsCollected": 7.0,
+      "pickupAttempts": 24.0,
+      "timeNearInteractables": 0.0,
+      "distanceTraveled": 15922.04557435279,
+      "timeSprinting": 29.5,
+      "timeOutOfCombat": 29.5
+    },
+    "deaths": []
+  },
+  {
+    "sessionId": "unreal_1769276511018",
+    "userId": "697502455d8e98b89f0a9f38",
+    "timestamp": "2026-01-24 23:11:51.018000+00:00",
+    "features": {
+      "enemiesHit": 0.0,
+      "damageDone": 0.0,
+      "timeInCombat": 0.0,
+      "kills": 0.0,
+      "itemsCollected": 1.0,
+      "pickupAttempts": 1.0,
+      "timeNearInteractables": 1.0,
+      "distanceTraveled": 14236.636857134066,
+      "timeSprinting": 22.5,
+      "timeOutOfCombat": 30.0
+    },
+    "deaths": [
+      {
+        "timestamp": "2026-01-24 23:14:35.212000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      }
+    ]
+  },
+  {
+    "sessionId": "unreal_1769467026455",
+    "userId": "6974acd8315a39e91bc1e52f",
+    "timestamp": "2026-01-27 04:07:06.455000+00:00",
+    "features": {
+      "enemiesHit": 0.0,
+      "damageDone": 0.0,
+      "timeInCombat": 0.0,
+      "kills": 0.0,
+      "itemsCollected": 6.0,
+      "pickupAttempts": 14.0,
+      "timeNearInteractables": 2.0,
+      "distanceTraveled": 15324.367617666843,
+      "timeSprinting": 19.0,
+      "timeOutOfCombat": 30.0
+    },
+    "deaths": []
+  },
+  {
+    "sessionId": "unreal_1769452339256",
+    "userId": "69778c326b155f362f1f80a3",
+    "timestamp": "2026-01-27 00:02:19.256000+00:00",
+    "features": {
+      "enemiesHit": 0.0,
+      "damageDone": 0.0,
+      "timeInCombat": 0.0,
+      "kills": 0.0,
+      "itemsCollected": 5.0,
+      "pickupAttempts": 53.0,
+      "timeNearInteractables": 1.0,
+      "distanceTraveled": 14829.87459946612,
+      "timeSprinting": 20.5,
+      "timeOutOfCombat": 30.0
+    },
+    "deaths": [
+      {
+        "timestamp": "2026-01-26 21:20:12.185000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-26 21:30:28.033000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-26 22:01:02.822000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      }
+    ]
+  },
+  {
+    "sessionId": "unreal_1769468314330",
+    "userId": "6974acd8315a39e91bc1e52f",
+    "timestamp": "2026-01-27 04:28:34.330000+00:00",
+    "features": {
+      "enemiesHit": 36.0,
+      "damageDone": 410.66666666666674,
+      "timeInCombat": 12.0,
+      "kills": 8.0,
+      "itemsCollected": 4.0,
+      "pickupAttempts": 10.0,
+      "timeNearInteractables": 1.0,
+      "distanceTraveled": 10069.179109955026,
+      "timeSprinting": 16.0,
+      "timeOutOfCombat": 18.0
+    },
+    "deaths": []
+  },
+  {
+    "sessionId": "unreal_1769449867006",
+    "userId": "69778c326b155f362f1f80a3",
+    "timestamp": "2026-01-26 23:21:07.006000+00:00",
+    "features": {
+      "enemiesHit": 0.0,
+      "damageDone": 0.0,
+      "timeInCombat": 0.0,
+      "kills": 0.0,
+      "itemsCollected": 2.0,
+      "pickupAttempts": 10.0,
+      "timeNearInteractables": 1.0,
+      "distanceTraveled": 11925.054505036136,
+      "timeSprinting": 18.5,
+      "timeOutOfCombat": 30.5
+    },
+    "deaths": [
+      {
+        "timestamp": "2026-01-26 21:20:12.185000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-26 21:30:28.033000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-26 22:01:02.822000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      }
+    ]
+  },
+  {
+    "sessionId": "unreal_1769330692230",
+    "userId": "6975d4f7547a2b541d12d86e",
+    "timestamp": "2026-01-25 14:14:52.230000+00:00",
+    "features": {
+      "enemiesHit": 1.0,
+      "damageDone": 18.666666666666664,
+      "timeInCombat": 2.0,
+      "kills": 0.0,
+      "itemsCollected": 0.0,
+      "pickupAttempts": 1.0,
+      "timeNearInteractables": 16.0,
+      "distanceTraveled": 12335.412216031384,
+      "timeSprinting": 17.5,
+      "timeOutOfCombat": 27.5
+    },
+    "deaths": [
+      {
+        "timestamp": "2026-01-25 14:08:30.555000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 14:11:12.496000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 14:13:52.341000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 14:19:13.764000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 14:23:12.533000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 14:25:26.373000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 14:29:28.650000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      },
+      {
+        "timestamp": "2026-01-25 14:39:04.139000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      }
+    ]
+  },
+  {
+    "sessionId": "unreal_1769533510815",
+    "userId": "6978e56942da48de3a8cb282",
+    "timestamp": "2026-01-27 22:35:10.815000+00:00",
+    "features": {
+      "enemiesHit": 6.0,
+      "damageDone": 111.99999999999996,
+      "timeInCombat": 16.5,
+      "kills": 0.0,
+      "itemsCollected": 1.0,
+      "pickupAttempts": 1.0,
+      "timeNearInteractables": 2.0,
+      "distanceTraveled": 4860.861318715241,
+      "timeSprinting": 0.0,
+      "timeOutOfCombat": 13.5
+    },
+    "deaths": [
+      {
+        "timestamp": "2026-01-27 22:36:09.030000+00:00",
+        "location": "Unknown",
+        "cause": "Unknown"
+      }
+    ]
+  },
+  {
+    "sessionId": "unreal_1769327909799",
+    "userId": "69759b30547a2b541d1151be",
+    "timestamp": "2026-01-25 13:28:29.799000+00:00",
+    "features": {
+      "enemiesHit": 0.0,
+      "damageDone": 0.0,
+      "timeInCombat": 0.0,
+      "kills": 0.0,
+      "itemsCollected": 0.0,
+      "pickupAttempts": 0.0,
+      "timeNearInteractables": 0.0,
+      "distanceTraveled": 0.0,
+      "timeSprinting": 0.0,
+      "timeOutOfCombat": 30.5
+    },
+    "deaths": []
+  },
+  {
+    "sessionId": "unreal_1769468529596",
+    "userId": "6974acd8315a39e91bc1e52f",
+    "timestamp": "2026-01-27 04:32:09.596000+00:00",
+    "features": {
+      "enemiesHit": 0.0,
+      "damageDone": 0.0,
+      "timeInCombat": 0.0,
+      "kills": 0.0,
+      "itemsCollected": 2.0,
+      "pickupAttempts": 4.0,
+      "timeNearInteractables": 1.0,
+      "distanceTraveled": 15308.261302750969,
+      "timeSprinting": 20.5,
+      "timeOutOfCombat": 30.0
+    },
+    "deaths": []
+  }
+]
