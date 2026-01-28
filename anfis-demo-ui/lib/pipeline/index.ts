@@ -41,21 +41,33 @@ export class ANFISPipeline {
    * Execute the full pipeline on a telemetry window
    */
   process(telemetry: TelemetryWindow, deaths?: DeathEvent): PipelineOutput {
+    const perfTimings: Record<string, number> = {};
     const duration_seconds = telemetry.duration ?? 30;
     this.validateDuration(duration_seconds);
 
     // Step 2-5: Feature Processing & Clustering
     const cleanedFeatures = { ...telemetry.features };
+    
+    const t0 = performance.now();
     const normalized = this.normalizer.normalize(cleanedFeatures);
+    perfTimings.normalization = performance.now() - t0;
+    
+    const t1 = performance.now();
     const activityScores = calculateActivityScores(normalized);
+    perfTimings.activityScoring = performance.now() - t1;
+    
+    const t2 = performance.now();
     const softMembership = this.clustering.calculateMembership(activityScores);
+    perfTimings.clustering = performance.now() - t2;
     
     if (!this.clustering.validateMembership(softMembership)) {
       console.warn('Soft membership does not sum to 1.0:', softMembership);
     }
 
     // Step 6: Delta Computation
+    const t3 = performance.now();
     const deltas = this.computeDeltas(softMembership);
+    perfTimings.deltaComputation = performance.now() - t3;
     this.previousSoftMembership = { ...softMembership };
 
     // Step 7-8: ANFIS Input & Inference
@@ -67,16 +79,27 @@ export class ANFISPipeline {
       delta_collect: deltas.delta_collect,
       delta_explore: deltas.delta_explore,
     };
+    const t4 = performance.now();
     const mlpResult = this.mlp.predict(anfisInput);
+    perfTimings.mlpInference = performance.now() - t4;
     const mlpOutput = mlpResult.result;
 
     // Step 9: Target Multiplier
     const { targetMultiplier, multiplierClamped } = this.computeTargetMultiplier(mlpOutput);
 
     // Step 10: Adaptation
+    const t5 = performance.now();
     const adaptedParameters = applyAdaptationContract(targetMultiplier, softMembership);
+    perfTimings.adaptation = performance.now() - t5;
 
     // Final Validation & Return
+    perfTimings.total = performance.now() - t0;
+    
+    // Log performance in development
+    if (typeof window !== 'undefined' && (window as any).__ANFIS_DEBUG__) {
+      console.log('[ANFIS Performance]', perfTimings);
+    }
+    
     return {
       filtering: { passed: true, duration_seconds },
       normalized_features: normalized,
@@ -101,7 +124,8 @@ export class ANFISPipeline {
       target_multiplier: targetMultiplier,
       adapted_parameters: adaptedParameters,
       validation: this.validateResult(softMembership, deltas, adaptedParameters, multiplierClamped),
-    };
+      performance_timings: perfTimings,
+    } as any;
   }
 
   private validateDuration(seconds: number): void {
