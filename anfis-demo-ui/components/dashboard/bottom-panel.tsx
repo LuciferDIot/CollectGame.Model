@@ -11,6 +11,7 @@ import { RuleInspectorDrawer } from './rule-inspector-drawer';
 
 export function BottomPanel() {
   const { pipelineState } = usePipeline();
+  const { session, currentRound } = useAnalytics(pipelineState);
 
   if (pipelineState.behaviorCategories.length === 0) {
     return (
@@ -39,6 +40,9 @@ export function BottomPanel() {
           </TabsTrigger>
           <TabsTrigger value="archetypes" className="rounded-none px-0 py-3 border-b-2 border-transparent data-[state=active]:border-blue-500">
             Archetypes
+          </TabsTrigger>
+          <TabsTrigger value="analytics" className="rounded-none px-0 py-3 border-b-2 border-transparent data-[state=active]:border-blue-500">
+            Analytics
           </TabsTrigger>
           <div className="ml-auto pr-4 flex items-center">
              <RuleInspectorDrawer />
@@ -348,6 +352,10 @@ export function BottomPanel() {
                 </div>
               </div>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="analytics" className="m-0 h-full">
+            <AnalyticsTab session={session} currentRound={currentRound} />
           </TabsContent>
         </div>
       </Tabs>
