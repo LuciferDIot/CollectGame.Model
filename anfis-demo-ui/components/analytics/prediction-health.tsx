@@ -1,146 +1,141 @@
 'use client';
 
+import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import type { RoundAnalytics, SessionAnalytics } from '@/lib/analytics';
-import { Minus, TrendingDown, TrendingUp } from 'lucide-react';
+import { TRAINING_DISTRIBUTION } from '@/lib/analytics/compute';
+import { Activity, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { Area, AreaChart, CartesianGrid, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { HelpfulTooltip } from './helpful-tooltip';
 
 interface PredictionHealthProps {
-  session: SessionAnalytics | null;
   currentRound: RoundAnalytics | null;
+  session: SessionAnalytics | null;
 }
 
-export function PredictionHealth({ session, currentRound }: PredictionHealthProps) {
-  if (!session || !currentRound) {
+export function PredictionHealth({ currentRound, session }: PredictionHealthProps) {
+  if (!currentRound || !session) {
     return (
       <Card>
         <CardHeader>
           <CardTitle>Prediction Health</CardTitle>
-          <CardDescription>Per-round stability metrics</CardDescription>
+          <CardDescription>Waiting for pipeline data...</CardDescription>
         </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">Run pipeline to see metrics</p>
-        </CardContent>
       </Card>
     );
   }
 
-  const { targetMultiplier, deltaFromPrevious } = currentRound;
-  const { rollingMean, rollingStd, avgMultiplier, stdMultiplier } = session;
+  const { targetMultiplier } = currentRound;
+  const { mean, std, min, max } = TRAINING_DISTRIBUTION;
+  const upperBand = mean + (std * 2);
+  const lowerBand = mean - (std * 2);
+  
+  // Determine consistency status
+  const isConsistent = targetMultiplier >= lowerBand && targetMultiplier <= upperBand;
+  const isOOD = targetMultiplier < min || targetMultiplier > max;
 
-  // Determine trend icon
-  const getTrendIcon = () => {
-    if (deltaFromPrevious === null) return <Minus className="h-4 w-4 text-muted-foreground" />;
-    if (Math.abs(deltaFromPrevious) < 0.001)
-      return <Minus className="h-4 w-4 text-muted-foreground" />;
-    return deltaFromPrevious > 0 ? (
-      <TrendingUp className="h-4 w-4 text-green-500" />
-    ) : (
-      <TrendingDown className="h-4 w-4 text-red-500" />
-    );
-  };
-
-  // Color code stability
-  const getStabilityColor = (std: number) => {
-    if (std < 0.02) return 'text-green-600';
-    if (std < 0.05) return 'text-yellow-600';
-    return 'text-red-600';
+  const getStabilityColor = (val: number) => {
+    if (Math.abs(val - mean) < std) return 'text-green-500';
+    if (Math.abs(val - mean) < std * 2) return 'text-yellow-500';
+    return 'text-red-500';
   };
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          Prediction Health
-          {getTrendIcon()}
-        </CardTitle>
-        <CardDescription>
-          Inference stability diagnostics (no training metrics)
-        </CardDescription>
+      <CardHeader className="pb-2">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Prediction Distribution Consistency
+            </CardTitle>
+            <HelpfulTooltip 
+              title="Distribution Check"
+              description="Verifies if the current prediction falls within the statistical envelope of the original training data."
+              interpretation="Consistent (Green) means the model is operating exactly as it was trained. Out-of-Distribution (Red) implies novel unstable behavior."
+            />
+          </div>
+          {isOOD ? (
+             <Badge variant="destructive" className="flex gap-1 items-center">
+               <AlertTriangle className="h-3 w-3" /> Out of Distribution
+             </Badge>
+          ) : isConsistent ? (
+             <Badge variant="outline" className="text-green-400 border-green-900 bg-green-950/20 flex gap-1 items-center">
+               <CheckCircle2 className="h-3 w-3" /> Consistent
+             </Badge>
+          ) : (
+             <Badge variant="outline" className="text-yellow-400 border-yellow-900 bg-yellow-950/20 flex gap-1 items-center">
+               <Activity className="h-3 w-3" /> Edge Behavior
+             </Badge>
+          )}
+        </div>
+        <div className="flex items-baseline gap-2 mt-1">
+           <HelpfulTooltip
+             trigger={
+               <span className={`text-2xl font-bold font-mono ${getStabilityColor(targetMultiplier)} cursor-help`}>
+                 {targetMultiplier.toFixed(4)}
+               </span>
+             }
+             title="Current Multiplier Value"
+             description="The exact difficulty scaling factor currently applied to the game parameters."
+             interpretation="Values near 1.0 are neutral. Higher values increase difficulty (e.g. 1.2 = +20% enemy stats)."
+           />
+           <span className="text-xs text-muted-foreground flex items-center gap-1">
+              <HelpfulTooltip
+                trigger={<span className="cursor-help">Current Multiplier (M)</span>}
+                title="Target Multiplier (M)"
+                description="The difficulty scaling factor generated by the ANFIS model. 1.0 is neutral, >1.0 harder, <1.0 easier."
+              />
+           </span>
+        </div>
       </CardHeader>
-      <CardContent className="space-y-4">
-        {/* Current Round */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <p className="text-sm font-medium text-muted-foreground">Current Multiplier</p>
-            <p className="text-2xl font-bold">{targetMultiplier.toFixed(4)}</p>
-          </div>
-          <div>
-            <p className="text-sm font-medium text-muted-foreground">Δ from Previous</p>
-            <p className="text-2xl font-bold">
-              {deltaFromPrevious !== null
-                ? (deltaFromPrevious >= 0 ? '+' : '') + deltaFromPrevious.toFixed(4)
-                : 'N/A'}
-            </p>
-          </div>
+      <CardContent>
+        <div className="h-[200px] w-full mt-2">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={session.history.slice(-50)}>
+              <defs>
+                <linearGradient id="colorM" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
+              <XAxis dataKey="roundNumber" hide />
+              <YAxis domain={[0.4, 1.6]} hide />
+              <Tooltip
+                contentStyle={{ background: '#0f172a', border: '1px solid #1e293b' }}
+                itemStyle={{ color: '#e2e8f0' }}
+                labelStyle={{ color: '#94a3b8' }}
+              />
+              
+              {/* Training Distribution Bands */}
+              <ReferenceLine y={mean} stroke="#10b981" strokeDasharray="3 3" label={{ value: 'Train μ', fill: '#10b981', fontSize: 10 }} />
+              <ReferenceLine y={upperBand} stroke="#f59e0b" strokeDasharray="3 3" label={{ value: '+2σ', fill: '#f59e0b', fontSize: 10 }} />
+              <ReferenceLine y={lowerBand} stroke="#f59e0b" strokeDasharray="3 3" label={{ value: '-2σ', fill: '#f59e0b', fontSize: 10 }} />
+              
+              <Area 
+                type="monotone" 
+                dataKey="targetMultiplier" 
+                stroke="#3b82f6" 
+                fillOpacity={1} 
+                fill="url(#colorM)" 
+                isAnimationActive={false}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
         </div>
-
-        {/* Rolling Stats */}
-        {rollingMean !== null && (
-          <div className="space-y-2 border-t pt-4">
-            <h4 className="text-sm font-semibold">Rolling Statistics (last 10 rounds)</h4>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-xs text-muted-foreground">Rolling Mean</p>
-                <p className="text-lg font-semibold">{rollingMean.toFixed(4)}</p>
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Rolling Std</p>
-                <p className={`text-lg font-semibold ${getStabilityColor(rollingStd!)}`}>
-                  {rollingStd!.toFixed(4)}
-                </p>
-              </div>
-            </div>
-            <p className="text-xs text-muted-foreground italic">
-              {rollingStd! < 0.02
-                ? '✓ Stable: smooth variation expected for adaptive control'
-                : rollingStd! < 0.05
-                ? '⚠ Moderate variation: monitor for trends'
-                : '⚠ High variation: check for input instability'}
-            </p>
-          </div>
-        )}
-
-        {/* Session Aggregates */}
-        <div className="space-y-2 border-t pt-4">
-          <h4 className="text-sm font-semibold">Session Summary</h4>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <p className="text-xs text-muted-foreground">Overall Avg</p>
-              <p className="text-lg font-semibold">{avgMultiplier.toFixed(4)}</p>
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground">Overall Std</p>
-              <p className={`text-lg font-semibold ${getStabilityColor(stdMultiplier)}`}>
-                {stdMultiplier.toFixed(4)}
-              </p>
-            </div>
-          </div>
+        
+        <div className="flex justify-between items-center text-xs text-muted-foreground mt-4 pt-4 border-t border-slate-800">
+           <div className="flex items-center gap-2">
+             <div className="w-2 h-0.5 bg-green-500"></div>
+             <span>Training Mean ({mean.toFixed(2)})</span>
+             <HelpfulTooltip title="Training Mean" description="The average multiplier value seen during model training." />
+           </div>
+           <div className="flex items-center gap-2">
+             <div className="w-2 h-0.5 bg-amber-500 border-dashed border-t"></div>
+             <span>Distribution Bounds (±2σ)</span>
+             <HelpfulTooltip title="Sigma Bands" description="Two standard deviations from the mean. 95% of all valid predictions should fall inside these lines." />
+           </div>
         </div>
-
-        {/* Mini trend visualization */}
-        {session.rounds.length > 1 && (
-          <div className="border-t pt-4">
-            <h4 className="text-sm font-semibold mb-2">Recent Trend</h4>
-            <div className="flex items-end gap-1 h-16">
-              {session.rounds.slice(-15).map((round, idx) => {
-                const height = ((round.targetMultiplier - 0.6) / 0.8) * 100; // normalize to [0.6, 1.4]
-                return (
-                  <div
-                    key={idx}
-                    className="flex-1 bg-primary rounded-t transition-all"
-                    style={{ height: `${Math.max(5, Math.min(100, height))}%` }}
-                    title={`Round ${round.roundNumber}: ${round.targetMultiplier.toFixed(3)}`}
-                  />
-                );
-              })}
-            </div>
-            <div className="flex justify-between text-xs text-muted-foreground mt-1">
-              <span>0.60</span>
-              <span>1.00</span>
-              <span>1.40</span>
-            </div>
-          </div>
-        )}
       </CardContent>
     </Card>
   );

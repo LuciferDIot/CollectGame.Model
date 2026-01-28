@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import type { RoundAnalytics, SessionAnalytics } from '@/lib/analytics';
 import { AlertCircle, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { HelpfulTooltip } from './helpful-tooltip';
 
 interface ClampMonitorProps {
   session: SessionAnalytics | null;
@@ -72,6 +73,11 @@ export function ClampMonitor({
         <CardTitle className="flex items-center gap-2">
           Clamp & Saturation Monitor
           {getHealthIcon(clampPercentage.total)}
+          <HelpfulTooltip 
+            title="Clamp Saturation"
+            description="Tracks how often the model's output hits the hard safety limits (0.6 or 1.4)."
+            interpretation="A healthy adaptive model should operate freely between the limits, only hitting clamps in extreme edge cases (Target < 5%)."
+          />
         </CardTitle>
         <CardDescription>
           Proves Option B target variance is within safe bounds [{config.lower}, {config.upper}]
@@ -80,7 +86,13 @@ export function ClampMonitor({
       <CardContent className="space-y-4">
         {/* Current Round Status */}
         <div className="space-y-2">
-          <h4 className="text-sm font-semibold">Current Round</h4>
+          <div className="flex items-center gap-2">
+            <h4 className="text-sm font-semibold">Current Round</h4>
+            <HelpfulTooltip 
+              title="Instantaneous Clamp Status"
+              description="Whether the specific multiplier generated in THIS round was clipped."
+            />
+          </div>
           <div className="flex gap-2">
             {isClamped.lower && (
               <Badge variant="destructive" className="gap-1">
@@ -110,7 +122,14 @@ export function ClampMonitor({
           {/* Lower Clamp */}
           <div className={`p-3 rounded-lg ${getClampBgColor(clampPercentage.lower)}`}>
             <div className="flex justify-between items-center mb-1">
-              <span className="text-sm font-medium">Lower Bound Hit</span>
+              <span className="text-sm font-medium flex items-center gap-1">
+                Lower Bound Hit
+                <HelpfulTooltip 
+                  title="Lower Clamp Rate"
+                  description="% of rounds where M would have been < 0.6."
+                  interpretation="High lower clamp usage means the model wants to make the game easier than allowed."
+                />
+              </span>
               <span className={`text-lg font-bold ${getClampColor(clampPercentage.lower)}`}>
                 {clampPercentage.lower.toFixed(1)}%
               </span>
@@ -132,7 +151,14 @@ export function ClampMonitor({
           {/* Upper Clamp */}
           <div className={`p-3 rounded-lg ${getClampBgColor(clampPercentage.upper)}`}>
             <div className="flex justify-between items-center mb-1">
-              <span className="text-sm font-medium">Upper Bound Hit</span>
+              <span className="text-sm font-medium flex items-center gap-1">
+                Upper Bound Hit
+                <HelpfulTooltip 
+                  title="Upper Clamp Rate"
+                  description="% of rounds where M would have been > 1.4."
+                  interpretation="High upper clamp usage means the model wants to make the game harder than allowed."
+                />
+              </span>
               <span className={`text-lg font-bold ${getClampColor(clampPercentage.upper)}`}>
                 {clampPercentage.upper.toFixed(1)}%
               </span>
@@ -154,7 +180,14 @@ export function ClampMonitor({
           {/* Total Clamp */}
           <div className={`p-3 rounded-lg ${getClampBgColor(clampPercentage.total)}`}>
             <div className="flex justify-between items-center mb-1">
-              <span className="text-sm font-medium">Total Clamped</span>
+              <span className="text-sm font-medium flex items-center gap-1">
+                Total Clamped
+                 <HelpfulTooltip 
+                  title="Total Saturation Index"
+                  description="Combined percentage of rounds where the model hit ANY limit."
+                  interpretation="This is the primary 'Stability Score'. If < 5%, the system is well-tuned."
+                />
+              </span>
               <span className={`text-lg font-bold ${getClampColor(clampPercentage.total)}`}>
                 {clampPercentage.total.toFixed(1)}%
               </span>

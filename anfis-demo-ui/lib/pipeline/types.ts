@@ -36,21 +36,21 @@ export interface ActivityScores {
 }
 
 export interface SoftMembership {
-  soft_combat: number;
-  soft_collect: number;
-  soft_explore: number;
+  combat: number;
+  collect: number;
+  explore: number;
 }
 
 export interface Deltas {
-  delta_combat: number;
-  delta_collect: number;
-  delta_explore: number;
+  combat: number;
+  collect: number;
+  explore: number;
 }
 
 export interface ANFISInput {
-  soft_combat: number;
-  soft_collect: number;
-  soft_explore: number;
+  combat: number;
+  collect: number;
+  explore: number;
   delta_combat: number;
   delta_collect: number;
   delta_explore: number;
@@ -165,3 +165,7 @@ export interface DeploymentManifest {
     archetype_modifier_range: number[]; // [min, max]
   };
 }
+
+// UI/State types
+// Re-export PipelineState from core types to maintain backward compatibility but single source of truth
+export type { PipelineState } from '@/lib/types';

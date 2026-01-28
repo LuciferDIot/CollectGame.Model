@@ -3,6 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import type { RoundAnalytics, SessionAnalytics } from '@/lib/analytics';
 import { AlertCircle } from 'lucide-react';
+import { HelpfulTooltip } from './helpful-tooltip';
 
 interface DeltaMonitorProps {
   session: SessionAnalytics | null;
@@ -38,20 +39,34 @@ export function DeltaMonitor({ session, currentRound }: DeltaMonitorProps) {
         <CardTitle className="flex items-center gap-2">
           Delta Effectiveness Monitor
           {deltaLow && <AlertCircle className="h-4 w-4 text-yellow-500" />}
+          <HelpfulTooltip 
+            title="Deltas (Δ)"
+            description="The instantaneous rate of change in player behavior (derivative of the input signals)."
+            interpretation="In Option B, Deltas are the primary driver of difficulty. High deltas mean the player is changing strategy, prompting adaptation."
+          />
         </CardTitle>
         <CardDescription>
-          Deltas drive variance and responsiveness in Option B
+          Behavioral changes driving variance (Option B Core Mechanism)
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Current Round Deltas */}
         <div className="space-y-3">
-          <h4 className="text-sm font-semibold">Current Round Deltas</h4>
+          <div className="flex items-center gap-2">
+             <h4 className="text-sm font-semibold">Current Round Deltas</h4>
+             <HelpfulTooltip 
+               title="Instantaneous Change"
+               description="How much the player's behavior changed in the last 5 seconds."
+             />
+          </div>
           
           {/* Combat Delta */}
           <div>
             <div className="flex justify-between text-sm mb-1">
-              <span>Δ Combat</span>
+              <span className="flex items-center gap-1">
+                Δ Combat
+                <HelpfulTooltip title="Combat Delta" description="Change in Kill/Death Ratio and Combat Frequency." />
+              </span>
               <span className="font-mono">{deltas.combat.toFixed(4)}</span>
             </div>
             <div className="flex items-center gap-2">
@@ -73,7 +88,10 @@ export function DeltaMonitor({ session, currentRound }: DeltaMonitorProps) {
           {/* Collect Delta */}
           <div>
             <div className="flex justify-between text-sm mb-1">
-              <span>Δ Collect</span>
+              <span className="flex items-center gap-1">
+                Δ Collect
+                 <HelpfulTooltip title="Collect Delta" description="Change in Items Collected per Minute." />
+              </span>
               <span className="font-mono">{deltas.collect.toFixed(4)}</span>
             </div>
             <div className="flex items-center gap-2">
@@ -95,7 +113,10 @@ export function DeltaMonitor({ session, currentRound }: DeltaMonitorProps) {
           {/* Explore Delta */}
           <div>
             <div className="flex justify-between text-sm mb-1">
-              <span>Δ Explore</span>
+               <span className="flex items-center gap-1">
+                Δ Explore
+                 <HelpfulTooltip title="Explore Delta" description="Change in Map Coverage and Movement Variance." />
+              </span>
               <span className="font-mono">{deltas.explore.toFixed(4)}</span>
             </div>
             <div className="flex items-center gap-2">
@@ -119,11 +140,17 @@ export function DeltaMonitor({ session, currentRound }: DeltaMonitorProps) {
         <div className="border-t pt-4 space-y-2">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <p className="text-xs text-muted-foreground">Current Magnitude</p>
+              <p className="text-xs text-muted-foreground flex items-center gap-1">
+                Current Magnitude
+                 <HelpfulTooltip title="Total Delta Magnitude" description="Sum of absolute changes. |ΔCmb| + |ΔCol| + |ΔExp|. Higher = More Adaptation." />
+              </p>
               <p className="text-lg font-semibold">{currentMagnitude.toFixed(4)}</p>
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Session Avg</p>
+              <p className="text-xs text-muted-foreground flex items-center gap-1">
+                Session Avg
+                 <HelpfulTooltip title="Average Magnitude" description="Long-term average of adaptation intensity. If < 0.05, the model is stagnating." />
+              </p>
               <p className={`text-lg font-semibold ${deltaLow ? 'text-yellow-600' : ''}`}>
                 {avgDeltaMagnitude.toFixed(4)}
               </p>

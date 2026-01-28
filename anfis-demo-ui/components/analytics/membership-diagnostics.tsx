@@ -3,6 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import type { Archetype, RoundAnalytics, SessionAnalytics } from '@/lib/analytics';
 import { Compass, Package, Swords } from 'lucide-react';
+import { HelpfulTooltip } from './helpful-tooltip';
 
 interface MembershipDiagnosticsProps {
   session: SessionAnalytics | null;
@@ -44,13 +45,23 @@ export function MembershipDiagnostics({ session, currentRound }: MembershipDiagn
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Soft Membership Diagnostics</CardTitle>
-        <CardDescription>Fuzzy clustering membership values (context for Option B)</CardDescription>
+        <CardTitle className="flex items-center gap-2">
+          Soft Membership Diagnostics
+          <HelpfulTooltip 
+            title="Soft Membership"
+            description="The degree to which the player currently fits into each Archetype (0.0 to 1.0). Unlike hard clustering, this is fuzzy and continuous."
+            interpretation="Option B uses this for 'Contextual Bias'—smoothing the output but not driving the main variance."
+          />
+        </CardTitle>
+        <CardDescription>Fuzzy clustering values</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Validation */}
         <div className="flex items-center justify-between p-2 bg-muted rounded">
-          <span className="text-sm font-medium">Membership Sum Check</span>
+          <span className="text-sm font-medium flex items-center gap-1">
+             Membership Sum Check
+             <HelpfulTooltip title="Partition of Unity" description="Fuzzy logic requirement: The sum of all membership degrees must equal exactly 1.0." />
+          </span>
           <span
             className={`text-sm font-bold ${
               membershipValid ? 'text-green-600' : 'text-red-600'
@@ -108,12 +119,19 @@ export function MembershipDiagnostics({ session, currentRound }: MembershipDiagn
             <span className="text-sm text-muted-foreground">
               ({(softMembership[dominantArchetype] * 100).toFixed(1)}%)
             </span>
+            <HelpfulTooltip 
+              title="Dominant Style" 
+              description="The single strongest component of the user's behavior this round."
+            />
           </div>
         </div>
 
         {/* Session Distribution */}
         <div className="border-t pt-4 space-y-2">
-          <h4 className="text-sm font-semibold">Session Distribution</h4>
+          <h4 className="text-sm font-semibold flex items-center gap-1">
+            Session Distribution
+             <HelpfulTooltip title="Long-term Style" description="Percentage of rounds where each archetype was dominant." />
+          </h4>
           <div className="space-y-2">
             {Object.entries(dominantArchetypeDistribution).map(([archetype, percentage]) => (
               <div key={archetype}>

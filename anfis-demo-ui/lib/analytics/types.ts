@@ -62,6 +62,8 @@ export interface SessionAnalytics {
   dominantArchetypeDistribution: Record<Archetype, number>; // percentages
   avgDeltaMagnitude: number;
   responsivenessScore: ResponsivenessLevel;
+  responsivenessCorrelation: number;
+  history: RoundAnalytics[]; // Alias for rounds, used by UI components
 }
 
 export interface AnalyticsConfig {

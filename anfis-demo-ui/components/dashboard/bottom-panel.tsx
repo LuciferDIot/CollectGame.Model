@@ -2,10 +2,12 @@
 
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useAnalytics } from '@/lib/hooks/use-analytics';
 import { usePipeline } from '@/lib/pipeline-context';
 import { AlertCircle, CheckCircle, Info, TrendingUp } from 'lucide-react';
 import { MetricCard } from './metric-card';
 import { RuleInspectorDrawer } from './rule-inspector-drawer';
+import { AnalyticsTab } from './tabs/analytics-tab';
 
 
 
