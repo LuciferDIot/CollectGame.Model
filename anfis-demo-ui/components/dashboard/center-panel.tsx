@@ -1,7 +1,7 @@
 'use client';
 
 import { usePipeline } from '@/lib/pipeline-context';
-import { AlertCircle, CheckCircle, ChevronDown, Zap } from 'lucide-react';
+import { Activity, AlertCircle, BrainCircuit, CheckCircle, ChevronDown, Zap } from 'lucide-react';
 import { useState } from 'react';
 
 const STEP_NAMES = [
@@ -32,9 +32,34 @@ export function CenterPanel() {
 
   if (pipelineState.steps.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-full bg-gradient-to-b from-slate-900 to-slate-950 text-center p-6">
-        <Zap className="w-12 h-12 text-slate-600 mb-4" />
-        <p className="text-sm text-slate-400">Load telemetry data and run simulation to see pipeline execution</p>
+      <div className="relative flex flex-col items-center justify-center h-full bg-slate-950 overflow-hidden text-center p-6">
+        {/* Animated Background Grid */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(30,41,59,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(30,41,59,0.1)_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,black,transparent)] pointer-events-none" />
+        
+        {/* Decorative Circles */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] border border-blue-500/5 rounded-full animate-[spin_60s_linear_infinite] pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] border border-cyan-500/5 rounded-full animate-[spin_40s_linear_infinite_reverse] pointer-events-none" />
+
+        {/* Hero Content */}
+        <div className="relative z-10 flex flex-col items-center">
+          <div className="relative mb-6">
+            <div className="absolute inset-0 bg-blue-500/20 blur-xl rounded-full" />
+            <div className="relative w-16 h-16 bg-slate-900 border border-blue-500/30 rounded-2xl flex items-center justify-center shadow-2xl overflow-hidden">
+               <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent" />
+               <BrainCircuit className="w-8 h-8 text-blue-400" />
+            </div>
+          </div>
+          
+          <h3 className="text-lg font-semibold text-slate-200 mb-2">ANFIS Pipeline Ready</h3>
+          <p className="text-sm text-slate-400 max-w-xs leading-relaxed">
+            System is standing by. Load telemetry data to visualize the neuro-fuzzy inference process.
+          </p>
+          
+          <div className="mt-8 flex items-center gap-2 text-xs text-slate-500 bg-slate-900/50 px-3 py-1.5 rounded-full border border-slate-800">
+             <Activity className="w-3 h-3 animate-pulse text-green-400" />
+             <span>Waiting for input stream...</span>
+          </div>
+        </div>
       </div>
     );
   }

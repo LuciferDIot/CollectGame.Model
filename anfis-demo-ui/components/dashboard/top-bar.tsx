@@ -1,78 +1,49 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
+import EXAMPLE_DATASETS from '@/lib/data/examples.json';
 import { usePipeline } from '@/lib/pipeline-context';
 import { BarChart3, Download, PlayCircle, Upload, XCircle } from 'lucide-react';
 import { useState } from 'react';
 import { AnalyticsSlideOver } from './analytics-slide-over';
 
-const EXAMPLE_TELEMETRY = {
-  "_id": { "$oid": "6974894b48d53c4152cf142a" },
-  "userId": { "$oid": "6974892348d53c4152cf1421" },
-  "timestamp": { "$date": "2026-01-24T14:26:43.613Z" },
-  "sessionId": "unreal_1769245003613",
-  "itemsCollected": 12,
-  "pickupAttempts": 15,
-  "timeNearInteractables": 45,
-  "enemiesHit": 8,
-  "damageDone": 1240,
-  "timeInCombat": 120,
-  "distanceTraveled": 1944.99,
-  "timeOutOfCombat": 1680,
-  "timeSprinting": 340,
-  "kills": 3,
-  "died": false,
-  "rawJson": {
-    "user_id": "6974892348d53c4152cf1421",
-    "session_id": "unreal_1769245003613",
-    "timestamp": { "$date": "2026-01-24T14:26:43.613Z" },
-    "items_collected": 12,
-    "pickup_attempts": 15,
-    "time_near_interactables": 45,
-    "enemies_hit": 8,
-    "damage_done": 1240,
-    "time_in_combat": 120,
-    "distance_traveled": 1944.99,
-    "time_out_of_combat": 1680,
-    "time_sprinting": 340,
-    "kills": 3,
-    "deaths": 0
-  },
-  "__v": 0
-};
-
-const EXAMPLE_DEATH_EVENTS = [
-  {
-    "_id": { "$oid": "69748b5b48d53c4152cf18cb" },
-    "userId": { "$oid": "6974892348d53c4152cf1421" },
-    "timestamp": { "$date": "2026-01-24T14:35:31.981Z" },
-    "sessionId": "unreal_death_1769245531981",
-    "location": "Forest_Zone_3",
-    "cause": "Enemy_Attack",
-    "__v": 0
-  },
-  {
-    "_id": { "$oid": "69748b5c48d53c4152cf18cc" },
-    "userId": { "$oid": "6974892348d53c4152cf1421" },
-    "timestamp": { "$date": "2026-01-24T14:40:15.234Z" },
-    "sessionId": "unreal_death_1769245815234",
-    "location": "Cave_Zone_5",
-    "cause": "Fall_Damage",
-    "__v": 0
-  }
-];
-
 export function TopBar() {
-  const { runSimulation, resetDashboard } = usePipeline();
+  const { runSimulation, resetDashboard, pipelineState, inputState } = usePipeline();
   const [stepByStep, setStepByStep] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
   const [analyticsOpen, setAnalyticsOpen] = useState(false);
 
   const handleLoadExample = () => {
+    // Pick random example
+    const randomIndex = Math.floor(Math.random() * EXAMPLE_DATASETS.length);
+    const example = EXAMPLE_DATASETS[randomIndex] as any; // Cast to any to avoid strict JSON type inference issues
+
+    // Construct Telemetry Object
+    const telemetryPayload = {
+        _id: { "$oid": "generated_" + example.sessionId },
+        userId: { "$oid": example.userId },
+        timestamp: { "$date": example.timestamp },
+        sessionId: example.sessionId,
+        ...example.features,
+        rawJson: {
+            ...example.features
+        }
+    };
+
+    // Construct Death Events
+    const deathEventsPayload = (example.deaths || []).map((d: any) => ({
+        _id: { "$oid": "death_" + Math.random().toString(36).substr(2, 9) },
+        userId: { "$oid": example.userId },
+        timestamp: { "$date": d.timestamp },
+        sessionId: example.sessionId,
+        location: d.location || 'Unknown',
+        cause: d.cause || 'Unknown'
+    }));
+
     window.dispatchEvent(new CustomEvent('loadExample', {
       detail: {
-        telemetry: JSON.stringify(EXAMPLE_TELEMETRY, null, 2),
-        deathEvents: JSON.stringify(EXAMPLE_DEATH_EVENTS, null, 2),
+        telemetry: JSON.stringify(telemetryPayload, null, 2),
+        deathEvents: JSON.stringify(deathEventsPayload, null, 2),
       },
     }));
   };
@@ -84,47 +55,55 @@ export function TopBar() {
   };
 
   const handleExport = () => {
-    const state = { telemetry: EXAMPLE_TELEMETRY, deathEvents: EXAMPLE_DEATH_EVENTS };
-    const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'telemetry-results.json';
-    a.click();
+    try {
+        const state = { 
+            telemetry: inputState.telemetryJson ? JSON.parse(inputState.telemetryJson) : null, 
+            deathEvents: inputState.deathEventsJson ? JSON.parse(inputState.deathEventsJson) : null 
+        };
+        const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'telemetry-results.json';
+        a.click();
+    } catch (e) {
+        console.error("Export failed", e);
+    }
   };
 
   return (
     <>
-      <div className="h-20 border-b border-blue-500/10 bg-slate-950/50 backdrop-blur-sm flex items-center px-6 gap-6">
-        <div className="flex-1">
+      <div className="h-auto md:h-20 border-b border-blue-500/10 bg-slate-950/50 backdrop-blur-sm flex flex-col md:flex-row items-start md:items-center px-4 md:px-6 py-4 md:py-0 gap-4 md:gap-6">
+        <div className="flex-1 w-full md:w-auto">
           <div className="flex flex-col gap-1">
             <h1 className="text-base font-semibold text-slate-100">Adaptive Telemetry Dashboard</h1>
             <p className="text-xs text-slate-400">ANFIS pipeline validation & analysis</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 ml-auto">
-          <label className="flex items-center gap-2 px-3 py-2 text-sm text-slate-300 hover:bg-slate-900/30 rounded-md cursor-pointer transition-colors">
+        <div className="flex flex-wrap items-center gap-2 w-full md:w-auto md:ml-auto">
+          <label className="flex items-center gap-2 px-3 py-2 text-sm text-slate-300 hover:bg-slate-900/30 rounded-md cursor-pointer transition-colors mr-2">
             <input 
               type="checkbox" 
               checked={stepByStep} 
               onChange={(e) => setStepByStep(e.target.checked)}
               className="w-4 h-4 rounded accent-blue-500"
             />
-            <span>Step-by-Step</span>
+            <span className="whitespace-nowrap">Step-by-Step</span>
           </label>
 
-          <div className="w-px h-6 bg-slate-700/50" />
+          <div className="hidden md:block w-px h-6 bg-slate-700/50" />
 
           <Button 
             variant="outline"
             size="sm"
             onClick={handleLoadExample}
-            title="Load example data"
-            className="gap-2 h-9 bg-transparent"
+            title="Load random example"
+            className="gap-2 h-9 border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white bg-transparent flex-1 md:flex-none"
           >
             <Upload size={16} />
-            Example
+            <span className="hidden sm:inline">Load Random</span>
+            <span className="sm:hidden">Load</span>
           </Button>
           
           <Button 
@@ -132,31 +111,33 @@ export function TopBar() {
             onClick={handleRun}
             disabled={isRunning}
             title="Run simulation"
-            className="gap-2 h-9 bg-blue-600 hover:bg-blue-700 text-white border-0"
+            className="gap-2 h-9 bg-blue-600 hover:bg-blue-500 text-white border-0 font-medium shadow-lg shadow-blue-900/20 flex-1 md:flex-none"
           >
             <PlayCircle size={16} />
             {isRunning ? 'Running...' : 'Run'}
           </Button>
 
-          <Button 
-            size="sm"
-            onClick={() => setAnalyticsOpen(true)}
-            title="Open analytics dashboard"
-            className="gap-2 h-9 bg-cyan-600 hover:bg-cyan-500 text-white border-0"
-          >
-            <BarChart3 size={16} />
-            Analytics
-          </Button>
+          {pipelineState.executionTime > 0 && (
+            <Button 
+              size="sm"
+              onClick={() => setAnalyticsOpen(true)}
+              title="Open analytics dashboard"
+              className="gap-2 h-9 bg-cyan-600 hover:bg-cyan-500 text-white border-0 font-medium shadow-lg shadow-cyan-900/20 animate-in fade-in zoom-in duration-300 flex-1 md:flex-none"
+            >
+              <BarChart3 size={16} />
+              <span className="hidden sm:inline">Analytics</span>
+            </Button>
+          )}
           
           <Button 
             variant="outline"
             size="sm"
             onClick={handleExport}
             title="Export results"
-            className="gap-2 h-9 bg-transparent"
+            className="gap-2 h-9 border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white bg-transparent flex-1 md:flex-none"
           >
             <Download size={16} />
-            Export
+            <span className="hidden sm:inline">Export</span>
           </Button>
           
           <Button 
@@ -167,10 +148,10 @@ export function TopBar() {
               setIsRunning(false);
             }}
             title="Reset dashboard"
-            className="gap-2 h-9"
+            className="gap-2 h-9 border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white bg-transparent hover:border-red-500/50 hover:bg-red-500/10 flex-1 md:flex-none"
           >
             <XCircle size={16} />
-            Reset
+            <span className="hidden sm:inline">Reset</span>
           </Button>
         </div>
       </div>
