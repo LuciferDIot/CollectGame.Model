@@ -14,7 +14,8 @@
 | **Phase 2**: Root Cause Analysis | Diagnostic | Identified variance collapse (σ=0.011) |
 | **Phase 3**: Design Iterations | Experimental | Tested multiple target formulations |
 | **Phase 4**: Canonical Solution | Final | Option B validated (R²=0.9566) |
-| **Phase 5**: Git & Documentation | Cleanup | Established traceability |
+| **Phase 5**: Production Architecture | Implementation | Client-side Inference & Analytics Dashboard |
+| **Phase 6**: Git & Documentation | Cleanup | Established traceability |
 
 ---
 
@@ -363,6 +364,40 @@ Even correct implementations need:
 - MAE: 0.013
 
 **Deployment Verdict**: APPROVED FOR PRODUCTION
+
+---
+
+**Deployment Verdict**: APPROVED FOR PRODUCTION
+
+---
+
+## Phase 5: Production Architecture (The "Dashboard" Pivot)
+
+### Design Challenge: The "Black Box" Problem
+**Issue:** Even with a high R² (0.95), the system is opaque. A Thesis Defense requires *visual proof* that adaptation is happening logically.
+**Solution:** Build a Real-time Analytics Dashboard.
+
+### Architectural Decisions
+
+#### 1. Client-Side Inference (JavaScript) vs Python Backend
+*   **Initial Idea:** Host the ANFIS model on a Flask/FastAPI server.
+*   **Problem:** Latency (HTTP RTT > 100ms) + Server Costs + Complexity.
+*   **Decision:** **Port the Model to TypeScript.**
+    *   Export Weights/Biases from Python (`mlp_model_weights.json`).
+    *   Re-implement matrix multiplication in `lib/pipeline`.
+    *   **Benefit:** Zero-latency (<1ms), offline-capable, free hosting (Vercel/Static).
+
+#### 2. Technical Stack: Next.js + Shadcn UI
+*   **Why?** The user specifically requested "Premium Aesthetics" and professional polish.
+*   **Selection:**
+    *   **Shadcn UI:** For accessible, high-quality, copy-pasteable components (Tabs, Cards, Alerts).
+    *   **Recharts:** For dynamic, animated visualization of the "Trust Anchor" (Clusters) and "Delta Monitor".
+    *   **TailwindCSS:** For rapid styling iteration.
+
+### Key Features Implemented for Defense
+1.  **The "Trust Anchor" Visualizer:** live plotting of player telemetry onto the K-Means centroids to prove *context awareness*.
+2.  **Responsiveness Monitor:** A dedicated chart showing `Delta` vs `Target` correlation to prove the system *reacts* to change.
+3.  **Educational Tooltips:** Interactive, clickable citations on every dashboard metric that explain the underlying math (e.g., "Why K=3?") to the thesis evaluators.
 
 ---
 
