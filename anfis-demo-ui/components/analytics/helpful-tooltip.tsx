@@ -1,69 +1,84 @@
-'use client';
-
 import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from '@/components/ui/tooltip';
-import { HelpCircle } from 'lucide-react';
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog';
+import { BookOpen, Calculator, HelpCircle } from 'lucide-react';
 import { ReactNode } from 'react';
 
 interface HelpfulTooltipProps {
   trigger?: ReactNode;
   title: string;
   description: string;
-  formula?: string;
+  formula?: string; // Legacy prop, can be mapped to calculation
+  calculation?: string; // New prop for technical details
   interpretation?: string;
-  side?: 'top' | 'right' | 'bottom' | 'left';
+  side?: 'top' | 'right' | 'bottom' | 'left'; // Kept for compatibility but unused in Dialog
 }
 
-// Removed local TooltipProvider here to rely on global or component-specific context if needed, 
-// but actually, Radix TooltipProvider IS needed if not at root.
-// We will keep it but add high z-index and ensure portal usage.
 export function HelpfulTooltip({
   trigger,
   title,
   description,
   formula,
+  calculation,
   interpretation,
-  side = 'top'
 }: HelpfulTooltipProps) {
+  // Map legacy formula to calculation if calculation is missing
+  const technicalDetail = calculation || formula;
+
   return (
-    <TooltipProvider delayDuration={100} skipDelayDuration={0}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <span className="cursor-help inline-flex items-center gap-1.5 opacity-80 hover:opacity-100 transition-opacity decoration-dotted underline-offset-2 hover:underline">
-            {trigger || <HelpCircle className="h-4 w-4 text-muted-foreground" />}
-          </span>
-        </TooltipTrigger>
-        <TooltipContent 
-            side={side} 
-            className="z-[9999] max-w-[320px] bg-slate-900 border-slate-700 p-4 shadow-2xl text-left"
-            sideOffset={5}
-            avoidCollisions={true}
-        >
-          <div className="space-y-3">
-            <div>
-              <h5 className="font-semibold text-sm text-slate-100 mb-1">{title}</h5>
-              <p className="text-xs text-slate-400 leading-relaxed">{description}</p>
+    <Dialog>
+      <DialogTrigger asChild>
+        {trigger ? (
+          // IMPORTANT: The trigger element must be able to accept a ref.
+          // Most HTML elements (span, div, button) work fine.
+          trigger 
+        ) : (
+          <button className="cursor-pointer inline-flex items-center gap-1.5 opacity-80 hover:opacity-100 transition-opacity decoration-dotted underline-offset-2 hover:underline outline-none focus:ring-2 focus:ring-slate-400 rounded-sm">
+            <HelpCircle className="h-4 w-4 text-muted-foreground" />
+          </button>
+        )}
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px] bg-slate-900 border-slate-700">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2 text-xl text-slate-100">
+            <BookOpen className="h-5 w-5 text-blue-400" />
+            {title}
+          </DialogTitle>
+          <DialogDescription className="text-slate-400 text-base pt-2">
+            {description}
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="grid gap-4 py-4">
+          {technicalDetail && (
+            <div className="space-y-2">
+              <h4 className="flex items-center gap-2 font-semibold text-slate-200 text-sm">
+                <Calculator className="h-4 w-4 text-emerald-400" />
+                How it is calculated
+              </h4>
+              <div className="bg-slate-950/50 p-3 rounded-md border border-slate-800 font-mono text-xs text-slate-300 overflow-x-auto whitespace-pre-wrap">
+                {technicalDetail}
+              </div>
             </div>
-            
-            {formula && (
-              <div className="bg-slate-950/50 p-2 rounded border border-slate-800/50">
-                <p className="text-[10px] font-mono text-slate-300">{formula}</p>
-              </div>
-            )}
-            
-            {interpretation && (
-              <div className="border-t border-slate-800 pt-2">
-                 <p className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">Interpretation</p>
-                 <p className="text-xs text-emerald-400/90 italic">{interpretation}</p>
-              </div>
-            )}
-          </div>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+          )}
+
+          {interpretation && (
+             <div className="space-y-2">
+               <h4 className="font-semibold text-slate-200 text-sm uppercase tracking-wider text-xs">
+                 Interpretation
+               </h4>
+               <p className="text-sm text-emerald-400/90 italic border-l-2 border-emerald-500/50 pl-3">
+                 {interpretation}
+               </p>
+             </div>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }

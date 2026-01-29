@@ -42,10 +42,11 @@ export function FeatureContribution({ currentRound, session }: FeatureContributi
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          Contribution Breakdown
           <HelpfulTooltip 
-            title="Feature Importance"
+            trigger={<span className="cursor-pointer hover:underline decoration-dotted underline-offset-4">Contribution Breakdown</span>}
+            title="Feature Importance (Sensitivity Analysis)"
             description="Decomposes the final prediction into its contributing factors. Shows 'Why' the model decided to change difficulty."
+            interpretation="Understanding which component (Behavior vs. Context) is driving the AI allows for better tuning of the game experience."
           />
         </CardTitle>
         <CardDescription>
@@ -83,19 +84,43 @@ export function FeatureContribution({ currentRound, session }: FeatureContributi
                  <div className="flex items-center gap-2">
                    <div className="w-2.5 h-2.5 rounded-full" style={{ background: item.color }} />
                    <span className="text-muted-foreground flex items-center gap-1">
-                     {item.name}
-                     {item.name === 'Behavioral Deltas' && <HelpfulTooltip title="Deltas" description="Short-term changes in player behavior (last 5 seconds)." />}
-                     {item.name === 'Soft Context' && <HelpfulTooltip title="Soft Context" description="Long-term stylistic patterns (Archetypes) smoothing the output." />}
+                     {item.name === 'Behavioral Deltas' && (
+                        <HelpfulTooltip 
+                          trigger={<span className="cursor-pointer hover:underline decoration-dotted underline-offset-4">{item.name}</span>}
+                          title="Behavioral Deltas (Derivative)" 
+                          description="Short-term changes in player behavior (last 5 seconds)." 
+                          calculation="ΔInput = Input(t) - Input(t-1)"
+                          interpretation="This is the 'Reactive' part of the AI. It responds immediately to sudden changes in player skill or action."
+                        />
+                     )}
+                     {item.name === 'Soft Context' && (
+                        <HelpfulTooltip 
+                          trigger={<span className="cursor-pointer hover:underline decoration-dotted underline-offset-4">{item.name}</span>}
+                          title="Soft Context (Fuzzy Membership)" 
+                          description="Long-term stylistic patterns (Archetypes) smoothing the output." 
+                          calculation="μ(x) = GaussianMF(x; c, σ)"
+                          interpretation="This is the 'Persistent' part of the AI. It ensures the game adapts to WHO the player is (Fighter vs Explorer), not just what they did 1 second ago."
+                        />
+                     )}
+                     {item.name === 'Base/Penalty' && (
+                        <HelpfulTooltip 
+                          trigger={<span className="cursor-pointer hover:underline decoration-dotted underline-offset-4">{item.name}</span>}
+                          title="Bias Term / Base Difficulty" 
+                          description="The constant offset ensuring the game is never 'zero' difficulty." 
+                          calculation="Bias = 0.1 (Constant)"
+                          interpretation="Prevents the multiplier from collapsing to zero even if the player does nothing."
+                        />
+                     )}
                    </span>
                  </div>
                  <HelpfulTooltip
-                   trigger={<span className="font-mono font-medium cursor-help">{((item.value / total) * 100).toFixed(0)}%</span>}
-                   title={`${item.name} Contribution`}
-                   description={`The relative impact of ${item.name.toLowerCase()} on the final difficulty adjustment.`}
+                   trigger={<span className="font-mono font-medium cursor-pointer hover:underline decoration-dotted underline-offset-4">{((item.value / total) * 100).toFixed(0)}%</span>}
+                   title={`${item.name} Impact`}
+                   description={`How much the ${item.name.toLowerCase()} logic is changing the game difficulty right now.`}
                    interpretation={
-                      item.name === 'Behavioral Deltas' ? "High delta contribution means recent actions are driving the change." :
-                      item.name === 'Soft Context' ? "High soft context contribution means your playstyle profile is stabilizing the result." :
-                      "Base contribution ensures a minimum adaptive pressure."
+                      item.name === 'Behavioral Deltas' ? "High impact means your recent actions are the main reason for the change." :
+                      item.name === 'Soft Context' ? "High impact means your playstyle profile is keeping things stable." :
+                      "This is the minimum baseline pressure applied to everyone."
                    }
                  />
                </div>

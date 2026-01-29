@@ -15,12 +15,14 @@ export function ModelEvaluationCard() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Lock className="h-5 w-5 text-blue-400" />
-            <CardTitle>Model Evaluation (Offline)</CardTitle>
-            <HelpfulTooltip 
-              title="Offline Evaluation"
-              description="Metrics calculated on a held-out test set (unseen data) after training. These values validation the model's theoretical capability."
-              interpretation="High R² on test data confirms the model learned general rules, not just memorized training data."
-            />
+            <CardTitle>
+              <HelpfulTooltip 
+                trigger={<span className="cursor-pointer hover:underline decoration-dotted underline-offset-4">Model Evaluation (Offline)</span>}
+                title="Supervised Learning Validation"
+                description="Metrics calculated on a held-out test set (unseen data) after training. These values validate the model's theoretical capability."
+                interpretation="We froze 20% of the player data (Test Set) and asked the model to predict it. High R² confirms it learned general rules, not just memorized the training data."
+              />
+            </CardTitle>
           </div>
           <Badge variant="outline" className="text-blue-400 bg-blue-950/30 border-blue-800">
             Validated Truth
@@ -37,10 +39,10 @@ export function ModelEvaluationCard() {
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <ShieldCheck className="h-3.5 w-3.5" />
               <HelpfulTooltip 
-                trigger={<span>Test R² Score</span>}
+                trigger={<span className="cursor-pointer hover:underline decoration-dotted underline-offset-4">Test R² Score</span>}
                 title="Coefficient of Determination (R²)"
                 description="Measures how well the model replicates the teacher's variance. 1.0 is perfect, 0.0 is random."
-                formula="R² = 1 - (SS_res / SS_tot)"
+                calculation="R² = 1 - (SS_res / SS_tot)"
                 interpretation="0.956 means the model captures 95.6% of the target's behavior logic."
               />
             </div>
@@ -52,10 +54,10 @@ export function ModelEvaluationCard() {
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <BarChart3 className="h-3.5 w-3.5" />
                <HelpfulTooltip 
-                trigger={<span>Mean Abs Error</span>}
+                trigger={<span className="cursor-pointer hover:underline decoration-dotted underline-offset-4">Mean Abs Error</span>}
                 title="Mean Absolute Error (MAE)"
                 description="The average positive difference between predicted and actual values."
-                formula="MAE = Σ|y_pred - y_true| / n"
+                calculation="MAE = Σ|y_pred - y_true| / n"
                 interpretation="On average, the prediction deviates by only 0.013 from the target value."
               />
             </div>
@@ -78,10 +80,11 @@ export function ModelEvaluationCard() {
                <div className="flex justify-between text-xs mb-1">
                  <span className="text-slate-400 flex items-center gap-1">
                    <HelpfulTooltip 
-                    trigger={<span>Target Std Dev</span>}
+                    trigger={<span className="cursor-pointer hover:underline decoration-dotted underline-offset-4">Target Std Dev</span>}
                     title="Target Standard Deviation" 
                     description="Spread of the target values."
                     interpretation="0.062 indicates a healthy, dynamic signal, unlike the original 0.011."
+                    calculation="std(target_signal)"
                    />
                  </span>
                  <span className="font-mono text-slate-200">{targetStd.toFixed(4)}</span>
@@ -96,10 +99,11 @@ export function ModelEvaluationCard() {
                <div className="flex justify-between text-xs mb-1">
                  <span className="text-slate-400 flex items-center gap-1">
                     <HelpfulTooltip 
-                      trigger={<span>Target Range</span>}
+                      trigger={<span className="cursor-pointer hover:underline decoration-dotted underline-offset-4">Target Range</span>}
                       title="Target Span (Max - Min)" 
                       description="The full operating width of the difficulty signal."
                       interpretation="0.41 span allows for deep corrections, compared to the trivial 0.02 of the original."
+                      calculation="max(target) - min(target)"
                     />
                  </span>
                  <span className="font-mono text-slate-200">{targetSpan.toFixed(2)}</span>

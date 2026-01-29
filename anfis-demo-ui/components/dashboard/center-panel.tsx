@@ -3,6 +3,7 @@
 import { usePipeline } from '@/lib/pipeline-context';
 import { Activity, AlertCircle, BrainCircuit, CheckCircle, ChevronDown, Zap } from 'lucide-react';
 import { useState } from 'react';
+import { HelpfulTooltip } from '../analytics/helpful-tooltip';
 
 const STEP_NAMES = [
   'Input Validation',
@@ -106,7 +107,31 @@ export function CenterPanel() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-baseline gap-2">
                       <span className="text-xs font-mono text-slate-500">Step {idx + 1}</span>
-                      <span className="text-sm font-medium text-slate-100 truncate">{stepName}</span>
+                      <HelpfulTooltip
+                        trigger={<span className="text-sm font-medium text-slate-100 truncate cursor-pointer hover:underline hover:text-blue-300 transition-colors">{stepName}</span>}
+                        title={`Step ${idx + 1}: ${stepName}`}
+                        description={STEP_EXPLANATIONS[idx] || 'Processing pipeline step...'}
+                        calculation={
+                          idx === 0 ? "Schema_Check(Input) && Range_Check(Input)" :
+                          idx === 1 ? "x' = (x - min) / (max - min)" :
+                          idx === 2 ? "μ(x) = 1 / (1 + |(x - c)/σ|²ᵇ)" :
+                          idx === 3 ? "w_i = Π(μ_j(x_j))" :
+                          idx === 4 ? "Y = Σ(w_i * f_i) / Σ(w_i)" :
+                          idx === 5 ? "ArgMax(Soft_Memberships)" :
+                          idx === 6 ? "Difficulty_Mult = Base + Model_Output_Delta" :
+                          "JSON_Serialize(Result)"
+                        }
+                        interpretation={
+                          idx === 0 ? "Ensures trash data doesn't crash the engine." :
+                          idx === 1 ? "Squashes all inputs to 0.0-1.0 range for fair comparison." :
+                          idx === 2 ? "Fuzzification: Determines 'degree of truth' for each rule." :
+                          idx === 3 ? "Calculates the 'firing strength' of every If-Then rule." :
+                          idx === 4 ? "Center of Gravity (Centroid) method to merge rule outputs." :
+                          idx === 5 ? "Identifies the single strongest behavior pattern." :
+                          idx === 6 ? "Applies the AI's wisdom to the actual game parameters." :
+                          "Prepares the packet for the game client."
+                        }
+                      />
                     </div>
                   </div>
 

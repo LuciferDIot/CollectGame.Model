@@ -46,9 +46,9 @@ export function MembershipDiagnostics({ session, currentRound }: MembershipDiagn
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          Soft Membership Diagnostics
           <HelpfulTooltip 
-            title="Soft Membership"
+            trigger={<span className="cursor-pointer hover:underline decoration-dotted underline-offset-4">Soft Membership Diagnostics</span>}
+            title="Soft Membership (Fuzzification)"
             description="The degree to which the player currently fits into each Archetype (0.0 to 1.0). Unlike hard clustering, this is fuzzy and continuous."
             interpretation="Option B uses this for 'Contextual Bias'—smoothing the output but not driving the main variance."
           />
@@ -59,8 +59,13 @@ export function MembershipDiagnostics({ session, currentRound }: MembershipDiagn
         {/* Validation */}
         <div className="flex items-center justify-between p-2 bg-muted rounded">
           <span className="text-sm font-medium flex items-center gap-1">
-             Membership Sum Check
-             <HelpfulTooltip title="Partition of Unity" description="Fuzzy logic requirement: The sum of all membership degrees must equal exactly 1.0." />
+             <HelpfulTooltip 
+               trigger={<span className="cursor-pointer hover:underline decoration-dotted underline-offset-4">Membership Sum Check</span>}
+               title="Partition of Unity (Correctness Check)" 
+               description="Fuzzy logic requirement: The sum of all membership degrees must equal exactly 1.0." 
+               calculation="Σ μ(x) = μ_combat + μ_collect + μ_explore = 1.0"
+               interpretation="If the sum != 1.0, the fuzzy system is invalid (broken probability space)."
+             />
           </span>
           <span
             className={`text-sm font-bold ${
@@ -95,18 +100,39 @@ export function MembershipDiagnostics({ session, currentRound }: MembershipDiagn
             </div>
           </div>
           <div className="grid grid-cols-3 gap-2 text-xs">
-            <div className="flex items-center gap-1">
-              <Swords className="h-3 w-3 text-red-500" />
-              <span>Combat: {(softMembership.combat * 100).toFixed(1)}%</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Package className="h-3 w-3 text-blue-500" />
-              <span>Collect: {(softMembership.collect * 100).toFixed(1)}%</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Compass className="h-3 w-3 text-green-500" />
-              <span>Explore: {(softMembership.explore * 100).toFixed(1)}%</span>
-            </div>
+            <HelpfulTooltip
+              trigger={
+                <div className="flex items-center gap-1 cursor-pointer hover:underline">
+                  <Swords className="h-3 w-3 text-red-500" />
+                  <span>Combat: {(softMembership.combat * 100).toFixed(1)}%</span>
+                </div>
+              }
+              title="Combat Membership (μ_combat)"
+              description="How much your current behavior matches the 'Aggressive Fighter' archetype."
+              calculation="μ_combat(x) = (1 / (1 + d(x, center_combat)^2)) / Σ(all_classes)"
+            />
+            <HelpfulTooltip
+              trigger={
+                <div className="flex items-center gap-1 cursor-pointer hover:underline">
+                  <Package className="h-3 w-3 text-blue-500" />
+                  <span>Collect: {(softMembership.collect * 100).toFixed(1)}%</span>
+                </div>
+              }
+              title="Collect Membership (μ_collect)"
+              description="How much your current behavior matches the 'Resource Gatherer' archetype."
+              calculation="μ_collect(x) = (1 / (1 + d(x, center_collect)^2)) / Σ(all_classes)"
+            />
+            <HelpfulTooltip
+              trigger={
+                <div className="flex items-center gap-1 cursor-pointer hover:underline">
+                  <Compass className="h-3 w-3 text-green-500" />
+                  <span>Explore: {(softMembership.explore * 100).toFixed(1)}%</span>
+                </div>
+              }
+              title="Explore Membership (μ_explore)"
+              description="How much your current behavior matches the 'Map Explorer' archetype."
+              calculation="μ_explore(x) = (1 / (1 + d(x, center_explore)^2)) / Σ(all_classes)"
+            />
           </div>
         </div>
 
@@ -122,6 +148,7 @@ export function MembershipDiagnostics({ session, currentRound }: MembershipDiagn
             <HelpfulTooltip 
               title="Dominant Style" 
               description="The single strongest component of the user's behavior this round."
+              interpretation="The archetype with the highest soft membership value (MAX(μ))."
             />
           </div>
         </div>
@@ -129,8 +156,12 @@ export function MembershipDiagnostics({ session, currentRound }: MembershipDiagn
         {/* Session Distribution */}
         <div className="border-t pt-4 space-y-2">
           <h4 className="text-sm font-semibold flex items-center gap-1">
-            Session Distribution
-             <HelpfulTooltip title="Long-term Style" description="Percentage of rounds where each archetype was dominant." />
+             <HelpfulTooltip 
+               trigger={<span className="cursor-pointer hover:underline decoration-dotted underline-offset-4">Session Distribution</span>}
+               title="Long-term Style (Archetype History)" 
+               description="Percentage of rounds where each archetype was dominant." 
+               calculation="%_Archetype_A = (Count(Rounds where A is Max) / Total_Rounds) * 100"
+             />
           </h4>
           <div className="space-y-2">
             {Object.entries(dominantArchetypeDistribution).map(([archetype, percentage]) => (
@@ -140,7 +171,7 @@ export function MembershipDiagnostics({ session, currentRound }: MembershipDiagn
                     {archetypeIcons[archetype as Archetype]}
                     {archetype}
                   </span>
-                  <span>{percentage.toFixed(1)}%</span>
+                  <span className="font-mono">{percentage.toFixed(1)}%</span>
                 </div>
                 <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                   <div

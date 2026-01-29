@@ -127,12 +127,16 @@ export function ClampMonitor({
                 <HelpfulTooltip 
                   title="Lower Clamp Rate"
                   description="% of rounds where M would have been < 0.6."
+                  calculation="Count(Rounds where M < 0.6) / Total_Rounds"
                   interpretation="High lower clamp usage means the model wants to make the game easier than allowed."
                 />
               </span>
-              <span className={`text-lg font-bold ${getClampColor(clampPercentage.lower)}`}>
-                {clampPercentage.lower.toFixed(1)}%
-              </span>
+              <HelpfulTooltip
+                trigger={<span className={`text-lg font-bold ${getClampColor(clampPercentage.lower)} cursor-pointer hover:underline`}>{clampPercentage.lower.toFixed(1)}%</span>}
+                title="Lower Clamp Percentage"
+                description="The exact frequency of lower bound violations."
+                calculation="Raw Frequency %"
+              />
             </div>
             <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
               <div
@@ -156,12 +160,16 @@ export function ClampMonitor({
                 <HelpfulTooltip 
                   title="Upper Clamp Rate"
                   description="% of rounds where M would have been > 1.4."
+                  calculation="Count(Rounds where M > 1.4) / Total_Rounds"
                   interpretation="High upper clamp usage means the model wants to make the game harder than allowed."
                 />
               </span>
-              <span className={`text-lg font-bold ${getClampColor(clampPercentage.upper)}`}>
-                {clampPercentage.upper.toFixed(1)}%
-              </span>
+              <HelpfulTooltip
+                trigger={<span className={`text-lg font-bold ${getClampColor(clampPercentage.upper)} cursor-pointer hover:underline`}>{clampPercentage.upper.toFixed(1)}%</span>}
+                title="Upper Clamp Percentage"
+                description="The exact frequency of upper bound violations."
+                calculation="Raw Frequency %"
+              />
             </div>
             <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
               <div
@@ -185,12 +193,16 @@ export function ClampMonitor({
                  <HelpfulTooltip 
                   title="Total Saturation Index"
                   description="Combined percentage of rounds where the model hit ANY limit."
+                  calculation="Count(Lower + Upper) / Total_Rounds"
                   interpretation="This is the primary 'Stability Score'. If < 5%, the system is well-tuned."
                 />
               </span>
-              <span className={`text-lg font-bold ${getClampColor(clampPercentage.total)}`}>
-                {clampPercentage.total.toFixed(1)}%
-              </span>
+              <HelpfulTooltip
+                trigger={<span className={`text-lg font-bold ${getClampColor(clampPercentage.total)} cursor-pointer hover:underline`}>{clampPercentage.total.toFixed(1)}%</span>}
+                title="Total Saturation Value"
+                description="The overall frequency of model clipping events."
+                calculation="Sum of Lower and Upper frequencies"
+              />
             </div>
             <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
               <div

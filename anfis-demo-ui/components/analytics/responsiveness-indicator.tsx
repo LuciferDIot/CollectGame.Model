@@ -61,13 +61,14 @@ export function ResponsivenessIndicator({ currentRound, session }: Responsivenes
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Behavior-Response Alignment
+              <HelpfulTooltip 
+                trigger={<span className="cursor-pointer hover:underline decoration-dotted underline-offset-4">Behavior-Response Alignment</span>}
+                title="Responsiveness"
+                description="Measures the statistical correlation between 'Player Action Intensity' (inputs) and 'Difficulty Adjustment' (outputs)."
+                interpretation="A high value (>0.6) proves the model is actively 'listening' to the player, not just drifting randomly."
+                calculation="Pearson_Correlation(Input_History, Output_History)"
+              />
             </CardTitle>
-            <HelpfulTooltip 
-              title="Responsiveness"
-              description="Measures the statistical correlation between 'Player Action Intensity' (inputs) and 'Difficulty Adjustment' (outputs)."
-              interpretation="A high value (>0.6) proves the model is actively 'listening' to the player, not just drifting randomly."
-            />
           </div>
           <Badge variant="outline" className={`${color} ${bg} ${borderColor} flex gap-1 items-center`}>
             <Icon className="h-3 w-3" /> {status}
