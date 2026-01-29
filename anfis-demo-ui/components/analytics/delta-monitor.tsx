@@ -37,13 +37,13 @@ export function DeltaMonitor({ session, currentRound }: DeltaMonitorProps) {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          Delta Effectiveness Monitor
-          {deltaLow && <AlertCircle className="h-4 w-4 text-yellow-500" />}
           <HelpfulTooltip 
-            title="Deltas (Δ)"
+            trigger={<span className="cursor-pointer hover:underline decoration-dotted underline-offset-4">Delta Effectiveness Monitor</span>}
+            title="Delta Effectiveness (Input Sensitivity)"
             description="The instantaneous rate of change in player behavior (derivative of the input signals)."
             interpretation="In Option B, Deltas are the primary driver of difficulty. High deltas mean the player is changing strategy, prompting adaptation."
           />
+          {deltaLow && <AlertCircle className="h-4 w-4 text-yellow-500" />}
         </CardTitle>
         <CardDescription>
           Behavioral changes driving variance (Option B Core Mechanism)
@@ -53,21 +53,34 @@ export function DeltaMonitor({ session, currentRound }: DeltaMonitorProps) {
         {/* Current Round Deltas */}
         <div className="space-y-3">
           <div className="flex items-center gap-2">
-             <h4 className="text-sm font-semibold">Current Round Deltas</h4>
-             <HelpfulTooltip 
-               title="Instantaneous Change"
-               description="How much the player's behavior changed in the last 5 seconds."
-             />
+             <h4 className="text-sm font-semibold">
+               <HelpfulTooltip 
+                 trigger={<span className="cursor-pointer hover:underline decoration-dotted underline-offset-4">Current Round Deltas</span>}
+                 title="Instantaneous Change Vector"
+                 description="How much the player's behavior changed in the last 5 seconds."
+               />
+             </h4>
           </div>
           
-          {/* Combat Delta */}
+            {/* Combat Delta */}
           <div>
             <div className="flex justify-between text-sm mb-1">
               <span className="flex items-center gap-1">
-                Δ Combat
-                <HelpfulTooltip title="Combat Delta" description="Change in Kill/Death Ratio and Combat Frequency." />
+                <HelpfulTooltip 
+                  trigger={<span className="cursor-pointer hover:underline decoration-dotted underline-offset-4">Δ Combat</span>}
+                  title="Combat Delta (Rate of Change)" 
+                  description="Measures how quickly your combat performance is changing." 
+                  calculation="ΔCombat = (Current_Kills/Time - Avg_Kills/Time) + (Current_Damage/Time - Avg_Damage/Time)"
+                  interpretation="Positive (+) means you are fighting more intensely than usual. Negative (-) means you are slowing down."
+                />
               </span>
-              <span className="font-mono">{deltas.combat.toFixed(4)}</span>
+              <HelpfulTooltip
+                trigger={<span className="font-mono cursor-pointer hover:underline decoration-dotted underline-offset-4">{deltas.combat.toFixed(4)}</span>}
+                title="Combat Delta Value"
+                description="The raw numerical value representing combat change intensity."
+                calculation="Raw_Delta_Value normalized between -1.0 and 1.0"
+                interpretation="High magnitude (>0.5) triggers strong adaptation responses."
+              />
             </div>
             <div className="flex items-center gap-2">
               <div className="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
@@ -89,10 +102,21 @@ export function DeltaMonitor({ session, currentRound }: DeltaMonitorProps) {
           <div>
             <div className="flex justify-between text-sm mb-1">
               <span className="flex items-center gap-1">
-                Δ Collect
-                 <HelpfulTooltip title="Collect Delta" description="Change in Items Collected per Minute." />
+                <HelpfulTooltip 
+                  trigger={<span className="cursor-pointer hover:underline decoration-dotted underline-offset-4">Δ Collect</span>}
+                  title="Collect Delta (Rate of Change)" 
+                  description="Measures change in item collection efficiency." 
+                  calculation="ΔCollect = (Items_Collected_Last_Window) - (Running_Average_Collection)"
+                  interpretation="Positive means a sudden burst of collecting. Negative means a lull in gathering."
+                />
               </span>
-              <span className="font-mono">{deltas.collect.toFixed(4)}</span>
+              <HelpfulTooltip
+                trigger={<span className="font-mono cursor-pointer hover:underline decoration-dotted underline-offset-4">{deltas.collect.toFixed(4)}</span>}
+                title="Collect Delta Value"
+                description="The raw numerical value representing collection surge."
+                calculation="Raw_Delta_Value normalized to standard deviation unit"
+                interpretation="Used to detect 'Item Hoarding' or 'Speed Running' behavior."
+              />
             </div>
             <div className="flex items-center gap-2">
               <div className="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
@@ -114,10 +138,21 @@ export function DeltaMonitor({ session, currentRound }: DeltaMonitorProps) {
           <div>
             <div className="flex justify-between text-sm mb-1">
                <span className="flex items-center gap-1">
-                Δ Explore
-                 <HelpfulTooltip title="Explore Delta" description="Change in Map Coverage and Movement Variance." />
+                 <HelpfulTooltip 
+                   trigger={<span className="cursor-pointer hover:underline decoration-dotted underline-offset-4">Δ Explore</span>}
+                   title="Explore Delta (Movement Variance)" 
+                   description="Measures changes in how you move across the map." 
+                   calculation="ΔExplore = (Distance_Traveled_In_Window / Duration) - Avg_Speed"
+                   interpretation="High positive values mean sudden sprinting or fleeing. Negative values mean camping or standing still."
+                 />
               </span>
-              <span className="font-mono">{deltas.explore.toFixed(4)}</span>
+              <HelpfulTooltip
+                trigger={<span className="font-mono cursor-pointer hover:underline decoration-dotted underline-offset-4">{deltas.explore.toFixed(4)}</span>}
+                title="Explore Delta Value"
+                description="The raw numerical value representing movement variability."
+                calculation="Normalized Movement Variance Vector Magnitude"
+                interpretation="Critical for detecting 'Rusher' vs 'Turtle' strategies."
+              />
             </div>
             <div className="flex items-center gap-2">
               <div className="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
@@ -141,15 +176,21 @@ export function DeltaMonitor({ session, currentRound }: DeltaMonitorProps) {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <p className="text-xs text-muted-foreground flex items-center gap-1">
-                Current Magnitude
-                 <HelpfulTooltip title="Total Delta Magnitude" description="Sum of absolute changes. |ΔCmb| + |ΔCol| + |ΔExp|. Higher = More Adaptation." />
+                 <HelpfulTooltip 
+                   trigger={<span className="cursor-pointer hover:underline decoration-dotted underline-offset-4">Current Magnitude</span>}
+                   title="Total Delta Magnitude" 
+                   description="Sum of absolute changes. |ΔCmb| + |ΔCol| + |ΔExp|. Higher = More Adaptation." 
+                 />
               </p>
               <p className="text-lg font-semibold">{currentMagnitude.toFixed(4)}</p>
             </div>
             <div>
               <p className="text-xs text-muted-foreground flex items-center gap-1">
-                Session Avg
-                 <HelpfulTooltip title="Average Magnitude" description="Long-term average of adaptation intensity. If < 0.05, the model is stagnating." />
+                 <HelpfulTooltip 
+                   trigger={<span className="cursor-pointer hover:underline decoration-dotted underline-offset-4">Session Avg</span>}
+                   title="Average Magnitude" 
+                   description="Long-term average of adaptation intensity. If < 0.05, the model is stagnating." 
+                 />
               </p>
               <p className={`text-lg font-semibold ${deltaLow ? 'text-yellow-600' : ''}`}>
                 {avgDeltaMagnitude.toFixed(4)}

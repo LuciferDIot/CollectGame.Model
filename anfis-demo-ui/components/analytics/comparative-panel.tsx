@@ -41,11 +41,12 @@ export function ComparativePanel() {
             <tbody>
               <tr className="border-b">
                 <td className="p-4 font-medium flex items-center gap-2">
-                  Target Std Dev
                    <HelpfulTooltip 
+                    trigger={<span className="cursor-pointer hover:underline decoration-dotted underline-offset-4">Target Std Dev</span>}
                     title="Target Standard Deviation"
                     description="Measure of signal variance. Low std means the game feels 'flat' and unresponsive."
                     interpretation="Option B's 0.062 proves it creates a dynamic experience, unlike the flat 0.011 of the original."
+                    calculation="std(target_signal)"
                    />
                 </td>
                 <td className="p-4 font-mono text-muted-foreground">{originalStd.toFixed(4)}</td>
@@ -55,11 +56,12 @@ export function ComparativePanel() {
               </tr>
               <tr className="border-b">
                 <td className="p-4 font-medium flex items-center gap-2">
-                  Target Span
                    <HelpfulTooltip 
+                    trigger={<span className="cursor-pointer hover:underline decoration-dotted underline-offset-4">Target Span</span>}
                     title="Effective Signal Span"
                     description="The difference between the maximum and minimum difficulty multipliers generated."
                     interpretation="A huge 1711% increase means the AI can now make the game significantly harder OR easier, not just slightly tweak it."
+                    calculation="max(target) - min(target)"
                    />
                 </td>
                 <td className="p-4 font-mono text-muted-foreground">{originalSpan.toFixed(3)}</td>
@@ -69,11 +71,12 @@ export function ComparativePanel() {
               </tr>
               <tr className="border-b">
                 <td className="p-4 font-medium flex items-center gap-2">
-                  Test R² Score
                   <HelpfulTooltip 
+                    trigger={<span className="cursor-pointer hover:underline decoration-dotted underline-offset-4">Test R² Score</span>}
                     title="Model Fit Accuracy"
                     description="The ability of the ANFIS model to replicate the target logic."
                     interpretation="Option B maintains professional-grade accuracy (>0.95) despite the vastly more complex target curve."
+                    calculation="1 - (SSR / SST)"
                    />
                 </td>
                 <td className="p-4 font-mono text-red-500">{originalR2.toFixed(2)}</td>
@@ -87,11 +90,12 @@ export function ComparativePanel() {
               </tr>
               <tr>
                 <td className="p-4 font-medium flex items-center gap-2">
-                  Clamp Saturation
                   <HelpfulTooltip 
+                    trigger={<span className="cursor-pointer hover:underline decoration-dotted underline-offset-4">Clamp Saturation</span>}
                     title="Safety Clamp Usage"
                     description="Percentage of time the model hits the hard safety limits."
                     interpretation="0% means Option B is naturally safe and stable, whereas the original system failed 100% of the time (hitting the limits)."
+                    calculation="count(clamped_outputs) / total_outputs"
                    />
                 </td>
                 <td className="p-4 font-mono text-red-500">100%</td>

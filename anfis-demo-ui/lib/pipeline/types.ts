@@ -36,9 +36,9 @@ export interface ActivityScores {
 }
 
 export interface SoftMembership {
-  combat: number;
-  collect: number;
-  explore: number;
+  soft_combat: number;
+  soft_collect: number;
+  soft_explore: number;
 }
 
 export interface Deltas {
@@ -57,25 +57,36 @@ export interface ANFISInput {
 }
 
 export interface AdaptedParameter {
+  id: string; // Added for list identification
   base: number;
   final: number;
   clamped: boolean;
+  metadata?: ParameterMetadata; // Optional trace back to config
 }
 
-export interface AdaptationResult {
-  enemy_spawn_interval: AdaptedParameter;
-  global_enemy_cap: AdaptedParameter;
-  enemy_damage_intensity: AdaptedParameter;
-  enemy_max_health: AdaptedParameter;
-  stamina_regen: AdaptedParameter;
-  stamina_damage: AdaptedParameter;
-  dash_cooldown: AdaptedParameter;
-  collectible_count: AdaptedParameter;
-  collectible_spawn_interval: AdaptedParameter;
-  collectible_lifetime: AdaptedParameter;
-  player_damage_intensity: AdaptedParameter;
-  player_max_health: AdaptedParameter;
+export type ScalingMode = 'Direct' | 'Inverse';
+
+export interface ArchetypeWeights {
+  combat?: number;
+  collect?: number;
+  explore?: number;
 }
+
+export interface ParameterMetadata {
+  id: string;
+  baseValue: number;
+  min: number;
+  max: number;
+  scaling: ScalingMode;
+  archetypeInfluence?: {
+    enabled: boolean;
+    weights?: ArchetypeWeights;
+  };
+}
+
+export type AdaptationRegistry = Record<string, ParameterMetadata>;
+
+export type AdaptationResult = Record<string, AdaptedParameter>;
 
 export interface PipelineOutput {
   filtering: {

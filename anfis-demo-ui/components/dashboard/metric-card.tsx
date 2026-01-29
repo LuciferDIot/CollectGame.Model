@@ -1,5 +1,4 @@
-'use client';
-
+import { HelpfulTooltip } from '@/components/analytics/helpful-tooltip';
 import { Card } from '@/components/ui/card';
 import { TrendingDown, TrendingUp } from 'lucide-react';
 
@@ -10,6 +9,12 @@ interface MetricCardProps {
   trendValue?: string;
   color?: 'combat' | 'collection' | 'exploration' | 'neutral';
   suffix?: string;
+  help?: {
+    title: string;
+    description: string;
+    calculation?: string;
+    interpretation?: string;
+  };
 }
 
 const colorMap = {
@@ -45,34 +50,47 @@ export function MetricCard({
   trend = 'neutral', 
   trendValue,
   color = 'neutral',
-  suffix = ''
+  suffix = '',
+  help
 }: MetricCardProps) {
   const colors = colorMap[color];
   
-  return (
-    <Card className={`bg-gradient-to-br ${colors.bg} ${colors.border} hover:scale-[1.02] transition-transform duration-200`}>
-      <div className="p-4">
-        <div className="flex items-center justify-between mb-3">
-          <p className="text-xs uppercase tracking-wider text-slate-400 font-medium">
-            {label}
-          </p>
-          {trend !== 'neutral' && trendValue && (
-            <div className={`flex items-center gap-1 text-xs ${trend === 'up' ? 'text-green-400' : 'text-red-400'}`}>
-              {trend === 'up' ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-              <span className="font-medium">{trendValue}</span>
-            </div>
-          )}
-        </div>
-        
-        <div className="flex items-baseline gap-1">
-          <p className={`text-3xl font-bold ${colors.text}`}>
-            {value}
-          </p>
-          {suffix && (
-            <span className={`text-lg ${colors.accent} font-medium`}>{suffix}</span>
-          )}
-        </div>
+  const content = (
+    <div className="p-4 cursor-pointer">
+      <div className="flex items-center justify-between mb-3">
+        <p className="text-xs uppercase tracking-wider text-slate-400 font-medium">
+          {label}
+        </p>
+        {trend !== 'neutral' && trendValue && (
+          <div className={`flex items-center gap-1 text-xs ${trend === 'up' ? 'text-green-400' : 'text-red-400'}`}>
+            {trend === 'up' ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+            <span className="font-medium">{trendValue}</span>
+          </div>
+        )}
       </div>
+      
+      <div className="flex items-baseline gap-1">
+        <p className={`text-3xl font-bold ${colors.text}`}>
+          {value}
+        </p>
+        {suffix && (
+          <span className={`text-lg ${colors.accent} font-medium`}>{suffix}</span>
+        )}
+      </div>
+    </div>
+  );
+
+  return (
+    <Card className={`bg-gradient-to-br ${colors.bg} ${colors.border} hover:scale-[1.02] transition-transform duration-200 relative group`}>
+       {help ? (
+         <HelpfulTooltip
+            trigger={<div className="w-full h-full">{content}</div>}
+            title={help.title}
+            description={help.description}
+            calculation={help.calculation}
+            interpretation={help.interpretation}
+         />
+       ) : content}
     </Card>
   );
 }

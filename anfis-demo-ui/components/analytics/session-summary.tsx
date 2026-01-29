@@ -50,9 +50,19 @@ export function SessionSummary({ session }: SessionSummaryProps) {
              <div className="flex items-center gap-2 text-muted-foreground text-xs font-medium">
                <Calculator className="h-3.5 w-3.5" />
                <span>Avg Multiplier</span>
-               <HelpfulTooltip title="Average Difficulty" description="Mean multiplier applied throughout the session. Should be close to 1.0." />
+               <HelpfulTooltip 
+                 title="Average Difficulty (Session)" 
+                 description="The mean difficulty multiplier applied across the entire game session so far." 
+                 calculation="SUM(all_multipliers) / count(rounds)"
+                 interpretation="If this is >> 1.0, the game is generally too hard for you. If << 1.0, it's too easy."
+               />
              </div>
-             <div className="text-2xl font-bold font-mono">{avgMultiplier.toFixed(3)}x</div>
+             <HelpfulTooltip
+               trigger={<span className="text-2xl font-bold font-mono cursor-pointer hover:underline block">{avgMultiplier.toFixed(3)}x</span>}
+               title="Mean Multiplier Value"
+               description="The exact average of every difficulty decision made by the AI."
+               calculation="Arithmetic Mean (μ)"
+             />
              <p className="text-[10px] text-green-500">Target: 1.0</p>
           </div>
 
@@ -60,9 +70,19 @@ export function SessionSummary({ session }: SessionSummaryProps) {
              <div className="flex items-center gap-2 text-muted-foreground text-xs font-medium">
                <Activity className="h-3.5 w-3.5" />
                <span>Variance (σ)</span>
-                <HelpfulTooltip title="Multiplier Deviation (σ)" description="Standard deviation of the multiplier. Higher means more dynamic adaptation." />
+                <HelpfulTooltip 
+                  title="Adaptation Variance (Standard Deviation)" 
+                  description="Standard deviation of the multiplier history. Measures how dynamic the difficulty is." 
+                  calculation="SQRT( SUM( (x - μ)² ) / N )"
+                  interpretation="High variance means the AI is actively searching for your skill ceiling. Low variance implies a stable but potentially boring experience."
+                />
              </div>
-             <div className="text-2xl font-bold font-mono text-blue-300">{stdMultiplier.toFixed(3)}</div>
+             <HelpfulTooltip
+               trigger={<span className="text-2xl font-bold font-mono text-blue-300 cursor-pointer hover:underline block">{stdMultiplier.toFixed(3)}</span>}
+               title="Variance Value"
+               description="The statistical spread of difficulty adjustments."
+               calculation="Standard Deviation (σ)"
+             />
              <p className="text-[10px] text-blue-400">Target: &gt; 0.05</p>
           </div>
 

@@ -8,6 +8,7 @@ import { AlertCircle, CheckCircle, Info, TrendingUp } from 'lucide-react';
 import { MetricCard } from './metric-card';
 import { RuleInspectorDrawer } from './rule-inspector-drawer';
 import { AnalyticsTab } from './tabs/analytics-tab';
+import { HelpfulTooltip } from '../analytics/helpful-tooltip';
 
 
 
@@ -67,6 +68,12 @@ export function BottomPanel() {
                 }
                 trend={cat.softMembership > 0.33 ? 'up' : 'down'}
                 trendValue={`${cat.activityPercentage}% activity`}
+                help={{
+                  title: `${cat.category} Membership`,
+                  description: `How accurately your current actions fit the ${cat.category} archetype.`,
+                  calculation: `μ_${cat.category.toLowerCase()}(x) = 1 / (1 + d(x, center)^2)`,
+                  interpretation: "Used to weight the rules. High membership means the rules for this style will dominate the final difficulty decision."
+                }}
               />
             ))}
             <MetricCard
@@ -76,6 +83,12 @@ export function BottomPanel() {
               color="neutral"
               trend="up"
               trendValue="High"
+              help={{
+                title: "Inference Confidence",
+                description: "The system's certainty that the current difficulty adaptation is mathematically optimal.",
+                calculation: "AVG(Rule_Firing_Strengths) * Stability_Index",
+                interpretation: "If confidence drops < 80%, the system will throttle changes to avoid erratic behavior."
+              }}
             />
           </div>
         </div>
@@ -184,7 +197,23 @@ export function BottomPanel() {
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h5 className="text-xs font-semibold text-slate-100">{check.name}</h5>
+                      <HelpfulTooltip
+                        trigger={<h5 className="text-xs font-semibold text-slate-100 cursor-pointer hover:underline decoration-dotted underline-offset-2">{check.name}</h5>}
+                        title={`Check: ${check.name}`}
+                        description={check.message}
+                        calculation={
+                          check.name.includes('Membership') ? "Sum(μ_i) ≈ 1.0 ± 0.001" :
+                          check.name.includes('Delta') ? "-1.0 <= Δ <= 1.0" :
+                          check.name.includes('Clamp') ? "Multiplier ∈ [0.5, 2.0]" :
+                          "Validation_Logic(State)"
+                        }
+                        interpretation={
+                          check.name.includes('Membership') ? "Ensures all behavior possibilities sum to 100%. If not, the AI is hallucinating." :
+                          check.name.includes('Delta') ? "Verifies that rate of change is physically possible within one frame." :
+                          check.name.includes('Clamp') ? "Safety: Prevents the difficulty from exploding to infinity or dropping to zero." :
+                          "A real-time integrity check running every frame."
+                        }
+                      />
                       <p className="text-xs text-slate-400 mt-0.5">{check.message}</p>
                     </div>
                     <span className={`text-xs font-mono px-2 py-1 rounded flex-shrink-0 ${
