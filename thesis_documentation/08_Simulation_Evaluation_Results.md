@@ -45,3 +45,16 @@ The following matrix illustrates how changes in player performance ($\Delta$) sh
 | **Explore Focus** | $M \uparrow 1.10$ (Faster Pace) | $M \approx 1.0$ | $M \downarrow 0.95$ (Guidance) |
 
 *Interpretation: High performance in Combat leads to the most aggressive difficulty increase, while struggling in any category triggers a difficulty reduction (Assist mode).*
+
+## 5. Runtime Analytics Bridge (The "Trust Anchor")
+
+**Bridge Implementation**:
+To verify these simulation results in the live game, we implemented the "Trust Anchor" chart in the Admin Dashboard.
+
+*   **Offline vs Online**: This report proves the *Model* works (R²=0.98). The Dashboard proves the *Game* submits correct data.
+*   **Visual Validation**:
+    *   The "Trust Anchor" plots real-time telemetry (white dots) against the K-Means centroids (colored backgrounds).
+    *   **Success Criteria**: If a player is fighting, their dot MUST move into the Red (Combat) zone.
+    *   **Failure Mode**: If the dot remains in the center during combat, the Feature Extraction Logic is broken.
+
+*See `ANALYTICS_WALKTHROUGH.md` for the full live verification protocol.*
