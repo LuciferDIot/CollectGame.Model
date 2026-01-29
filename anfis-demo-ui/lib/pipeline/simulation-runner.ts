@@ -105,6 +105,12 @@ export const runSimulationService = {
                 maeTest: 0.012,
                 mseTest: 0.0001,
                 rmseTest: 0.01
+            },
+            // FIX: Map the backend multiplier to the output state so adaptation tabs can read it
+            output: {
+                adjustedMultiplier: backendResult.target_multiplier,
+                confidence: backendResult.validation.membership_sum > 0.8 ? 0.95 : 0.60,
+                ruleActivations: backendResult.inference.rulesFired || []
             }
         };
     },
