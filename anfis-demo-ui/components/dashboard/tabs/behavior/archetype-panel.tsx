@@ -9,9 +9,10 @@ import { GitBranch } from 'lucide-react';
 
 interface ArchetypePanelProps {
   categories: BehaviorCategory[];
+  onMetricSelect?: (key: string) => void;
 }
 
-export function ArchetypePanel({ categories }: ArchetypePanelProps) {
+export function ArchetypePanel({ categories, onMetricSelect }: ArchetypePanelProps) {
   
   const getCategoryColor = (cat: string) => {
     switch (cat) {
@@ -38,7 +39,7 @@ export function ArchetypePanel({ categories }: ArchetypePanelProps) {
         </span>
       </div>
 
-      <div className="grid gap-3 flex-1 content-start">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 flex-1 content-start">
         {categories.map((cat) => (
           <Card
             key={cat.category}
@@ -51,12 +52,10 @@ export function ArchetypePanel({ categories }: ArchetypePanelProps) {
                 />
              </div>
              
-             {/* Clickable Overlay for Education */}
-             <EducationalDrawer 
-                contentKey={`archetype_${cat.category.toLowerCase()}`}
-                trigger={
-                   <div className="absolute inset-0 z-0 cursor-help" />
-                }
+             {/* Clickable Area */}
+             <div 
+                onClick={() => onMetricSelect?.(`archetype_${cat.category.toLowerCase()}`)}
+                className="absolute inset-0 z-0 cursor-pointer hover:bg-white/[0.02] transition-colors" 
              />
 
             <div className="flex items-stretch pointer-events-none relative z-10">
