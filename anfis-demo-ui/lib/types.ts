@@ -20,8 +20,10 @@ export interface SoftMembership {
   explore: number;
 }
 
+export type Category = 'Combat' | 'Collection' | 'Exploration';
+
 export interface BehaviorCategory {
-  category: 'Combat' | 'Collection' | 'Exploration';
+  category: Category;
   softMembership: number;
   activityPercentage: number;
   confidence: number;
@@ -31,7 +33,7 @@ export interface AdaptationDelta {
   field: string;
   before: number;
   after: number;
-  category: 'Combat' | 'Collection' | 'Exploration';
+  category: Category;
   intensity: 'low' | 'medium' | 'high';
 }
 
@@ -79,13 +81,13 @@ export interface PipelineState {
     confidence: number;
   } | null;
   metadata?: {
-    deltas?: {
-      combat: number;
-      collect: number;
-      explore: number;
-    };
+    deltas?: Delta;
   };
   error?: string | null;
+}
+
+export type Delta = {
+  [key in Category]: number;
 }
 
 export interface DashboardInputState {

@@ -8,13 +8,26 @@ export function cn(...inputs: ClassValue[]) {
 export function getTextColor(category: string) {
   switch (category.toLowerCase()) {
     case 'combat':
-      return 'text-red-300';
+      return 'text-purple-300';
     case 'collection':
-      return 'text-emerald-300';
-    case 'exploration':
       return 'text-amber-300';
+    case 'exploration':
+      return 'text-emerald-300';
     default:
       return 'text-slate-300';
+  }
+}
+
+export function getBgColor(category: string) {
+  switch (category.toLowerCase()) {
+    case 'combat':
+      return 'bg-purple-900';
+    case 'collection':
+      return 'bg-amber-900';
+    case 'exploration':
+      return 'bg-emerald-900';
+    default:
+      return 'bg-slate-900';
   }
 }
 
