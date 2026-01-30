@@ -1,0 +1,60 @@
+{
+  "verdict": "SEVERELY OVERFITTED (CRITICAL FAILURE)",
+  "explanation": "R\u00b2 = -4.69 indicates the model is significantly worse than predicting the mean. This suggests fundamental training issues or inappropriate architecture.",
+  "metrics": {
+    "train": {
+      "MAE": 0.01112290121639999,
+      "RMSE": 0.014758612889040314,
+      "R2": -5.394335119820403,
+      "samples": 2159
+    },
+    "val": {
+      "MAE": 0.011957718113079446,
+      "RMSE": 0.015224051397420146,
+      "R2": -4.59320931557694,
+      "samples": 491
+    },
+    "test": {
+      "MAE": 0.010691951201235143,
+      "RMSE": 0.013706273264318159,
+      "R2": -4.688209900959345,
+      "samples": 514
+    }
+  },
+  "sensitivities": {
+    "soft_combat": {
+      "mean_gradient": 0.004274174276336557,
+      "max_impact": 0.14493888792260767
+    },
+    "soft_collect": {
+      "mean_gradient": 0.0004350184194059047,
+      "max_impact": 0.021315902550889332
+    },
+    "soft_explore": {
+      "mean_gradient": 0.002002565789264637,
+      "max_impact": 0.09812572367396721
+    },
+    "delta_combat": {
+      "mean_gradient": 0.0019199772001304962,
+      "max_impact": 0.09407888280639431
+    },
+    "delta_collect": {
+      "mean_gradient": 0.0011002657867325287,
+      "max_impact": 0.03182111053168435
+    },
+    "delta_explore": {
+      "mean_gradient": 0.0007390574144153353,
+      "max_impact": 0.01778843412801634
+    }
+  },
+  "clamp_stats": {
+    "train": {
+      "near_0.5_pct": 0.0,
+      "near_1.5_pct": 0.0
+    },
+    "test": {
+      "near_0.5_pct": 0.0,
+      "near_1.5_pct": 0.0
+    }
+  }
+}

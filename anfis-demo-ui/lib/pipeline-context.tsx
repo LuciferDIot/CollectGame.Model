@@ -178,7 +178,10 @@ export function PipelineProvider({ children }: { children: React.ReactNode }) {
             behaviorCategories: mappedState.behaviorCategories || [],
             adaptationDeltas: mappedState.adaptationDeltas || [],
             validationChecks: mappedState.validationChecks || [],
-            rulesFired: mappedState.rulesFired || []
+            rulesFired: mappedState.rulesFired || [],
+            metadata: mappedState.metadata || null,
+            output: mappedState.output || null,
+            modelMetrics: mappedState.modelMetrics || null,
         } as PipelineState;
 
         setSimulationResult(finalState);
