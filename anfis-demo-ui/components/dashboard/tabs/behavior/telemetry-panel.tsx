@@ -4,12 +4,12 @@ import { EducationalDrawer } from '@/components/analytics/educational-drawer';
 import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
 import { Database } from 'lucide-react';
@@ -21,7 +21,7 @@ interface TelemetryPanelProps {
 
 export function TelemetryPanel({ features, onMetricSelect }: TelemetryPanelProps) {
   return (
-    <div className="xl:col-span-3 flex flex-col gap-3 min-h-[300px]">
+    <div className="xl:col-span-3 flex flex-col gap-3">
       <div className="flex items-center gap-2 text-slate-400 mb-1">
         <Database className="w-3.5 h-3.5" />
         <EducationalDrawer
@@ -50,7 +50,7 @@ export function TelemetryPanel({ features, onMetricSelect }: TelemetryPanelProps
                   </TableCell>
                 </TableRow>
               ) : (
-                features.map((f, i) => (
+                features.map((f, i) => f.value > 0.001 && (
                   <TableRow 
                     key={i} 
                     onClick={() => onMetricSelect?.(`feature_${f.name}`)}

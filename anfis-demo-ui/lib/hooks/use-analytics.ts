@@ -110,8 +110,8 @@ function extractDeltas(pipelineState: PipelineState) {
   const deltas = pipelineState.metadata?.deltas;
   
   return {
-    combat: deltas?.combat || 0,
-    collect: deltas?.collect || 0,
-    explore: deltas?.explore || 0,
+    combat: deltas?.Combat || 0,
+    collect: deltas?.Collection || 0,
+    explore: deltas?.Exploration || 0,
   };
 }
