@@ -16,9 +16,10 @@ import { Database } from 'lucide-react';
 
 interface TelemetryPanelProps {
   features: { name: string; value: number }[];
+  onMetricSelect?: (key: string) => void;
 }
 
-export function TelemetryPanel({ features }: TelemetryPanelProps) {
+export function TelemetryPanel({ features, onMetricSelect }: TelemetryPanelProps) {
   return (
     <div className="xl:col-span-3 flex flex-col gap-3 min-h-[300px]">
       <div className="flex items-center gap-2 text-slate-400 mb-1">
@@ -50,7 +51,11 @@ export function TelemetryPanel({ features }: TelemetryPanelProps) {
                 </TableRow>
               ) : (
                 features.map((f, i) => (
-                  <TableRow key={i} className="hover:bg-slate-900/40 border-slate-800/50">
+                  <TableRow 
+                    key={i} 
+                    onClick={() => onMetricSelect?.(`feature_${f.name}`)}
+                    className="hover:bg-slate-900/40 border-slate-800/50 cursor-pointer group transition-colors"
+                  >
                     <TableCell className="py-2 text-xs font-medium text-slate-300 font-mono">
                       {f.name.replace(/_/g, ' ')}
                     </TableCell>

@@ -36,10 +36,10 @@ export function EducationalDrawer({ contentKey, trigger }: EducationalDrawerProp
           </button>
         )}
       </SheetTrigger>
-      <SheetContent className="w-[400px] sm:w-[540px] bg-slate-950 border-l border-slate-800 text-slate-200 overflow-y-auto">
+      <SheetContent className="w-[400px] sm:w-[540px] p-6 bg-slate-950 border-l border-slate-800 text-slate-200 overflow-y-auto">
         <SheetHeader className="pb-6 border-b border-slate-800">
-          <SheetTitle className="text-2xl font-bold text-slate-100 flex items-center gap-3">
-             <BookOpen className="w-6 h-6 text-blue-500" />
+          <SheetTitle className="text-xl font-bold text-slate-100 flex items-center gap-3">
+             <BookOpen className="text-blue-500" />
              {content.title}
           </SheetTitle>
           <SheetDescription className="text-slate-400 text-base">

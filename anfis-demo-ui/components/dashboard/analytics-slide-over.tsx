@@ -1,9 +1,10 @@
 'use client';
 
+import { EducationalDrawer } from '@/components/analytics/educational-drawer';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { usePipeline } from '@/lib/pipeline-context';
 import * as Dialog from '@radix-ui/react-dialog';
-import { BarChart3, TrendingUp, X } from 'lucide-react';
+import { BarChart3, Info, TrendingUp, X } from 'lucide-react';
 import { AnalyticsMetricsCards } from './analytics-metrics-cards';
 import { AnalyticsTabsList } from './analytics-tabs-list';
 import { AdaptationTab } from './tabs/adaptation-tab';
@@ -51,15 +52,21 @@ export function AnalyticsSlideOver({ open, onOpenChange }: AnalyticsSlideOverPro
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 z-40" />
-        <Dialog.Content className="fixed right-0 top-0 h-screen w-[700px] bg-gradient-to-b from-slate-900 to-slate-950 border-l border-slate-700 shadow-2xl data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right z-50 overflow-hidden flex flex-col">
+        <Dialog.Content className="fixed inset-y-0 right-0 h-full w-full sm:max-w-xl md:max-w-2xl bg-gradient-to-b from-slate-900 to-slate-950 border-l border-slate-700 shadow-2xl data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right z-50 overflow-hidden flex flex-col">
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-slate-700/50 bg-slate-900/30">
+          <div className="flex items-center justify-between p-4 sm:p-6 border-b border-slate-700/50 bg-slate-900/30 shrink-0">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-cyan-500/10 border border-cyan-500/20">
                 <BarChart3 className="w-5 h-5 text-cyan-400" />
               </div>
               <div>
-                <Dialog.Title className="text-lg font-semibold text-slate-100 tracking-tight">System Analytics</Dialog.Title>
+                <Dialog.Title className="text-base sm:text-lg font-semibold text-slate-100 tracking-tight flex items-center gap-2">
+                   System Analytics
+                   <EducationalDrawer 
+                      contentKey="anfis_pipeline_overview"
+                      trigger={<Info className="w-4 h-4 text-slate-500 hover:text-cyan-400 cursor-pointer transition-colors" />}
+                   />
+                </Dialog.Title>
                 <p className="text-xs text-slate-500 font-mono">Real-time behavioral telemetry</p>
               </div>
             </div>
