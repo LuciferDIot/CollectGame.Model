@@ -42,40 +42,51 @@ export interface SoftMembership {
 }
 
 export interface Deltas {
-  delta_combat: number;
-  delta_collect: number;
-  delta_explore: number;
+  combat: number;
+  collect: number;
+  explore: number;
 }
 
 export interface ANFISInput {
-  soft_combat: number;
-  soft_collect: number;
-  soft_explore: number;
+  combat: number;
+  collect: number;
+  explore: number;
   delta_combat: number;
   delta_collect: number;
   delta_explore: number;
 }
 
 export interface AdaptedParameter {
+  id: string; // Added for list identification
   base: number;
   final: number;
   clamped: boolean;
+  metadata?: ParameterMetadata; // Optional trace back to config
 }
 
-export interface AdaptationResult {
-  enemy_spawn_interval: AdaptedParameter;
-  global_enemy_cap: AdaptedParameter;
-  enemy_damage_intensity: AdaptedParameter;
-  enemy_max_health: AdaptedParameter;
-  stamina_regen: AdaptedParameter;
-  stamina_damage: AdaptedParameter;
-  dash_cooldown: AdaptedParameter;
-  collectible_count: AdaptedParameter;
-  collectible_spawn_interval: AdaptedParameter;
-  collectible_lifetime: AdaptedParameter;
-  player_damage_intensity: AdaptedParameter;
-  player_max_health: AdaptedParameter;
+export type ScalingMode = 'Direct' | 'Inverse';
+
+export interface ArchetypeWeights {
+  combat?: number;
+  collect?: number;
+  explore?: number;
 }
+
+export interface ParameterMetadata {
+  id: string;
+  baseValue: number;
+  min: number;
+  max: number;
+  scaling: ScalingMode;
+  archetypeInfluence?: {
+    enabled: boolean;
+    weights?: ArchetypeWeights;
+  };
+}
+
+export type AdaptationRegistry = Record<string, ParameterMetadata>;
+
+export type AdaptationResult = Record<string, AdaptedParameter>;
 
 export interface PipelineOutput {
   filtering: {
@@ -165,3 +176,7 @@ export interface DeploymentManifest {
     archetype_modifier_range: number[]; // [min, max]
   };
 }
+
+// UI/State types
+// Re-export PipelineState from core types to maintain backward compatibility but single source of truth
+export type { PipelineState } from '@/lib/types';

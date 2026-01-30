@@ -20,8 +20,10 @@ export interface SoftMembership {
   explore: number;
 }
 
+export type Category = 'Combat' | 'Collection' | 'Exploration';
+
 export interface BehaviorCategory {
-  category: 'Combat' | 'Collection' | 'Exploration';
+  category: Category;
   softMembership: number;
   activityPercentage: number;
   confidence: number;
@@ -31,7 +33,7 @@ export interface AdaptationDelta {
   field: string;
   before: number;
   after: number;
-  category: 'Combat' | 'Collection' | 'Exploration';
+  category: Category;
   intensity: 'low' | 'medium' | 'high';
 }
 
@@ -72,6 +74,20 @@ export interface PipelineState {
   };
   isRunning: boolean;
   executionTime: number;
+  // Added for Analytics compatibility
+  output?: {
+    adjustedMultiplier: number;
+    ruleActivations: any[]; // Using any to avoid circular dependency
+    confidence: number;
+  } | null;
+  metadata?: {
+    deltas?: Delta;
+  };
+  error?: string | null;
+}
+
+export type Delta = {
+  [key in Category]: number;
 }
 
 export interface DashboardInputState {
