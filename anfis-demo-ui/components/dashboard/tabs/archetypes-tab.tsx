@@ -6,6 +6,7 @@ import { usePipeline } from '@/lib/pipeline-context';
 import { GlobeLock, SeparatorVertical } from 'lucide-react';
 import { useState } from 'react';
 import { MetricDetailModal } from '../../analytics/metric-detail-modal';
+import { ArchetypeCategoryPanel } from './archetypes/archetype-category-panel';
 
 export function ArchetypesTab() {
   const { pipelineState } = usePipeline();
@@ -43,83 +44,8 @@ export function ArchetypesTab() {
         />
         </div>
       
-        <div className="grid grid-cols-3 gap-4">
-          
-          {/* COMBAT */}
-          <Card 
-            onClick={() => setSelectedMetric('archetype_combat')}
-            className="bg-red-950/20 border-red-900/30 cursor-pointer hover:bg-red-950/30 transition-all group"
-          >
-            <div className="p-4">
-              <h4 className="text-sm font-semibold text-red-300 mb-3 group-hover:text-red-200 transition-colors">Combat</h4>
-              <p className="text-xs text-slate-400 mb-3">High combat engagement, aggressive playstyle</p>
-              <div className="space-y-2 pointer-events-none">
-                <div className="flex justify-between text-xs">
-                  <span className="text-slate-400">Combat %</span>
-                  <span className="text-red-300 font-mono">~65%</span>
-                </div>
-                <div className="flex justify-between text-xs">
-                  <span className="text-slate-400">Collection %</span>
-                  <span className="text-slate-500 font-mono">~15%</span>
-                </div>
-                <div className="flex justify-between text-xs">
-                  <span className="text-slate-400">Exploration %</span>
-                  <span className="text-slate-500 font-mono">~20%</span>
-                </div>
-              </div>
-            </div>
-          </Card>
-
-          {/* COLLECTION */}
-          <Card 
-            onClick={() => setSelectedMetric('archetype_collection')}
-            className="bg-amber-950/20 border-amber-900/30 cursor-pointer hover:bg-amber-950/30 transition-all group"
-          >
-            <div className="p-4">
-              <h4 className="text-sm font-semibold text-amber-300 mb-3 group-hover:text-amber-200 transition-colors">Collection</h4>
-              <p className="text-xs text-slate-400 mb-3">Resource-focused, strategic gathering</p>
-              <div className="space-y-2 pointer-events-none">
-                <div className="flex justify-between text-xs">
-                  <span className="text-slate-400">Combat %</span>
-                  <span className="text-slate-500 font-mono">~20%</span>
-                </div>
-                <div className="flex justify-between text-xs">
-                  <span className="text-slate-400">Collection %</span>
-                  <span className="text-amber-300 font-mono">~60%</span>
-                </div>
-                <div className="flex justify-between text-xs">
-                  <span className="text-slate-400">Exploration %</span>
-                  <span className="text-slate-500 font-mono">~20%</span>
-                </div>
-              </div>
-            </div>
-          </Card>
-
-          {/* EXPLORATION */}
-          <Card 
-            onClick={() => setSelectedMetric('archetype_exploration')}
-            className="bg-cyan-950/20 border-cyan-900/30 cursor-pointer hover:bg-cyan-950/30 transition-all group"
-          >
-            <div className="p-4">
-              <h4 className="text-sm font-semibold text-cyan-300 mb-3 group-hover:text-cyan-200 transition-colors">Exploration</h4>
-              <p className="text-xs text-slate-400 mb-3">Discovery-oriented, passive gameplay</p>
-              <div className="space-y-2 pointer-events-none">
-                <div className="flex justify-between text-xs">
-                  <span className="text-slate-400">Combat %</span>
-                  <span className="text-slate-500 font-mono">~10%</span>
-                </div>
-                <div className="flex justify-between text-xs">
-                  <span className="text-slate-400">Collection %</span>
-                  <span className="text-slate-500 font-mono">~15%</span>
-                </div>
-                <div className="flex justify-between text-xs">
-                  <span className="text-slate-400">Exploration %</span>
-                  <span className="text-cyan-300 font-mono">~75%</span>
-                </div>
-              </div>
-            </div>
-          </Card>
-        </div>
+        
+        <ArchetypeCategoryPanel  onMetricSelect={setSelectedMetric} categories={pipelineState.behaviorCategories} />
         
         <Card 
           onClick={() => setSelectedMetric('session_classification')}

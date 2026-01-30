@@ -4,7 +4,7 @@ import { EducationalDrawer } from '@/components/analytics/educational-drawer';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { BehaviorCategory } from '@/lib/types';
-import { cn } from '@/lib/utils';
+import { cn, getTextColor } from '@/lib/utils';
 import { GitBranch } from 'lucide-react';
 
 interface ArchetypePanelProps {
@@ -14,21 +14,6 @@ interface ArchetypePanelProps {
 
 export function ArchetypePanel({ categories, onMetricSelect }: ArchetypePanelProps) {
   
-  const getCategoryColor = (cat: string) => {
-    switch (cat) {
-      case 'Combat': return 'bg-red-500 text-red-500';
-      case 'Collection': return 'bg-emerald-500 text-emerald-500';
-      default: return 'bg-amber-500 text-amber-500';
-    }
-  };
-
-  const getTextColor = (cat: string) => {
-      switch (cat) {
-      case 'Combat': return 'text-red-300';
-      case 'Collection': return 'text-emerald-300';
-      default: return 'text-amber-300';
-    }
-  }
 
   return (
     <div className="xl:col-span-5 flex flex-col gap-3">
