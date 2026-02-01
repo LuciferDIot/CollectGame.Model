@@ -1,10 +1,12 @@
 'use client';
 
 import { EducationalDrawer } from '@/components/analytics/educational-drawer';
+import { MembershipDiagnostics } from '@/components/analytics/membership-diagnostics';
 import { Card } from '@/components/ui/card';
+import { useAnalytics } from '@/lib/hooks/use-analytics';
 import { usePipeline } from '@/lib/pipeline-context';
 import { BehaviorCategory } from '@/lib/types';
-import { GlobeLock, SeparatorVertical } from 'lucide-react';
+import { GlobeLock, Scan, ScanEye, SeparatorVertical } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { MetricDetailModal } from '../../analytics/metric-detail-modal';
 import { RadarChart } from '../radar-chart';
@@ -12,6 +14,7 @@ import { ArchetypeCategoryPanel } from './archetypes/archetype-category-panel';
 
 export function ArchetypesTab() {
   const { pipelineState } = usePipeline();
+  const { session, currentRound } = useAnalytics();
   const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
 
   const ClosestArchetype:BehaviorCategory = useMemo(()=>{
@@ -42,62 +45,74 @@ export function ArchetypesTab() {
         </div>
       </div>
       
-      <div className="flex flex-col gap-6">
-        <div className="flex items-center gap-2 text-slate-400 mb-1">
-        <SeparatorVertical className="w-3.5 h-3.5" />
-        <EducationalDrawer
-          contentKey="input_normalization"
-          trigger={
-            <span className="text-xs font-bold uppercase tracking-wider font-mono cursor-help hover:text-blue-400 transition-colors border-b border-dotted border-slate-600">
-              Behavior Archetypes
-            </span>
-          }
-        />
-        </div>
-      
-        
-        <ArchetypeCategoryPanel  onMetricSelect={setSelectedMetric} pipelineState={pipelineState} maxSoftCatString={ClosestArchetype.category}/>
-
-        <Card className="bg-slate-800/50 border-slate-700">
-        <div className="p-6">
-          <h4 className="text-sm font-semibold text-slate-300 mb-4">Archetype Comparison</h4>
-          <RadarChart
-            data={[
-              { attribute: 'Combat', value: pipelineState.softMembership?.combat ? pipelineState.softMembership.combat * 100 : 0, fullMark: 100 },
-              { attribute: 'Collection', value: pipelineState.softMembership?.collect ? pipelineState.softMembership.collect * 100 : 0, fullMark: 100 },
-              { attribute: 'Exploration', value: pipelineState.softMembership?.explore ? pipelineState.softMembership.explore * 100 : 0, fullMark: 100 },
-            ]}
-            color="#06b6d4"
-            fillOpacity={0.5}
-          />
-        </div>
-      </Card>
-        
-        {
-          ClosestArchetype && 
-          <Card 
-          onClick={() => setSelectedMetric('session_classification')}
-          className="bg-slate-800/50 border-slate-700 cursor-help hover:bg-slate-800/80 transition-colors group"
-          >
-          <div className="p-4">
-            <h4 className="text-xs font-semibold text-slate-300 mb-3 group-hover:text-blue-300 transition-colors">Current Session Classification</h4>
-            <div className="flex items-center gap-4">
-              <div className="flex-1">
-                <div className="flex justify-between text-xs mb-1">
-                  <span className="text-slate-400">Closest Archetype</span>
-                  <span className="text-cyan-300 font-semibold">{ClosestArchetype.category}</span>
-                </div>
-                <div className="w-full bg-slate-900/50 h-2 rounded-full overflow-hidden">
-                  <div className="h-full bg-cyan-500" style={{ width: `${ClosestArchetype.softMembership ? ClosestArchetype.softMembership * 100 : 0}%` }} />
-                </div>
-              </div>
-              <span className="text-xs text-slate-300 font-mono">
-                {ClosestArchetype.softMembership ? (ClosestArchetype.softMembership * 100).toFixed(1) : '0'}% match
-              </span>
-            </div>
+      <div className="items-start h-full">
+        <div className="flex flex-col gap-6 w-full min-w-0">
+          <div className="flex items-center gap-2 text-slate-400 mb-1">
+            <SeparatorVertical className="w-3.5 h-3.5" />
+            <EducationalDrawer
+              contentKey="input_normalization"
+              trigger={
+                <span className="text-xs font-bold uppercase tracking-wider font-mono cursor-help hover:text-blue-400 transition-colors border-b border-dotted border-slate-600">
+                  Behavior Archetypes
+                </span>
+              }
+            />
           </div>
-        </Card>
-        }
+
+          {/* Radar Chart Container */}
+          <Card className="bg-slate-950/40 border-slate-800 backdrop-blur-sm relative overflow-hidden group">
+            {/* Corner Accents */}
+            <div className="absolute top-0 right-0 p-2 opacity-50">
+               <Scan className="w-4 h-4 text-cyan-500/50" />
+            </div>
+            
+            <div className="p-6">
+              <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                 <ScanEye className="w-4 h-4" />
+                 Vector Projection
+              </h4>
+              <RadarChart
+                data={[
+                  { attribute: 'Combat', value: pipelineState.softMembership?.combat ? pipelineState.softMembership.combat * 100 : 0, fullMark: 100 },
+                  { attribute: 'Collection', value: pipelineState.softMembership?.collect ? pipelineState.softMembership.collect * 100 : 0, fullMark: 100 },
+                  { attribute: 'Exploration', value: pipelineState.softMembership?.explore ? pipelineState.softMembership.explore * 100 : 0, fullMark: 100 },
+                ]}
+                color="#06b6d4"
+                fillOpacity={0.4}
+              />
+            </div>
+          </Card>
+          
+          <ArchetypeCategoryPanel  onMetricSelect={setSelectedMetric} pipelineState={pipelineState} maxSoftCatString={ClosestArchetype.category}/>
+
+          <MembershipDiagnostics session={session} currentRound={currentRound} />
+          
+          {
+            ClosestArchetype && 
+            <Card 
+            onClick={() => setSelectedMetric('session_classification')}
+            className="bg-slate-950/40 border-slate-800 backdrop-blur-sm cursor-help hover:border-cyan-500/30 transition-all duration-300 group"
+            >
+            <div className="p-4 flex items-center justify-between">
+              <div className="flex flex-col">
+                   <h4 className="text-[10px] uppercase font-bold text-slate-500 mb-1 tracking-wider">Current Classification</h4>
+                   <div className="flex items-center gap-3">
+                        <span className="text-lg font-bold text-slate-200 tracking-tight group-hover:text-cyan-300 transition-colors">
+                            {ClosestArchetype.category}
+                        </span>
+                        <div className="px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-[10px] font-mono text-cyan-400">
+                             {(ClosestArchetype.softMembership * 100).toFixed(1)}% Match
+                        </div>
+                   </div>
+              </div>
+
+               <div className="w-32 bg-slate-900 h-1.5 rounded-full overflow-hidden border border-slate-800">
+                    <div className="h-full bg-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.5)]" style={{ width: `${ClosestArchetype.softMembership ? ClosestArchetype.softMembership * 100 : 0}%` }} />
+               </div>
+            </div>
+          </Card>
+          }
+        </div>
       </div>
 
       <MetricDetailModal 

@@ -2,11 +2,11 @@
   display: grid;
   grid-template-rows: 80px 1fr;
   grid-template-columns: 340px 1fr 420px;
-  min-height: 100vh;
+  height: 100vh;
   width: 100%;
   background: #0f1419;
   font-family: 'Geist', sans-serif;
-  overflow: auto;
+  overflow: hidden;
 }
 
 .topBar {
@@ -24,6 +24,7 @@
   grid-template-columns: 280px 1fr;
   gap: 0;
   overflow: hidden;
+  min-height: 0; /* Critical for nested scroll containers */
 }
 
 .leftPanel {
@@ -33,15 +34,16 @@
   background: rgba(15, 20, 25, 0.3);
   overflow-y: auto;
   overflow-x: hidden;
+  min-height: 0;
 }
 
 .centerPanel {
   display: flex;
   flex-direction: column;
   border-right: 1px solid rgba(100, 200, 255, 0.08);
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden; /* Changed from auto to hidden to allow internal ScrollArea to work */
   background: rgba(10, 15, 20, 0.2);
+  min-height: 0;
 }
 
 .rightPanel {
@@ -51,44 +53,7 @@
   background: rgba(10, 15, 20, 0.15);
 }
 
-.topBar {
-  border-bottom: 1px solid rgba(100, 200, 255, 0.1);
-  background: rgba(15, 20, 25, 0.8);
-  backdrop-filter: blur(10px);
-  flex-shrink: 0;
-}
-
-.contentWrapper {
-  display: flex;
-  flex: 1;
-  overflow: hidden;
-}
-
-.leftPanel {
-  display: flex;
-  flex-direction: column;
-  border-right: 1px solid rgba(100, 200, 255, 0.1);
-  background: rgba(15, 20, 25, 0.5);
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-
-.centerPanel {
-  display: flex;
-  flex-direction: column;
-  border-right: 1px solid rgba(100, 200, 255, 0.1);
-  overflow-y: auto;
-  overflow-x: hidden;
-  background: rgba(10, 15, 20, 0.3);
-}
-
-.rightPanel {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  background: rgba(10, 15, 20, 0.2);
-}
+/* Removed duplicate definitions to prevent conflict */
 
 /* Resizable handle styles */
 .react-resizable-hide {

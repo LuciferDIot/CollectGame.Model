@@ -50,6 +50,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (!telemetry.userId) {
+        console.warn('Invalid pipeline input: Missing userId');
+        return NextResponse.json(
+          { error: 'Missing userId in telemetry' },
+          { status: 400 }
+        );
+    }
+
     // Reset if requested
     if (reset) {
       pipeline.reset();

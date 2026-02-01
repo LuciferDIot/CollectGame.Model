@@ -3,7 +3,8 @@
 import { Button } from '@/components/ui/button';
 import EXAMPLE_DATASETS from '@/lib/data/examples.json';
 import { usePipeline } from '@/lib/pipeline-context';
-import { BarChart3, Download, PlayCircle, Upload, XCircle } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { BarChart3, Download, PlayCircle, Terminal, Upload, XCircle } from 'lucide-react';
 import { useState } from 'react';
 import { AnalyticsSlideOver } from './analytics-slide-over';
 
@@ -14,30 +15,39 @@ export function TopBar() {
   const [analyticsOpen, setAnalyticsOpen] = useState(false);
 
   const handleLoadExample = () => {
-    // Pick random example
+    // Pick random example to base values on
     const randomIndex = Math.floor(Math.random() * EXAMPLE_DATASETS.length);
-    const example = EXAMPLE_DATASETS[randomIndex] as any; // Cast to any to avoid strict JSON type inference issues
+    const example = EXAMPLE_DATASETS[randomIndex] as any;
 
-    // Construct Telemetry Object
+    // Use a fixed User ID for session continuity testing, or randomize if requested
+    const stableUserId = "test-subject-001"; 
+
+    // Construct Clean Telemetry Object
     const telemetryPayload = {
-        _id: { "$oid": "generated_" + example.sessionId },
-        userId: { "$oid": example.userId },
-        timestamp: { "$date": example.timestamp },
-        sessionId: example.sessionId,
-        ...example.features,
-        rawJson: {
-            ...example.features
+        userId: stableUserId,
+        sessionId: `session-${Date.now()}`,
+        timestamp: new Date().toISOString(),
+        
+        telemetry: {
+            enemiesHit: example.features.enemiesHit ?? Math.floor(Math.random() * 20),
+            damageDone: example.features.damageDone ?? Math.floor(Math.random() * 500),
+            timeInCombat: example.features.timeInCombat ?? Math.floor(Math.random() * 60),
+            kills: example.features.kills ?? Math.floor(Math.random() * 10),
+            itemsCollected: example.features.itemsCollected ?? Math.floor(Math.random() * 10),
+            pickupAttempts: example.features.pickupAttempts ?? Math.floor(Math.random() * 15),
+            timeNearInteractables: example.features.timeNearInteractables ?? Math.floor(Math.random() * 30),
+            distanceTraveled: example.features.distanceTraveled ?? Math.floor(Math.random() * 1000),
+            timeSprinting: example.features.timeSprinting ?? Math.floor(Math.random() * 30),
+            timeOutOfCombat: example.features.timeOutOfCombat ?? Math.floor(Math.random() * 60)
         }
     };
 
-    // Construct Death Events
+    // Construct Clean Death Events
     const deathEventsPayload = (example.deaths || []).map((d: any) => ({
-        _id: { "$oid": "death_" + Math.random().toString(36).substr(2, 9) },
-        userId: { "$oid": example.userId },
-        timestamp: { "$date": d.timestamp },
-        sessionId: example.sessionId,
-        location: d.location || 'Unknown',
-        cause: d.cause || 'Unknown'
+        userId: stableUserId,
+        timestamp: new Date().toISOString(),
+        location: d.location || 'Zone_1',
+        cause: d.cause || 'Combat'
     }));
 
     window.dispatchEvent(new CustomEvent('loadExample', {
@@ -73,36 +83,47 @@ export function TopBar() {
 
   return (
     <>
-      <div className="h-auto md:h-20 border-b border-blue-500/10 bg-slate-950/50 backdrop-blur-sm flex flex-col md:flex-row items-start md:items-center px-4 md:px-6 py-4 md:py-0 gap-4 md:gap-6">
+      <div className="h-auto md:h-20 border-b border-cyan-500/10 bg-[#050a14]/90 backdrop-blur-md flex flex-col md:flex-row items-start md:items-center px-4 md:px-6 py-4 md:py-0 gap-4 md:gap-6 relative z-50">
+        
+        {/* Glow Line */}
+        <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent opacity-50" />
+
         <div className="flex-1 w-full md:w-auto">
-          <div className="flex flex-col gap-1">
-            <h1 className="text-base font-semibold text-slate-100">Adaptive Telemetry Dashboard</h1>
-            <p className="text-xs text-slate-400">ANFIS pipeline validation & analysis</p>
+          <div className="flex items-center gap-3">
+             <div className="p-2 rounded bg-cyan-950/30 border border-cyan-500/20 shadow-[0_0_10px_rgba(6,182,212,0.1)]">
+                <Terminal className="w-5 h-5 text-cyan-400" />
+             </div>
+             <div className="flex flex-col">
+                <h1 className="text-sm font-bold tracking-widest uppercase text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
+                    Adaptive Telemetry Dashboard
+                </h1>
+                <p className="text-[10px] text-slate-500 font-mono tracking-wider">ANFIS PIPELINE v2.2.0-ALPHA</p>
+             </div>
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 w-full md:w-auto md:ml-auto">
-          <label className="flex items-center gap-2 px-3 py-2 text-sm text-slate-300 hover:bg-slate-900/30 rounded-md cursor-pointer transition-colors mr-2">
+        <div className="flex flex-wrap items-center gap-3 w-full md:w-auto md:ml-auto">
+          <label className="flex items-center gap-2 px-3 py-2 text-[10px] font-mono uppercase tracking-wider text-slate-400 hover:text-cyan-400 cursor-pointer transition-colors mr-2">
             <input 
               type="checkbox" 
               checked={stepByStep} 
               onChange={(e) => setStepByStep(e.target.checked)}
-              className="w-4 h-4 rounded accent-blue-500"
+              className="w-3.5 h-3.5 rounded-sm border-slate-700 bg-slate-950/50 accent-cyan-500"
             />
-            <span className="whitespace-nowrap">Step-by-Step</span>
+            <span className="whitespace-nowrap">Step-by-Step Execution</span>
           </label>
 
-          <div className="hidden md:block w-px h-6 bg-slate-700/50" />
+          <div className="hidden md:block w-px h-6 bg-slate-800" />
 
           <Button 
             variant="outline"
             size="sm"
             onClick={handleLoadExample}
             title="Load random example"
-            className="gap-2 h-9 border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white bg-transparent flex-1 md:flex-none"
+            className="gap-2 h-9 border-slate-700/60 text-slate-400 hover:text-cyan-400 hover:border-cyan-500/50 hover:bg-cyan-950/10 bg-transparent flex-1 md:flex-none uppercase text-[10px] font-bold tracking-wider transition-all"
           >
-            <Upload size={16} />
-            <span className="hidden sm:inline">Load Random</span>
+            <Upload size={14} />
+            <span className="hidden sm:inline">Load Data</span>
             <span className="sm:hidden">Load</span>
           </Button>
           
@@ -111,10 +132,13 @@ export function TopBar() {
             onClick={handleRun}
             disabled={isRunning}
             title="Run simulation"
-            className="gap-2 h-9 bg-blue-600 hover:bg-blue-500 text-white border-0 font-medium shadow-lg shadow-blue-900/20 flex-1 md:flex-none"
+            className={cn(
+                "gap-2 h-9 border-0 font-bold uppercase text-[10px] tracking-wider flex-1 md:flex-none transition-all shadow-lg",
+                isRunning ? "bg-slate-800 text-slate-500" : "bg-cyan-600 hover:bg-cyan-500 text-white shadow-cyan-500/20 hover:shadow-cyan-500/40"
+            )}
           >
-            <PlayCircle size={16} />
-            {isRunning ? 'Running...' : 'Run'}
+            <PlayCircle size={14} className={cn(isRunning && "animate-spin")} />
+            {isRunning ? 'Processing...' : 'Run Simulation'}
           </Button>
 
           {pipelineState.executionTime > 0 && (
@@ -122,22 +146,23 @@ export function TopBar() {
               size="sm"
               onClick={() => setAnalyticsOpen(true)}
               title="Open analytics dashboard"
-              className="gap-2 h-9 bg-cyan-600 hover:bg-cyan-500 text-white border-0 font-medium shadow-lg shadow-cyan-900/20 animate-in fade-in zoom-in duration-300 flex-1 md:flex-none"
+              className="gap-2 h-9 bg-purple-600 hover:bg-purple-500 text-white border-0 font-bold uppercase text-[10px] tracking-wider shadow-lg shadow-purple-900/40 animate-in fade-in zoom-in duration-300 flex-1 md:flex-none"
             >
-              <BarChart3 size={16} />
+              <BarChart3 size={14} />
               <span className="hidden sm:inline">Analytics</span>
             </Button>
           )}
           
+          <div className="hidden md:block w-px h-6 bg-slate-800" />
+
           <Button 
             variant="outline"
             size="sm"
             onClick={handleExport}
             title="Export results"
-            className="gap-2 h-9 border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white bg-transparent flex-1 md:flex-none"
+            className="gap-2 h-9 border-slate-700/60 text-slate-400 hover:text-cyan-400 hover:border-cyan-500/50 hover:bg-cyan-950/10 bg-transparent flex-1 md:flex-none uppercase text-[10px] font-bold tracking-wider transition-all"
           >
-            <Download size={16} />
-            <span className="hidden sm:inline">Export</span>
+            <Download size={14} />
           </Button>
           
           <Button 
@@ -147,11 +172,10 @@ export function TopBar() {
               resetDashboard();
               setIsRunning(false);
             }}
-            title="Reset dashboard"
-            className="gap-2 h-9 border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white bg-transparent hover:border-red-500/50 hover:bg-red-500/10 flex-1 md:flex-none"
+            title="Reset text-red-500"
+            className="gap-2 h-9 border-slate-700/60 text-slate-500 hover:text-red-400 hover:border-red-500/50 hover:bg-red-950/10 bg-transparent flex-1 md:flex-none uppercase text-[10px] font-bold tracking-wider transition-all"
           >
-            <XCircle size={16} />
-            <span className="hidden sm:inline">Reset</span>
+            <XCircle size={14} />
           </Button>
         </div>
       </div>
