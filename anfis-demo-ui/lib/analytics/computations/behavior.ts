@@ -4,6 +4,7 @@ import { Archetype, RoundAnalytics, SoftMembership } from '../types';
  * Determine dominant archetype from soft membership
  */
 export function getDominantArchetype(soft: SoftMembership): Archetype {
+  // console.log('[Behavior] Soft Membership:', soft);
   if (soft.combat >= soft.collect && soft.combat >= soft.explore) {
     return 'combat';
   }
