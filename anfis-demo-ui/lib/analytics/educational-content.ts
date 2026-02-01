@@ -320,6 +320,14 @@ export const METRIC_EXPLANATIONS: Record<string, EducationalContent> = {
     reading: 'Verify version and training date.',
   },
 
+  'session_inertia': {
+    title: 'Metric: Session Inertia',
+    what: 'The historical distribution of your dominant behavioral archetypes over the entire session.',
+    why: 'Prevents rapid flipping between playstyles (jitter). The system uses this "memory" to smooth out adaptation, ensuring consistent difficulty adjustments even if you perform a few outlier actions.',
+    computed: 'Running count of how many rounds were classified as Combat vs. Collection vs. Exploration.',
+    reading: 'A highly dominant bar (e.g., 80% Combat) means the system is "locked in" to that playstyle. Balanced bars suggest a hybrid or shifting playstyle.',
+  },
+
   'anfis_pipeline_overview': {
     title: 'System: ANFIS Inference Engine',
     what: 'Adaptive Neuro-Fuzzy Inference System.',
