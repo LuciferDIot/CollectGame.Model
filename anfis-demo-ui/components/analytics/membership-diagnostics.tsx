@@ -1,8 +1,9 @@
 'use client';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { Archetype, RoundAnalytics, SessionAnalytics } from '@/lib/analytics';
-import { Compass, Package, Swords } from 'lucide-react';
+import { calculateCounterfactuals, CounterfactualResult } from '@/lib/analytics/counterfactuals';
+import { Activity, ArrowRight, BarChart3, Binary, Compass, Cpu, Layers, Package, Swords, Zap } from 'lucide-react';
 import { HelpfulTooltip } from './helpful-tooltip';
 
 interface MembershipDiagnosticsProps {
@@ -11,16 +12,22 @@ interface MembershipDiagnosticsProps {
 }
 
 const archetypeIcons: Record<Archetype, React.ReactNode> = {
-  combat: <Swords className="h-4 w-4" />,
-  collect: <Package className="h-4 w-4" />,
-  explore: <Compass className="h-4 w-4" />,
+  combat: <Swords className="h-3.5 w-3.5" />,
+  collect: <Package className="h-3.5 w-3.5" />,
+  explore: <Compass className="h-3.5 w-3.5" />,
 };
 
 const archetypeColors: Record<Archetype, string> = {
-  combat: 'bg-red-500',
-  collect: 'bg-blue-500',
-  explore: 'bg-green-500',
+  combat: 'text-red-400 bg-red-500/10 border-red-500/20',
+  collect: 'text-cyan-400 bg-cyan-500/10 border-cyan-500/20',
+  explore: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
 };
+
+const archetypeBarColors: Record<Archetype, string> = {
+    combat: 'bg-red-500',
+    collect: 'bg-cyan-500',
+    explore: 'bg-emerald-500',
+  };
 
 export function MembershipDiagnostics({ session, currentRound }: MembershipDiagnosticsProps) {
   if (!session || !currentRound) {
@@ -29,197 +36,191 @@ export function MembershipDiagnostics({ session, currentRound }: MembershipDiagn
 
   const { softMembership, membershipSum, dominantArchetype } = currentRound;
   const { dominantArchetypeDistribution } = session;
+  const cf = calculateCounterfactuals(currentRound);
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <HelpfulTooltip 
-            trigger={<span className="cursor-pointer hover:underline decoration-dotted underline-offset-4">Soft Membership Diagnostics</span>}
-            title="Soft Membership (Fuzzification)"
-            description="The degree to which the player currently fits into each Archetype (0.0 to 1.0). Unlike hard clustering, this is fuzzy and continuous."
-            interpretation="Option B uses this for 'Contextual Bias'—smoothing the output but not driving the main variance."
-          />
-        </CardTitle>
-        <CardDescription>Fuzzy clustering values</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {/* Validation */}
-        <MembershipValidation membershipSum={membershipSum} />
-
-        {/* Current Round Stacked Bar */}
-        <CurrentRoundDistribution softMembership={softMembership} />
-
-        {/* Dominant Archetype */}
-        <DominantArchetypeDisplay dominantArchetype={dominantArchetype} softMembership={softMembership} />
-
-        {/* Session Distribution */}
-        <SessionDistribution distribution={dominantArchetypeDistribution} />
-
-        {/* Tooltip */}
-        <div className="border-t pt-4">
-          <p className="text-xs italic text-muted-foreground">
-            Soft membership provides <strong>contextual bias</strong> in Option B. Primary variance
-            comes from behavioral <strong>deltas</strong>.
-          </p>
+    <Card className="bg-slate-950/40 border-slate-800/60 backdrop-blur-sm shadow-xl overflow-hidden relative">
+      {/* Decorative top border */}
+      <div className="absolute top-0 left-0 w-full h-0.5 bg-linear-to-r from-transparent via-cyan-500/50 to-transparent opacity-50" />
+      
+      <CardHeader className="pb-4 border-b border-slate-800/50">
+        <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-slate-100">
+            <Binary className="w-4 h-4 text-cyan-400" />
+            <span className="bg-clip-text text-transparent bg-linear-to-r from-slate-100 to-slate-400">
+                Fuzzy Diagnostics
+            </span>
+            </CardTitle>
+            <HelpfulTooltip 
+                trigger={<div className="p-1.5 rounded-md hover:bg-slate-800/50 transition-colors cursor-help"><Cpu className="w-3.5 h-3.5 text-slate-500" /></div>}
+                title="Soft Membership (Fuzzification)"
+                description="The degree to which the player currently fits into each Archetype (0.0 to 1.0). Unlike hard clustering, this is fuzzy and continuous."
+                interpretation="Option B uses this for 'Contextual Bias'—smoothing the output but not driving the main variance."
+            />
         </div>
+      </CardHeader>
+
+      <CardContent className="space-y-6 pt-5">
+        
+        {/* Validation & Status */}
+        <div className="grid grid-cols-2 gap-3">
+             <MembershipValidation membershipSum={membershipSum} />
+             <div className="flex items-center justify-between p-2.5 rounded-md border border-slate-800 bg-slate-900/40">
+                <span className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold flex items-center gap-1.5">
+                    <Layers className="w-3 h-3" />
+                    Classification
+                </span>
+                <span className="text-xs font-mono text-cyan-300">
+                    FCM-IDW
+                </span>
+             </div>
+        </div>
+
+        {/* Current Round Visual */}
+        <div className="space-y-3">
+            <div className="flex items-center justify-between">
+                <h4 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                    <Activity className="w-3 h-3 text-slate-500" />
+                    Current Vector
+                </h4>
+                <div className="text-[10px] font-mono text-slate-500">t_curr</div>
+            </div>
+            
+            <div className="relative h-6 bg-slate-900/60 rounded-sm overflow-hidden flex border border-slate-800/50">
+                 {/* Stacked Bar */}
+                 <div className="h-full bg-red-500/80 hover:bg-red-500 transition-colors flex items-center justify-center relative group" style={{ width: `${softMembership.combat * 100}%` }}>
+                    <div className="absolute inset-0 bg-[url('/scanline.png')] opacity-10" />
+                 </div>
+                 <div className="h-full bg-cyan-500/80 hover:bg-cyan-500 transition-colors flex items-center justify-center relative group" style={{ width: `${softMembership.collect * 100}%` }}>
+                    <div className="absolute inset-0 bg-[url('/scanline.png')] opacity-10" />
+                 </div>
+                 <div className="h-full bg-emerald-500/80 hover:bg-emerald-500 transition-colors flex items-center justify-center relative group" style={{ width: `${softMembership.explore * 100}%` }}>
+                    <div className="absolute inset-0 bg-[url('/scanline.png')] opacity-10" />
+                 </div>
+            </div>
+
+            {/* Micro Legends */}
+            <div className="grid grid-cols-3 gap-2">
+                <ArchetypeStat type="combat" value={softMembership.combat} active={dominantArchetype === 'combat'} />
+                <ArchetypeStat type="collect" value={softMembership.collect} active={dominantArchetype === 'collect'} />
+                <ArchetypeStat type="explore" value={softMembership.explore} active={dominantArchetype === 'explore'} />
+            </div>
+        </div>
+
+        {/* Counterfactuals (Tech View) */}
+        <CounterfactualDisplay cf={cf} />
+
+        {/* Session Stats (Mini) */}
+        <div className="pt-2 border-t border-slate-800/50">
+             <div className="flex items-center justify-between mb-3">
+                <h4 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                    <BarChart3 className="w-3 h-3 text-slate-500" />
+                    Session Inertia
+                </h4>
+             </div>
+             <div className="space-y-1.5">
+                {(Object.entries(dominantArchetypeDistribution) as [Archetype, number][]).map(([type, pct]) => (
+                    <div key={type} className="flex items-center gap-3 group">
+                        <div className={`w-1.5 h-1.5 rounded-full ${archetypeBarColors[type]} opacity-50 group-hover:opacity-100 transition-opacity`} />
+                        <div className="flex-1 h-1 bg-slate-800 rounded-full overflow-hidden">
+                            <div className={`h-full ${archetypeBarColors[type]} opacity-70`} style={{ width: `${pct}%` }} />
+                        </div>
+                        <span className="text-[10px] font-mono text-slate-500 w-8 text-right group-hover:text-slate-300 transition-colors">{pct.toFixed(0)}%</span>
+                    </div>
+                ))}
+             </div>
+        </div>
+
       </CardContent>
     </Card>
   );
 }
 
-function DiagnosticsEmptyState() {
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Soft Membership Diagnostics</CardTitle>
-        <CardDescription>Fuzzy archetype distribution</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <p className="text-sm text-muted-foreground">Run pipeline to see metrics</p>
-      </CardContent>
-    </Card>
-  );
+function ArchetypeStat({ type, value, active }: { type: Archetype, value: number, active: boolean }) {
+    return (
+        <div className={`flex flex-col p-1.5 rounded border transition-all duration-300 ${active ? archetypeColors[type] + ' bg-opacity-10' : 'border-transparent bg-slate-900/20 text-slate-500'}`}>
+            <div className="flex items-center gap-1.5 mb-0.5">
+               <span className={active ? 'opacity-100' : 'opacity-50'}>{archetypeIcons[type]}</span>
+               <span className="text-[9px] uppercase font-bold tracking-wider opacity-80">{type}</span>
+            </div>
+            <span className={`text-xs font-mono font-bold ${active ? '' : 'text-slate-600'}`}>
+                {(value * 100).toFixed(1)}%
+            </span>
+        </div>
+    )
 }
 
 function MembershipValidation({ membershipSum }: { membershipSum: number }) {
   const membershipValid = Math.abs(membershipSum - 1.0) < 0.01;
 
   return (
-    <div className="flex items-center justify-between p-2 bg-muted rounded">
-      <span className="text-sm font-medium flex items-center gap-1">
-         <HelpfulTooltip 
-           trigger={<span className="cursor-pointer hover:underline decoration-dotted underline-offset-4">Membership Sum Check</span>}
-           title="Partition of Unity (Correctness Check)" 
-           description="Fuzzy logic requirement: The sum of all membership degrees must equal exactly 1.0." 
-           calculation="Σ μ(x) = μ_combat + μ_collect + μ_explore = 1.0"
-           interpretation="If the sum != 1.0, the fuzzy system is invalid (broken probability space)."
-         />
-      </span>
-      <span
-        className={`text-sm font-bold ${
-          membershipValid ? 'text-green-600' : 'text-red-600'
-        }`}
-      >
-        {membershipSum.toFixed(4)} {membershipValid ? '✓' : '✗ (must = 1.0)'}
-      </span>
-    </div>
-  );
-}
-
-function CurrentRoundDistribution({ softMembership }: { softMembership: RoundAnalytics['softMembership'] }) {
-  return (
-    <div className="space-y-2">
-      <h4 className="text-sm font-semibold">Current Round Distribution</h4>
-      <div className="flex h-8 rounded overflow-hidden">
-        <div
-          className="bg-red-500 flex items-center justify-center text-xs text-white font-semibold"
-          style={{ width: `${softMembership.combat * 100}%` }}
-        >
-          {softMembership.combat > 0.15 && `${(softMembership.combat * 100).toFixed(0)}%`}
-        </div>
-        <div
-          className="bg-blue-500 flex items-center justify-center text-xs text-white font-semibold"
-          style={{ width: `${softMembership.collect * 100}%` }}
-        >
-          {softMembership.collect > 0.15 && `${(softMembership.collect * 100).toFixed(0)}%`}
-        </div>
-        <div
-          className="bg-green-500 flex items-center justify-center text-xs text-white font-semibold"
-          style={{ width: `${softMembership.explore * 100}%` }}
-        >
-          {softMembership.explore > 0.15 && `${(softMembership.explore * 100).toFixed(0)}%`}
-        </div>
-      </div>
-      <div className="grid grid-cols-3 gap-2 text-xs">
-        <HelpfulTooltip
-          trigger={
-            <div className="flex items-center gap-1 cursor-pointer hover:underline">
-              <Swords className="h-3 w-3 text-red-500" />
-              <span>Combat: {(softMembership.combat * 100).toFixed(1)}%</span>
-            </div>
-          }
-          title="Combat Membership (μ_combat)"
-          description="How much your current behavior matches the 'Aggressive Fighter' archetype."
-          calculation="μ_combat(x) = (1 / (1 + d(x, center_combat)^2)) / Σ(all_classes)"
-        />
-        <HelpfulTooltip
-          trigger={
-            <div className="flex items-center gap-1 cursor-pointer hover:underline">
-              <Package className="h-3 w-3 text-blue-500" />
-              <span>Collect: {(softMembership.collect * 100).toFixed(1)}%</span>
-            </div>
-          }
-          title="Collect Membership (μ_collect)"
-          description="How much your current behavior matches the 'Resource Gatherer' archetype."
-          calculation="μ_collect(x) = (1 / (1 + d(x, center_collect)^2)) / Σ(all_classes)"
-        />
-        <HelpfulTooltip
-          trigger={
-            <div className="flex items-center gap-1 cursor-pointer hover:underline">
-              <Compass className="h-3 w-3 text-green-500" />
-              <span>Explore: {(softMembership.explore * 100).toFixed(1)}%</span>
-            </div>
-          }
-          title="Explore Membership (μ_explore)"
-          description="How much your current behavior matches the 'Map Explorer' archetype."
-          calculation="μ_explore(x) = (1 / (1 + d(x, center_explore)^2)) / Σ(all_classes)"
-        />
+    <div className={`flex flex-col justify-between p-2.5 rounded-md border ${membershipValid ? 'border-emerald-500/20 bg-emerald-500/5' : 'border-red-500/20 bg-red-500/5'}`}>
+      <span className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold mb-1">Partition Check</span>
+      <div className="flex items-center justify-between">
+          <span className={`text-xs font-mono font-bold ${membershipValid ? 'text-emerald-400' : 'text-red-400'}`}>
+            Σ = {membershipSum.toFixed(4)}
+          </span>
+          {membershipValid && <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] animate-pulse" />}
       </div>
     </div>
   );
 }
 
-function DominantArchetypeDisplay({ dominantArchetype, softMembership }: { dominantArchetype: Archetype, softMembership: RoundAnalytics['softMembership'] }) {
-  return (
-    <div className="border-t pt-4">
-      <h4 className="text-sm font-semibold mb-2">Dominant Archetype</h4>
-      <div className="flex items-center gap-2 p-3 bg-muted rounded">
-        {archetypeIcons[dominantArchetype]}
-        <span className="font-semibold capitalize">{dominantArchetype}</span>
-        <span className="text-sm text-muted-foreground">
-          ({(softMembership[dominantArchetype] * 100).toFixed(1)}%)
-        </span>
-        <HelpfulTooltip 
-          title="Dominant Style" 
-          description="The single strongest component of the user's behavior this round."
-          interpretation="The archetype with the highest soft membership value (MAX(μ))."
-        />
-      </div>
-    </div>
-  );
-}
 
-function SessionDistribution({ distribution }: { distribution: SessionAnalytics['dominantArchetypeDistribution'] }) {
+function CounterfactualDisplay({ cf }: { cf: CounterfactualResult }) {
+  const isPositive = cf.impact > 0;
+  
   return (
-    <div className="border-t pt-4 space-y-2">
-      <h4 className="text-sm font-semibold flex items-center gap-1">
-         <HelpfulTooltip 
-           trigger={<span className="cursor-pointer hover:underline decoration-dotted underline-offset-4">Session Distribution</span>}
-           title="Long-term Style (Archetype History)" 
-           description="Percentage of rounds where each archetype was dominant." 
-           calculation="%_Archetype_A = (Count(Rounds where A is Max) / Total_Rounds) * 100"
-         />
-      </h4>
-      <div className="space-y-2">
-        {Object.entries(distribution).map(([archetype, percentage]) => (
-          <div key={archetype}>
-            <div className="flex justify-between text-xs mb-1">
-              <span className="capitalize flex items-center gap-1">
-                {archetypeIcons[archetype as Archetype]}
-                {archetype}
-              </span>
-              <span className="font-mono">{percentage.toFixed(1)}%</span>
-            </div>
-            <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-              <div
-                className={archetypeColors[archetype as Archetype]}
-                style={{ width: `${percentage}%` }}
-              />
-            </div>
+    <div className="space-y-3 bg-slate-900/30 rounded-lg p-3 border border-slate-800">
+      <div className="flex items-center justify-between">
+          <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+            <Zap className="w-3 h-3 text-amber-500/80" />
+            Adaptation Delta
+          </h4>
+          <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded border uppercase tracking-wider ${isPositive ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' : 'bg-slate-800 text-slate-500 border-slate-700'}`}>
+              {isPositive ? 'Active' : 'Static'}
+          </span>
+      </div>
+
+      <div className="flex items-center gap-4 relative">
+          {/* Static */}
+          <div className="flex-1 opacity-60">
+             <div className="text-[9px] text-slate-500 uppercase mb-0.5">Baseline</div>
+             <div className="text-sm font-mono text-slate-400">
+                x{cf.multiplierWithoutAdaptation.toFixed(2)}
+             </div>
           </div>
-        ))}
+
+          {/* Arrow */}
+          <div className="text-slate-700">
+            <ArrowRight className="w-3.5 h-3.5" />
+          </div>
+
+          {/* Dynamic */}
+          <div className="flex-1 relative">
+             <div className="text-[9px] text-indigo-400 uppercase mb-0.5">Velocity Adjusted</div>
+             <div className="text-sm font-mono text-indigo-300 font-bold flex items-center gap-2 shadow-indigo-500/20 drop-shadow-sm">
+                x{cf.multiplierWithAdaptation.toFixed(2)}
+             </div>
+             {Math.abs(cf.impact) > 0.01 && (
+                <span className={`absolute -right-2 top-0 text-[9px] font-mono ${cf.impact > 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                    {cf.impact > 0 ? '+' : ''}{cf.percentChange.toFixed(1)}%
+                </span>
+             )}
+          </div>
       </div>
     </div>
+  )
+}
+
+function DiagnosticsEmptyState() {
+  return (
+    <Card className="bg-slate-950/40 border-slate-800/60 backdrop-blur-sm h-full flex flex-col justify-center items-center text-center p-6 border-dashed">
+      <div className="p-3 bg-slate-900/50 rounded-full mb-3">
+        <Binary className="w-5 h-5 text-slate-600" />
+      </div>
+      <h3 className="text-sm font-semibold text-slate-400 mb-1">No Telemetry</h3>
+      <p className="text-xs text-slate-600 max-w-[150px]">Waiting for simulation stream...</p>
+    </Card>
   );
 }

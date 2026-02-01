@@ -23,7 +23,9 @@ export class ANFISPipeline {
   private clustering: KMeansSoftMembership;
   private mlp: MLPInference;
   private manifest: DeploymentManifest;
-  private previousSoftMembership: { soft_combat: number; soft_collect: number; soft_explore: number } | null = null;
+  // State: Map<UserId, UserState> to handle multi-user sessions
+  private userStates: Map<string, { lastSoftMembership: SoftMembership; lastTimestamp: number }> = new Map();
+  private readonly STATE_TIMEOUT_MS = 40000; // 40 seconds
 
   constructor(
     scalerParams: ScalerParams,
@@ -43,6 +45,8 @@ export class ANFISPipeline {
   process(telemetry: TelemetryWindow, deaths?: DeathEvent): PipelineOutput {
     const perfTimings: Record<string, number> = {};
     const duration_seconds = telemetry.duration ?? 30;
+    const userId = telemetry.userId; // Essential for state management
+    
     this.validateDuration(duration_seconds);
 
     // Step 2-5: Feature Processing & Clustering
@@ -66,9 +70,14 @@ export class ANFISPipeline {
 
     // Step 6: Delta Computation
     const t3 = performance.now();
-    const deltas = this.computeDeltas(softMembership);
+    const deltas = this.computeDeltas(userId, softMembership);
     perfTimings.deltaComputation = performance.now() - t3;
-    this.previousSoftMembership = { ...softMembership };
+    
+    // Update State for next window
+    this.userStates.set(userId, {
+        lastSoftMembership: { ...softMembership },
+        lastTimestamp: Date.now()
+    });
 
     // Step 7-8: ANFIS Input & Inference
     const anfisInput = {
@@ -139,14 +148,28 @@ export class ANFISPipeline {
     }
   }
 
-  private computeDeltas(current: SoftMembership): Deltas {
-    if (!this.previousSoftMembership) {
+  private computeDeltas(userId: string, current: SoftMembership): Deltas {
+    const userState = this.userStates.get(userId);
+    const now = Date.now();
+
+    // Condition 1: New User (No history)
+    if (!userState) {
       return { delta_combat: 0, delta_collect: 0, delta_explore: 0 };
     }
+
+    // Condition 2: Stale Session (Timeout exceeded)
+    // If the lag between requests is > 40s, we reset delta to 0 prevents 
+    // calculating velocity across a pause screen or disconnect
+    if (now - userState.lastTimestamp > this.STATE_TIMEOUT_MS) {
+        console.log(`[Pipeline] Session timeout for ${userId} (>${this.STATE_TIMEOUT_MS}ms). Resetting Deltas.`);
+        return { delta_combat: 0, delta_collect: 0, delta_explore: 0 };
+    }
+
+    // Normal calculation
     return {
-      delta_combat: current.soft_combat - this.previousSoftMembership.soft_combat,
-      delta_collect: current.soft_collect - this.previousSoftMembership.soft_collect,
-      delta_explore: current.soft_explore - this.previousSoftMembership.soft_explore,
+      delta_combat: current.soft_combat - userState.lastSoftMembership.soft_combat,
+      delta_collect: current.soft_collect - userState.lastSoftMembership.soft_collect,
+      delta_explore: current.soft_explore - userState.lastSoftMembership.soft_explore,
     };
   }
 
@@ -184,8 +207,16 @@ export class ANFISPipeline {
   /**
    * Reset delta state (for new player sessions)
    */
-  reset() {
-    this.previousSoftMembership = null;
+  /**
+   * Reset delta state (for new player sessions or debugging)
+   * can pass userId to reset specific user, or null/undefined to reset ALL
+   */
+  reset(userId?: string) {
+    if (userId) {
+        this.userStates.delete(userId);
+    } else {
+        this.userStates.clear();
+    }
   }
 
   /**
