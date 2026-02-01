@@ -79,7 +79,7 @@ export function CenterPanel() {
       </div>
 
       {/* Steps List */}
-      <ScrollArea className="flex-1 w-full relative" ref={scrollRef} type="always">
+      <ScrollArea className="flex-1 basis-0 min-h-0 w-full relative" ref={scrollRef} type="always">
           <div className="p-6 space-y-4 min-h-full pb-20 relative z-10">
             {/* Decorative Connection Line */}
             <div className="absolute left-[29px] top-6 bottom-20 w-px bg-slate-800/50 -z-10" />
