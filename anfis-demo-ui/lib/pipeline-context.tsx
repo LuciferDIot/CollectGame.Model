@@ -1,13 +1,14 @@
 'use client';
 
-import React, { createContext, useCallback, useContext, useState } from 'react';
+import React, { createContext, useCallback, useContext, useRef, useState } from 'react';
+import type { RoundAnalytics } from './analytics/types';
 import { runSimulationService } from './pipeline/simulation-runner';
 import type {
-  DashboardInputState,
-  DeathEvent,
-  PipelineState,
-  PipelineStep,
-  TelemetryFeatures
+    DashboardInputState,
+    DeathEvent,
+    PipelineState,
+    PipelineStep,
+    TelemetryFeatures
 } from './types';
 
 interface PipelineContextType {
@@ -47,14 +48,17 @@ export function PipelineProvider({ children }: { children: React.ReactNode }) {
   const [currentStep, setCurrentStep] = useState(0);
   const [stepByStepMode, setStepByStepMode] = useState(false);
   const [simulationResult, setSimulationResult] = useState<PipelineState | null>(null);
+  
+  // Track the last complete round for history visualization (Previous State)
+  const lastRoundRef = useRef<RoundAnalytics | null>(null);
 
   const parseTelemetry = useCallback((json: string): TelemetryFeatures | null => {
     try {
       const parsed = JSON.parse(json);
       if (typeof parsed !== 'object' || parsed === null) return null;
 
-      // Handle Mongo-style with rawJson
-      const source = parsed.rawJson || parsed;
+      // Handle Mongo-style with rawJson, or clean nested structure, or flat
+      const source = parsed.rawJson || parsed.telemetry || parsed;
 
       // Helper to safely get number from snake_case or camelCase
       const getNum = (obj: any, snake: string, camel: string): number => {
@@ -153,8 +157,17 @@ export function PipelineProvider({ children }: { children: React.ReactNode }) {
     try {
         const startTime = performance.now();
         
+        // Parse userId from input JSON if available
+        let userId = 'sim-user';
+        try {
+            const raw = JSON.parse(inputState.telemetryJson);
+            userId = raw.userId || raw.telemetry?.userId || 'sim-user';
+        } catch (e) {
+            // ignore JSON parse error, already handled by validation
+        }
+
         // 1. Fetch from Backend
-        const backendResult = await runSimulationService.fetchSimulationResults(telemetry, deathEvents);
+        const backendResult = await runSimulationService.fetchSimulationResults(telemetry, deathEvents, userId);
         
         const endTime = performance.now();
         const executionTime = endTime - startTime;
@@ -162,9 +175,27 @@ export function PipelineProvider({ children }: { children: React.ReactNode }) {
         // 2. Map to UI State
         const mappedState = runSimulationService.mapBackendToUI(backendResult);
 
+        // 2b. Generate Round Analytics for History/Steps
+        // Use lastRound from Ref to determine next round number and previous state
+        const nextRoundNumber = (lastRoundRef.current?.roundNumber || 0) + 1;
+        
+        const roundAnalytics = runSimulationService.mapBackendToRoundAnalytics(
+            backendResult, 
+            telemetry, 
+            nextRoundNumber
+        );
+
         // 3. Reconstruct Steps (History)
-        const initialSteps = initializePipelineSteps();
-        const completedSteps = runSimulationService.reconstructPipelineSteps(initialSteps, telemetry, mappedState);
+        // Pass the PREVIOUS round (lastRoundRef) to popuate "Previous State" in steps
+        const completedSteps = runSimulationService.reconstructPipelineSteps(
+            initialSteps, 
+            telemetry, 
+            mappedState, 
+            lastRoundRef.current || undefined
+        );
+        
+        // Update History Ref for next run
+        lastRoundRef.current = roundAnalytics;
 
         const finalState: PipelineState = {
             ...pipelineState,
@@ -186,7 +217,6 @@ export function PipelineProvider({ children }: { children: React.ReactNode }) {
 
         setSimulationResult(finalState);
 
-        // Playback logic
         // Playback logic
         if (!stepByStep) {
             setPipelineState(finalState);

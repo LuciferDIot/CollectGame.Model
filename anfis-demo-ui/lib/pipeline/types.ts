@@ -42,15 +42,15 @@ export interface SoftMembership {
 }
 
 export interface Deltas {
-  combat: number;
-  collect: number;
-  explore: number;
+  delta_combat: number;
+  delta_collect: number;
+  delta_explore: number;
 }
 
 export interface ANFISInput {
-  combat: number;
-  collect: number;
-  explore: number;
+  soft_combat: number;
+  soft_collect: number;
+  soft_explore: number;
   delta_combat: number;
   delta_collect: number;
   delta_explore: number;
