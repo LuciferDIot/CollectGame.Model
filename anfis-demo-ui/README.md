@@ -1,4 +1,4 @@
-# ANFIS Adaptive Difficulty Engine (v2.1)
+# ANFIS Adaptive Difficulty Engine (v2.2)
 
 This repository serves as the runtime demonstration and integration backend for the **Adaptive Neuro-Fuzzy Inference System (ANFIS)**. It implements the complete mathematical pipeline derived from the core research notebooks, allowing external game engines (Unity/Unreal) to query for real-time difficulty adjustments.
 
@@ -12,10 +12,11 @@ The system is designed as a modular pipeline where data flows strictly from raw 
 *   `app/api/pipeline/route.ts`: **Entry Point**. Handles API requests, validation, and session state.
 *   `lib/pipeline/index.ts`: **Orchestrator**. Manages the sequential execution of mathematical modules.
 *   `lib/pipeline/normalization.ts`: **Step 1**. Applies MinMax scaling from training data.
-*   `lib/pipeline/activity.ts`: **Step 2**. calculates behavioral intensity percentages.
+*   `lib/pipeline/activity.ts`: **Step 2**. calculated behavioral intensity percentages.
 *   `lib/pipeline/clustering.ts`: **Step 3**. Fuzzy clustering (Soft Membership).
 *   `lib/pipeline/mlp.ts`: **Step 5**. Neural network inference.
 *   `lib/pipeline/adaptation.ts`: **Step 6**. Applies contract logic to game parameters.
+*   `lib/analytics`: **New**. Centralized Analytics Context and Computation Engine for session diagnostics.
 
 ---
 
@@ -48,10 +49,12 @@ Players are classified into archetypes using **Inverse Distance Weighting (IDW)*
 3.  **Soft Membership ($\mu_k$)**:
     $$ \mu_k = \frac{w_k}{\sum_{j=1}^{3} w_j} $$
 
-### Step 4: Temporal Deltas
-To track behavioral shifts, we calculate the rate of change from the previous request.
+### Step 4: Temporal Deltas (Velocity)
+To track behavioral shifts, we calculate the rate of change from the previous request ($t-1$).
 
 $$ \Delta_{\text{cat}}(t) = \mu_{\text{cat}}(t) - \mu_{\text{cat}}(t-1) $$
+
+This "Behavioral Velocity" is critical for detecting rapid playstyle shifts (e.g., sudden aggression) versus steady-state behavior.
 
 ### Step 5: ANFIS Inference (MLP Surrogate)
 A trained Multi-Layer Perceptron (MLP) predicts the difficulty multiplier.
@@ -75,23 +78,30 @@ The final game parameters are calculated using the **Archetype-Aware Adaptation*
 
 ---
 
-## 3. Dashboard Analytics Explained
+## 3. Dashboard Analytics & Diagnostics
 
-The dashboard visualizes the internal state of the engine.
+The dashboard provides deep introspection into the engine's state, powered by a React Context-based Analytics Engine.
 
-### Behavior Tab
-*   **Badges (MED/LOW)**: Indicate probability strength.
-    *   **MED** (Blue): $\mu > 0.30$ (Significant behavior)
-    *   **LOW** (Grey): $\mu \le 0.30$ (Minor behavior)
-    *   **HIGH** (Green): $\mu > 0.50$ (Dominant behavior)
-*   **Confidence**: A heuristic metric estimating model certainty based on membership strength.
-    $$ \text{Conf} = \min(0.98, \max(0.65, \mu \times 1.5)) $$
+### 3.1 Membership Diagnostics
+Located in the **Archetypes** tab, this panel breaks down the Fuzzy Clustering process.
+*   **Partition of Unity Check**: Validates that $\sum \mu = 1.0$.
+*   **Current Round Distribution**: Visualizes the exact mix of Combat/Collect/Explore for the current time step.
+*   **Dominant Archetype**: Identifies the primary classification.
 
-### Model Tab
-*   **Rules Fired**: The activation strength of the MLP hidden neurons, representing which "rules" in the neuro-fuzzy system are active.
-*   **R² Score (0.965)**: The coefficient of determination for the surrogate model against the validation set (High accuracy).
-*   **MAE (0.012)**: Mean Absolute Error on the test set.
-*   **Silhouette Score**: Measures clustering separation quality.
+### 3.2 Counterfactual Analysis (New in v2.2)
+Located in the **Archetypes** tab, this feature answers "What if?".
+*   **Adaptation Impact**: Calculates the difference between the *actual* difficulty multiplier and a theoretical *static* multiplier (as if Deltas were zero).
+*   **Metric**: "Dynamic Adjust" shows how much the player's *rate of change* (Velocity) contributed to the difficulty, separate from their static position.
+
+### 3.3 Pipeline History
+The "Pipeline Visualization" center panel now tracks state history.
+*   **Step 5 (Defuzzification)**: Displays **Behavioral Deltas** (Velocity), showing the exact numerical shift in behavior since the last tick.
+*   **Previous State (t-1)**: Shows the Soft Membership values from the prior request, allowing easy comparison.
+
+### 3.4 Session Analytics
+*   **Responsiveness**: Measures how quickly the system adapts to changes.
+*   **Clamp Statistics**: Tracks how often parameters hit their safety bounds (Min/Max).
+*   **Archetype Distribution**: Long-term session averages for player classification.
 
 ---
 

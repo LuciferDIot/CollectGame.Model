@@ -58,6 +58,8 @@ export interface RuleFired {
   strength: number;
 }
 
+import type { SessionAnalytics } from './analytics';
+
 export interface PipelineState {
   steps: PipelineStep[];
   normalizedFeatures: NormalizedFeatures | null;
@@ -83,6 +85,7 @@ export interface PipelineState {
   metadata?: {
     deltas?: Delta;
   };
+  session?: SessionAnalytics;
   error?: string | null;
 }
 
@@ -102,3 +105,5 @@ export interface SchemaExpectation {
   type: string;
   required: boolean;
 }
+
+

@@ -1,12 +1,15 @@
 'use client';
 
-import { PipelineProvider } from '@/lib/pipeline-context';
 import { DashboardContainer } from '@/components/dashboard/dashboard-container';
+import { AnalyticsProvider } from '@/lib/analytics-context';
+import { PipelineProvider } from '@/lib/pipeline-context';
 
 export default function Home() {
   return (
     <PipelineProvider>
-      <DashboardContainer />
+      <AnalyticsProvider>
+        <DashboardContainer />
+      </AnalyticsProvider>
     </PipelineProvider>
   );
 }

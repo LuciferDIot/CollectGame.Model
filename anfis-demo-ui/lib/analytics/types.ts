@@ -23,7 +23,10 @@ export type ResponsivenessLevel = 'responsive' | 'under-responsive' | 'noisy';
 
 export interface RoundAnalytics {
   roundNumber: number;
+  duration: number;
+  features: Record<string, number>;
   targetMultiplier: number;
+  adjustedMultiplier: number; // Post-clamp value
   deltaFromPrevious: number | null; // null for first round
   softMembership: SoftMembership;
   deltas: DeltaMetrics;
@@ -31,6 +34,13 @@ export interface RoundAnalytics {
   dominantArchetype: Archetype;
   membershipSum: number;
   timestamp: number;
+  ruleActivations?: { ruleName: string; strength: number }[];
+  validation: {
+    membership_sum: number;
+    delta_range_ok: boolean;
+    multiplier_clamped: boolean;
+    all_params_in_bounds: boolean;
+  };
 }
 
 export interface RollingStats {
