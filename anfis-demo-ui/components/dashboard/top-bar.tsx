@@ -38,22 +38,15 @@ export function TopBar() {
             timeNearInteractables: example.features.timeNearInteractables ?? Math.floor(Math.random() * 30),
             distanceTraveled: example.features.distanceTraveled ?? Math.floor(Math.random() * 1000),
             timeSprinting: example.features.timeSprinting ?? Math.floor(Math.random() * 30),
-            timeOutOfCombat: example.features.timeOutOfCombat ?? Math.floor(Math.random() * 60)
+            timeOutOfCombat: example.features.timeOutOfCombat ?? Math.floor(Math.random() * 60),
+            deathCount: (example.deaths?.length) ?? Math.floor(Math.random() * 3) // Unified death count
         }
     };
-
-    // Construct Clean Death Events
-    const deathEventsPayload = (example.deaths || []).map((d: any) => ({
-        userId: stableUserId,
-        timestamp: new Date().toISOString(),
-        location: d.location || 'Zone_1',
-        cause: d.cause || 'Combat'
-    }));
 
     window.dispatchEvent(new CustomEvent('loadExample', {
       detail: {
         telemetry: JSON.stringify(telemetryPayload, null, 2),
-        deathEvents: JSON.stringify(deathEventsPayload, null, 2),
+        // deathEvents field removed - no longer needed
       },
     }));
   };

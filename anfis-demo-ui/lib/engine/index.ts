@@ -16,18 +16,17 @@ import { KMeansSoftMembership } from './clustering';
 import { MLPInference } from './mlp';
 import { MinMaxNormalizer } from './normalization';
 import {
-    validateDuration,
-    validatePipelineResult
+  validateDuration,
+  validatePipelineResult
 } from './validators';
 
 import type {
-    ClusterCentroid,
-    DeathEvent,
-    DeploymentManifest,
-    MLPWeights,
-    PipelineOutput,
-    ScalerParams,
-    TelemetryWindow,
+  ClusterCentroid,
+  DeploymentManifest,
+  MLPWeights,
+  PipelineOutput,
+  ScalerParams,
+  TelemetryWindow
 } from './types';
 
 export class ANFISPipeline {
@@ -57,7 +56,7 @@ export class ANFISPipeline {
    * @param telemetry Raw telemetry window from the client
    * @param deaths Optional death events for context
    */
-  process(telemetry: TelemetryWindow, deaths?: DeathEvent): PipelineOutput {
+  process(telemetry: TelemetryWindow): PipelineOutput {
     const perfTimings: Record<string, number> = {};
     const t0 = performance.now();
 
@@ -79,7 +78,12 @@ export class ANFISPipeline {
 
     // Step 5: Defuzzification & Temporal Dynamics
     // Eq 4.2: Delta Calculation (Velocity)
-    const deltas = this.step5_ComputeDeltas(telemetry.userId, softMembership);
+    // Parse timestamp if available (handles ISO strings)
+    const timestamp = telemetry.timestamp 
+        ? new Date(telemetry.timestamp).getTime() 
+        : Date.now();
+        
+    const deltas = this.step5_ComputeDeltas(telemetry.userId, softMembership, timestamp);
 
     // Step 6: Inference Engine (Rules Layer)
     // Neural Surrogate Forward Pass
@@ -168,9 +172,8 @@ export class ANFISPipeline {
    * Step 5: Temporal Delta Computation
    * Calculates the rate of change (Velocity) of the user's state.
    * Delta = Current_Membership - Previous_Membership
-   * Critical for breaking the "Static State Variance Collapse" (Thesis Section 5.3).
    */
-  private step5_ComputeDeltas(userId: string, currentMembership: any) {
+  private step5_ComputeDeltas(userId: string, currentMembership: any, timestamp?: number) {
     return this.sessionManager.computeDeltasAndUpdate(userId, currentMembership);
   }
 

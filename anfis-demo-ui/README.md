@@ -120,52 +120,133 @@ The "Pipeline Visualization" center panel now tracks state history.
 ```json
 {
   "telemetry": {
-    "duration": 30, // Window duration in seconds
+    "userId": "player_01",    // [REQUIRED] Unique Session ID
+    "timestamp": 1704225600,  // [REQUIRED] Epoch Timestamp or ISO String
+    "duration": 30,           // Window duration in seconds
     "features": {
-      "enemiesHit": 10,       // integer
-      "damageDone": 500.0,    // float
-      "timeInCombat": 15.0,
-      "kills": 2,
-      "itemsCollected": 5,
-      "pickupAttempts": 6,
-      "timeNearInteractables": 10.0,
-      "distanceTraveled": 150.0,
-      "timeSprinting": 20.0,
-      "timeOutOfCombat": 5.0
+      "enemiesHit": 15,       // integer
+      "damageDone": 850.5,    // float
+      "timeInCombat": 12.5,
+      "kills": 3,
+      "itemsCollected": 8,
+      "pickupAttempts": 8,
+      "timeNearInteractables": 15.0,
+      "distanceTraveled": 210.0,
+      "timeSprinting": 45.0,
+      "timeOutOfCombat": 10.0,
+      "deathCount": 0         // [OPTIONAL] Total deaths in this window
     }
   },
-  "deaths": { "count": 0 }, // Optional death data
-  "reset": false            // Set true for new session
+  "reset": false              // Set true to force new session state
 }
 ```
+
+> **Note**: `deathCount` is now a direct property of `features`. The separate `deaths` object has been deprecated.
 
 ### Response Body Schema
 ```json
 {
-  "target_multiplier": 1.12,
+  "target_multiplier": 1.15,
   "soft_membership": {
-    "soft_combat": 0.40,
-    "soft_collect": 0.35,
-    "soft_explore": 0.25
+    "soft_combat": 0.65,
+    "soft_collect": 0.25,
+    "soft_explore": 0.10
   },
   "adapted_parameters": {
-    "enemy_damage_intensity": {
-      "base": 10,
-      "final": 11.2,
+    // --- Combat Parameters ---
+    "enemy_spawn_interval": {
+      "id": "enemy_spawn_interval",
+      "base": 40,
+      "final": 34.78,   // Inverse Scaling (Harder)
       "clamped": false
     },
-    // ... complete list of 12 parameters
+    "global_enemy_cap": {
+      "id": "global_enemy_cap",
+      "base": 35,
+      "final": 40.25,   // Direct Scaling (Harder)
+      "clamped": false
+    },
+    "enemy_damage_intensity": {
+      "id": "enemy_damage_intensity",
+      "base": 10,
+      "final": 11.5,
+      "clamped": false
+    },
+    "enemy_max_health": {
+      "id": "enemy_max_health",
+      "base": 100,
+      "final": 115.0,
+      "clamped": false
+    },
+
+    // --- Exploration Parameters ---
+    "stamina_regen": {
+      "id": "stamina_regen",
+      "base": 12,
+      "final": 10.43,   // Inverse Scaling
+      "clamped": false
+    },
+    "stamina_damage": {
+      "id": "stamina_damage",
+      "base": 5,
+      "final": 5.75,
+      "clamped": false
+    },
+    "dash_cooldown": {
+      "id": "dash_cooldown",
+      "base": 3,
+      "final": 3.45,
+      "clamped": false
+    },
+
+    // --- Collection Parameters ---
+    "collectible_count": {
+      "id": "collectible_count",
+      "base": 120,
+      "final": 104.34,
+      "clamped": false
+    },
+    "collectible_spawn_interval": {
+      "id": "collectible_spawn_interval",
+      "base": 40,
+      "final": 46.0,
+      "clamped": false
+    },
+    "collectible_lifetime": {
+      "id": "collectible_lifetime",
+      "base": 30,
+      "final": 26.08,
+      "clamped": false
+    },
+
+    // --- Global Parameters ---
+    "player_damage_intensity": {
+      "id": "player_damage_intensity",
+      "base": 16,
+      "final": 13.91,
+      "clamped": false
+    },
+    "player_max_health": {
+      "id": "player_max_health",
+      "base": 180,
+      "final": 156.52,
+      "clamped": false
+    }
   },
   "validation": {
-    "membership_sum": 1.0,  // Verified logic
-    "delta_range_ok": true
+    "membership_sum": 1.0,
+    "delta_range_ok": true,
+    "multiplier_clamped": false,
+    "all_params_in_bounds": true
   }
 }
 ```
 
-### Adapted Parameters List
-The API returns updates for the following GameSync parameters:
-*   **Combat**: `enemy_spawn_interval`, `global_enemy_cap`, `enemy_damage_intensity`, `enemy_max_health`
-*   **Collection**: `collectible_count`, `collectible_spawn_interval`, `collectible_lifetime`
-*   **Exploration**: `stamina_regen`, `stamina_damage`, `dash_cooldown`
-*   **Global**: `player_damage_intensity`, `player_max_health`
+### Response Value Definitions
+*   **target_multiplier**: The raw AI difficulty recommendation (e.g., `1.15` = 15% Harder).
+*   **soft_membership**: The player's current classification (must sum to 1.0).
+*   **adapted_parameters**: The dictionary of *final* game values to apply directly to the game engine. Each parameter contains:
+    *   `base`: The default value.
+    *   `final`: The AI-adjusted value to use.
+    *   `clamped`: Boolean flag indicating if safety limits were hit.
+*   **validation**: System health checks. `all_params_in_bounds` confirms no hard limits were exceeded.
