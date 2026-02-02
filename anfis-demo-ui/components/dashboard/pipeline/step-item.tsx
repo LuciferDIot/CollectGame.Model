@@ -58,7 +58,7 @@ function StepHeader({
                     <EducationalDrawer 
                         contentKey={contentKey || ''}
                         trigger={
-                            <div className="opacity-0 group-hover/card:opacity-100 transition-opacity p-1 hover:bg-slate-700 rounded text-slate-500 hover:text-cyan-400 cursor-help">
+                            <div className="opacity-0 group-hover/card:opacity-100 transition-opacity p-1 hover:bg-accent/20 rounded text-muted-foreground hover:text-primary cursor-help">
                                 <HelpCircle className="w-3 h-3" />
                             </div>
                         }
@@ -68,11 +68,11 @@ function StepHeader({
             
             <div className="flex items-center gap-2">
                 {hasOutput && (
-                    <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">
+                    <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">
                         Data Ready
                     </span>
                 )}
-                {isExpanded ? <ChevronDown className="w-3 h-3 text-slate-500" /> : <ChevronRight className="w-3 h-3 text-slate-500" />}
+                {isExpanded ? <ChevronDown className="w-3 h-3 text-muted-foreground" /> : <ChevronRight className="w-3 h-3 text-muted-foreground" />}
             </div>
         </div>
     );
@@ -101,7 +101,7 @@ export function PipelineStepItem({ step, index, isLast }: { step: any, index: nu
             transition={{ duration: 0.3 }}
             className="relative pl-8"
         >
-            {!isLast && <div className="absolute left-[15px] top-8 bottom-[-16px] w-0.5 bg-slate-800" />}
+            {!isLast && <div className="absolute left-[15px] top-8 bottom-[-16px] w-px bg-border/30" />}
 
             <StepStatusIcon status={step.status} stepId={step.id} />
 
@@ -125,15 +125,15 @@ export function PipelineStepItem({ step, index, isLast }: { step: any, index: nu
                             exit={{ height: 0, opacity: 0 }}
                             className="overflow-hidden"
                         >
-                            <div className="mt-3 pt-3 border-t border-slate-700/30 space-y-3">
-                                <p className="text-xs text-slate-400 italic mb-2">{step.description}</p>
+                            <div className="mt-3 pt-3 border-t border-border/30 space-y-3">
+                                <p className="text-xs text-muted-foreground italic mb-2">{step.description}</p>
                                 
                                 {step.input && (
                                     <div className="mb-4">
-                                        <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                                            <ArrowDown className="w-3 h-3" /> Input Data
+                                        <div className="text-[11px] font-bold text-muted-foreground/80 uppercase tracking-wider mb-2.5 flex items-center gap-2">
+                                            <ArrowDown className="w-3.5 h-3.5" /> Input Data
                                         </div>
-                                        <div className="bg-slate-950/50 rounded border border-slate-800/50 p-2">
+                                        <div className="bg-card/30 rounded-md border border-border/30 p-3">
                                            <PipelineStepDetails step={step} details={step.input} isInput={true} />
                                         </div>
                                     </div>
@@ -141,8 +141,8 @@ export function PipelineStepItem({ step, index, isLast }: { step: any, index: nu
 
                                 {step.output && (
                                     <div>
-                                        <div className="text-[10px] font-bold text-cyan-500/80 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                                            <Activity className="w-3 h-3" /> Output Result
+                                        <div className="text-[11px] font-bold text-primary uppercase tracking-wider mb-2.5 flex items-center gap-2">
+                                            <Activity className="w-3.5 h-3.5" /> Output Result
                                         </div>
                                         <PipelineStepDetails step={step} details={step.output} />
                                     </div>

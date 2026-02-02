@@ -10,7 +10,7 @@ export interface PipelineContextType {
   runSimulation: (stepByStep: boolean) => Promise<void>;
   resetDashboard: () => void;
   advanceStep: () => void;
-  parseTelemetry: (json: string) => TelemetryFeatures | null;
+  parseTelemetry: (json: string) => { userId: string, features: TelemetryFeatures } | null;
   parseDeathEvents: (json: string) => DeathEvent[] | null;
 }
 

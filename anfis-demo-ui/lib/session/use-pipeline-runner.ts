@@ -29,60 +29,63 @@ export function usePipelineRunner({
     
     const lastRoundRef = useRef<RoundAnalytics | null>(null);
 
-    const runSimulation = async (stepByStep: boolean = false) => {
-        // 1. Parse & Validate Inputs
-        const telemetry = parseTelemetry(inputState.telemetryJson) as unknown as EngineFeatures;
-        const deathEvents = inputState.deathEventsJson ? parseDeathEvents(inputState.deathEventsJson) : [];
-    
-        if (!telemetry) {
-          setInputState((prev) => ({ ...prev, telemetryError: 'Invalid telemetry JSON' }));
-          return;
-        }
-    
-        // 2. Reset / Init State
+    const initSimulationState = (stepByStep: boolean) => {
         setStepByStepMode(stepByStep);
         setCurrentStep(0);
-        
         setPipelineState((prev) => ({
           ...prev,
           steps: INITIAL_PIPELINE_STEPS,
           isRunning: true,
           executionTime: 0,
         }));
+    };
+
+    const handleSimulationPlayback = async (
+        stepByStep: boolean, 
+        result: any, 
+        finalState: PipelineState, 
+        executionTime: number
+    ) => {
+        if (!stepByStep) {
+            setPipelineState(finalState);
+        } else {
+            await animateSimulation({
+                initialSteps: INITIAL_PIPELINE_STEPS, 
+                completedSteps: result.completedSteps, 
+                finalState, 
+                executionTime, 
+                setPipelineState
+            });
+        }
+    };
+
+    const runSimulation = async (stepByStep: boolean = false) => {
+        const parsed = parseTelemetry(inputState.telemetryJson);
+        const telemetry = parsed?.features as unknown as EngineFeatures;
+        
+        if (!telemetry) {
+          setInputState((prev) => ({ ...prev, telemetryError: 'Invalid telemetry JSON' }));
+          return;
+        }
+
+        const userId = parsed?.userId || 'unknown-user';
+        const deathEvents = inputState.deathEventsJson ? parseDeathEvents(inputState.deathEventsJson) : [];
+    
+        initSimulationState(stepByStep);
     
         try {
             const startTime = performance.now();
-            
-            // 3. Exec Logic
             const result = await executePipelineLogic(
-                telemetry, 
-                (deathEvents || []) as any[], 
-                lastRoundRef.current || undefined
+                userId, telemetry, (deathEvents || []) as any[], lastRoundRef.current || undefined
             );
             
             const executionTime = performance.now() - startTime;
-    
-            // 4. Update References
             lastRoundRef.current = result.roundAnalytics;
     
-            // 5. Construct Final State
             const finalState = constructFinalState(pipelineState, result, executionTime);
-    
             setSimulationResult(finalState);
     
-            // 6. Playback
-            if (!stepByStep) {
-                setPipelineState(finalState);
-            } else {
-                await animateSimulation({
-                    initialSteps: INITIAL_PIPELINE_STEPS, 
-                    completedSteps: result.completedSteps, 
-                    finalState, 
-                    executionTime, 
-                    setPipelineState
-                });
-            }
-    
+            await handleSimulationPlayback(stepByStep, result, finalState, executionTime);
         } catch (e) {
             console.error("Simulation failed", e);
             setPipelineState(prev => ({ ...prev, isRunning: false }));
