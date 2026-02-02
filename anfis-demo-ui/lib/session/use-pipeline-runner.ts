@@ -72,7 +72,16 @@ export function usePipelineRunner({
         const userId = parsed?.userId || 'unknown-user';
         const deathEvents = inputState.deathEventsJson ? parseDeathEvents(inputState.deathEventsJson) : [];
         
-        return { userId, telemetry, deathEvents };
+        // Merge death count directly into features (Unified Payload)
+        // This removes the need to track deaths separately downstream
+        const deathCount = deathEvents.length > 0 ? deathEvents[0].deathCount || 0 : 0;
+        
+        const unifiedTelemetry = {
+            ...telemetry,
+            deathCount: deathCount
+        };
+
+        return { userId, telemetry: unifiedTelemetry };
     };
 
     // Main simulation runner (CC = 3)
@@ -80,13 +89,14 @@ export function usePipelineRunner({
         const inputs = validateInputs();
         if (!inputs) return;
         
-        const { userId, telemetry, deathEvents } = inputs;
+        const { userId, telemetry } = inputs;
         initSimulationState(stepByStep);
     
         try {
             const startTime = performance.now();
+            // Pass empty array for deathEvents because it's now inside telemetry
             const result = await executePipelineLogic(
-                userId, telemetry, (deathEvents || []) as any[], lastRoundRef.current || undefined
+                userId, telemetry, [], lastRoundRef.current || undefined
             );
             
             const executionTime = performance.now() - startTime;
