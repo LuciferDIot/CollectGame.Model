@@ -13,19 +13,19 @@ export function CenterPanel() {
   const scrollRef = useAutoScroll([pipelineState.steps.length, pipelineState.executionTime]);
 
   return (
-    <div className="h-full flex flex-col bg-slate-900/50 border-r border-slate-800 relative overflow-hidden">
+    <div className="h-full flex flex-col bg-background/60 backdrop-blur-lg border-r border-border relative overflow-hidden">
       {/* Background Grid Pattern */}
-      <div className="absolute inset-0 bg-size-[40px_40px] opacity-20 pointer-events-none"
-           style={{ backgroundImage: 'linear-gradient(to right, #1e293b 1px, transparent 1px), linear-gradient(to bottom, #1e293b 1px, transparent 1px)' }} 
+      <div className="absolute inset-0 bg-size-[50px_50px] opacity-[0.03] pointer-events-none"
+           style={{ backgroundImage: 'linear-gradient(to right, var(--primary) 1px, transparent 1px), linear-gradient(to bottom, var(--primary) 1px, transparent 1px)' }} 
       />
       
       {/* Header */}
-      <div className="h-12 border-b border-slate-800 bg-slate-900/80 backdrop-blur-sm flex items-center px-4 justify-between shrink-0 z-10">
+      <div className="h-12 border-b border-border bg-background/40 backdrop-blur-md flex items-center px-4 justify-between shrink-0 z-10">
         <div className="flex items-center gap-2">
-            <Cpu className="w-4 h-4 text-cyan-500" />
-            <span className="text-sm font-semibold text-slate-200">Pipeline Execution</span>
+            <Cpu className="w-4 h-4 text-primary" />
+            <span className="text-sm font-semibold text-foreground/90 tracking-tight">Pipeline Execution</span>
         </div>
-        <div className="text-xs font-mono text-slate-500">
+        <div className="text-xs font-mono text-muted-foreground/60">
              {pipelineState.isRunning ? (
                  <span className="text-emerald-400 flex items-center gap-1.5">
                     <span className="relative flex h-2 w-2">
@@ -49,7 +49,7 @@ export function CenterPanel() {
       <ScrollArea className="flex-1 basis-0 min-h-0 w-full relative" ref={scrollRef} type="always">
           <div className="p-6 space-y-4 min-h-full pb-20 relative z-10">
             {/* Decorative Connection Line */}
-            <div className="absolute left-[29px] top-6 bottom-20 w-px bg-slate-800/50 -z-10" />
+            <div className="absolute left-[29px] top-6 bottom-20 w-px bg-border/30 -z-10 shadow-[0_0_10px_rgba(var(--primary-rgb),0.05)]" />
 
             <AnimatePresence mode='popLayout'>
                 {pipelineState.steps.map((step, index) => (
@@ -77,16 +77,16 @@ export function CenterPanel() {
       </ScrollArea>
       
       {/* Decorative HUD Corners */}
-      <div className="absolute top-12 left-0 w-4 h-4 border-l border-t border-cyan-900/50" />
-      <div className="absolute top-12 right-0 w-4 h-4 border-r border-t border-cyan-900/50" />
-      <div className="absolute bottom-0 left-0 w-4 h-4 border-l border-b border-cyan-900/50" />
-      <div className="absolute bottom-0 right-0 w-4 h-4 border-r border-b border-cyan-900/50" />
+      <div className="absolute top-12 left-0 w-4 h-4 border-l border-t border-primary/20" />
+      <div className="absolute top-12 right-0 w-4 h-4 border-r border-t border-primary/20" />
+      <div className="absolute bottom-0 left-0 w-4 h-4 border-l border-b border-primary/20" />
+      <div className="absolute bottom-0 right-0 w-4 h-4 border-r border-b border-primary/20" />
 
       {/* Scanning Line Animation (Overlay) */}
-      <div className="absolute inset-0 bg-linear-to-b from-transparent via-cyan-500/2 to-transparent pointer-events-none -translate-y-full animate-[scan_8s_ease-in-out_infinite]" />
+      <div className="absolute inset-0 bg-linear-to-b from-transparent via-primary/5 to-transparent pointer-events-none -translate-y-full animate-[scan_8s_ease-in-out_infinite]" />
 
       {/* Bottom Gradient Overlay */}
-      <div className="absolute bottom-0 left-0 right-0 h-16 bg-linear-to-t from-[#050a14] via-[#050a14]/80 to-transparent pointer-events-none" />
+      <div className="absolute bottom-0 left-0 right-0 h-16 bg-linear-to-t from-background via-background/80 to-transparent pointer-events-none" />
     </div>
   );
 }

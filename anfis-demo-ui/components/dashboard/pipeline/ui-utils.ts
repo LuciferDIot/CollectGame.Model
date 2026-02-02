@@ -2,16 +2,16 @@
 // --- Styling Helpers ---
 
 export function getStatusColorClasses(status: string): string {
-    if (status === 'completed') return 'border-emerald-500/50 text-emerald-500';
-    if (status === 'running') return 'border-cyan-500 text-cyan-400 shadow-[0_0_10px_rgba(6,182,212,0.5)]';
-    if (status === 'error') return 'border-red-500 text-red-500';
-    return 'border-slate-700 text-slate-600';
+    if (status === 'completed') return 'border-emerald-500/50 text-emerald-400';
+    if (status === 'running') return 'border-primary text-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.3)]';
+    if (status === 'error') return 'border-destructive text-destructive';
+    return 'border-border/50 text-muted-foreground';
 }
 
 export function getCardBackgroundClasses(isRunning: boolean): string {
     return isRunning 
-        ? 'bg-slate-900/80 border-cyan-500/50 shadow-lg' 
-        : 'bg-slate-900/40 border-slate-800 hover:border-slate-700 hover:bg-slate-800/50';
+        ? 'bg-card/90 backdrop-blur-md border-primary/40 shadow-[0_0_15px_rgba(var(--primary-rgb),0.15)]' 
+        : 'bg-card/50 backdrop-blur-sm border-border/30 hover:border-primary/25 hover:bg-card/70 transition-all duration-300';
 }
 
 export function getHeaderTitleColor(isRunning: boolean): string {

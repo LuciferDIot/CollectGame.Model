@@ -12,12 +12,13 @@ export interface SimulationExecutionResult {
 }
 
 export const executePipelineLogic = async (
+    userId: string,
     telemetry: EngineFeatures, 
     deathEvents: DeathEvent[], 
     lastRound: any
 ): Promise<SimulationExecutionResult> => {
       // 1. Fetch from Backend
-      const backendResult = await runSimulationService.fetchSimulationResults(telemetry as any, deathEvents as any, 'sim-user');
+      const backendResult = await runSimulationService.fetchSimulationResults(telemetry as any, deathEvents as any, userId);
       
       // 2. Map to UI State
       const mappedState = runSimulationService.mapBackendToUI(backendResult);

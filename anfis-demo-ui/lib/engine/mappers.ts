@@ -16,8 +16,11 @@ const validateCrispLogic = (behaviors: string[]): ValidationCheck => {
 // --- Mapping Helpers ---
 
 export const mapBehaviorCategories = (backendResult: BackendPipelineOutput): BehaviorCategory[] => {
-    // 1. Get dictionary of soft memberships
-    const soft = backendResult.fuzzification?.soft_membership || { soft_combat: 0, soft_collect: 0, soft_explore: 0 };
+    // 1. Get dictionary of soft memberships (handle multiple potential root keys)
+    const soft = backendResult.soft_membership || 
+                 (backendResult as any).fuzzification?.soft_membership || 
+                 { soft_combat: 0, soft_collect: 0, soft_explore: 0 };
+                 
     const scores = backendResult.activity_scores || { pct_combat: 0, pct_collect: 0, pct_explore: 0 };
     
     // Helper to reduce repetition
@@ -36,7 +39,9 @@ export const mapBehaviorCategories = (backendResult: BackendPipelineOutput): Beh
 };
 
 export const mapValidationChecks = (backendResult: BackendPipelineOutput): ValidationCheck[] => {
-    const soft = backendResult.fuzzification?.soft_membership || { soft_combat: 0, soft_collect: 0, soft_explore: 0 };
+    const soft = backendResult.soft_membership || 
+                 (backendResult as any).fuzzification?.soft_membership || 
+                 { soft_combat: 0, soft_collect: 0, soft_explore: 0 };
     
     // Convert to format expected by validator (UI types)
     const uiSoft = {
@@ -57,21 +62,36 @@ export const mapValidationChecks = (backendResult: BackendPipelineOutput): Valid
     ];
 };
 
+// --- Adaptation Specific Helpers ---
+
+const getAdjustmentValues = (val: any) => {
+    const isObject = typeof val === 'object' && val !== null;
+    return {
+        final: isObject ? Number((val as any).final) : Number(val),
+        base: isObject ? Number((val as any).base) : 1.0
+    };
+};
+
+const calculateDeltaPercent = (base: number, final: number): number => {
+    if (base === 0) return 0;
+    return ((final / base) - 1) * 100;
+};
+
 export const mapAdaptationDeltas = (backendResult: BackendPipelineOutput): AdaptationDelta[] => {
-    // 1. Get adjustments
-    const adjustments = (backendResult as any).adaptation?.parameter_adjustments || {};
+    const adjustments = (backendResult as any).adaptation?.parameter_adjustments || 
+                    backendResult.adapted_parameters || {};
     
-    // 2. Map Key -> Delta
-    return Object.entries(adjustments).map(([key, value]) => {
-        const category = inferCategoryFromKey(key);
-        // We calculate % change if we had previous value.
+    return Object.entries(adjustments).map(([key, val]) => {
+        const { final, base } = getAdjustmentValues(val);
+        const change = calculateDeltaPercent(base, final);
+
         return {
            field: key,
-           before: 1.0, // We'd need state history to know real old value
-           after: Number(value),
-           change: (Number(value) - 1.0) * 100, // Assuming baseline 1.0
-           category: category,
-           intensity: Math.abs((Number(value) - 1.0) * 100) > 10 ? 'high' : 'low' // logic
-        } as AdaptationDelta; // Force cast if partial match or strict
+           before: base,
+           after: final,
+           change: change,
+           category: inferCategoryFromKey(key),
+           intensity: Math.abs(change) > 10 ? 'high' : 'low'
+        } as AdaptationDelta;
     });
 };
