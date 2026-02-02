@@ -9,7 +9,7 @@
 // ------------------------------------------------------------------
 
 import { ANFISPipeline } from '@/lib/engine';
-import type { DeathEvent, TelemetryWindow } from '@/lib/engine/types';
+import type { TelemetryWindow } from '@/lib/engine/types';
 import { NextRequest, NextResponse } from 'next/server';
 
 // Load Standard Model Artifacts (The "Knowledge" learned during training)
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
     
     // 2. Read the Message
     const body = await request.json();
-    const { telemetry, deaths, reset } = body;
+    const { telemetry, reset } = body;
 
     // 3. Check the Rules (Validation)
     // We make sure the message has the parts we need (UserId, Features).
@@ -78,9 +78,12 @@ export async function POST(request: NextRequest) {
 
     // 5. Think! (Execution)
     // The Brain processes the data and decides on difficulty changes.
+    // 5. Think! (Execution)
+    // The Brain processes the data and decides on difficulty changes.
+    // Construct backward-compatible death event from features
+
     const result = pipeline.process(
-      telemetry as TelemetryWindow,
-      deaths as DeathEvent | undefined
+      telemetry as TelemetryWindow
     );
 
     // 6. Reply (Response)

@@ -11,6 +11,7 @@ export interface TelemetryFeatures {
   distanceTraveled: number;
   timeSprinting: number;
   timeOutOfCombat: number;
+  deathCount: number;
 }
 
 export interface TelemetryWindow {
@@ -191,3 +192,4 @@ export interface DeploymentManifest {
 // UI/State types
 // Re-export PipelineState from core types to maintain backward compatibility but single source of truth
 export type { PipelineState } from '@/lib/types';
+

@@ -98,24 +98,33 @@ export async function fetchSimulationResults(
     // ========================================
     // Package all the data into a format the API expects
     
+    // Extract death count if available
+    const deathEventsCount = deathEvents?.[0]?.deathCount || 0;
+    const telemetryDeathCount = telemetry.deathCount || 0;
+    const finalDeathCount = Math.max(deathEventsCount, telemetryDeathCount);
+
+    // Inject death count into features for simpler API contract
+    const featuresWithDeaths = {
+        ...telemetry,
+        deathCount: finalDeathCount
+    };
+
     const requestBody = { 
-        // Player's game data with metadata
+        // Single unified object
         telemetry: { 
             userId: userId,                        // Who is this?
-            timestamp: new Date().toISOString(),   // When did they play?
-            features: telemetry                    // What did they do?
+            timestamp: new Date().toISOString(),   // When did they play? (ISO 8601)
+            features: featuresWithDeaths           // What did they do? (Includes deathCount)
         }, 
-        
-        // Death information (if any)
-        // Using the first death event, or empty object if none
-        deaths: deathEvents?.[0] || {} 
+        // 'deaths' root object removed - simplified API
+        reset: false 
     };
     
     console.log('📤 Sending request to API:', {
         endpoint: '/api/pipeline',
         player: userId,
         actionsTracked: Object.keys(telemetry).length,
-        hasDeaths: !!deathEvents
+        deaths: finalDeathCount
     });
     
     // ========================================
