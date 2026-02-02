@@ -16,18 +16,17 @@ import { KMeansSoftMembership } from './clustering';
 import { MLPInference } from './mlp';
 import { MinMaxNormalizer } from './normalization';
 import {
-    validateDuration,
-    validatePipelineResult
+  validateDuration,
+  validatePipelineResult
 } from './validators';
 
 import type {
-    ClusterCentroid,
-    DeathEvent,
-    DeploymentManifest,
-    MLPWeights,
-    PipelineOutput,
-    ScalerParams,
-    TelemetryWindow,
+  ClusterCentroid,
+  DeploymentManifest,
+  MLPWeights,
+  PipelineOutput,
+  ScalerParams,
+  TelemetryWindow
 } from './types';
 
 export class ANFISPipeline {
@@ -57,7 +56,7 @@ export class ANFISPipeline {
    * @param telemetry Raw telemetry window from the client
    * @param deaths Optional death events for context
    */
-  process(telemetry: TelemetryWindow, deaths?: DeathEvent): PipelineOutput {
+  process(telemetry: TelemetryWindow): PipelineOutput {
     const perfTimings: Record<string, number> = {};
     const t0 = performance.now();
 
@@ -175,7 +174,7 @@ export class ANFISPipeline {
    * Delta = Current_Membership - Previous_Membership
    */
   private step5_ComputeDeltas(userId: string, currentMembership: any, timestamp?: number) {
-    return this.sessionManager.computeDeltasAndUpdate(userId, currentMembership, timestamp);
+    return this.sessionManager.computeDeltasAndUpdate(userId, currentMembership);
   }
 
   /**

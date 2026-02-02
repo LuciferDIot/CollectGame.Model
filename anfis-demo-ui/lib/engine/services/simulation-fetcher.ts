@@ -99,12 +99,14 @@ export async function fetchSimulationResults(
     // Package all the data into a format the API expects
     
     // Extract death count if available
-    const deathCount = deathEvents?.[0]?.deathCount || 0;
+    const deathEventsCount = deathEvents?.[0]?.deathCount || 0;
+    const telemetryDeathCount = telemetry.deathCount || 0;
+    const finalDeathCount = Math.max(deathEventsCount, telemetryDeathCount);
 
     // Inject death count into features for simpler API contract
     const featuresWithDeaths = {
         ...telemetry,
-        deathCount: deathCount
+        deathCount: finalDeathCount
     };
 
     const requestBody = { 
@@ -122,7 +124,7 @@ export async function fetchSimulationResults(
         endpoint: '/api/pipeline',
         player: userId,
         actionsTracked: Object.keys(telemetry).length,
-        deaths: deathCount
+        deaths: finalDeathCount
     });
     
     // ========================================

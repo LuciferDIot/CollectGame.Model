@@ -3,7 +3,7 @@ import { TelemetryFeatures as EngineFeatures } from '@/lib/engine/types';
 import { DashboardInputState, PipelineState } from '@/lib/types';
 import { useRef } from 'react';
 import { animateSimulation } from './animation';
-import { parseDeathEvents, parseTelemetry } from './parsers';
+import { mergeTelemetryWithDeaths, parseTelemetry } from './parsers';
 import { INITIAL_PIPELINE_STEPS } from './pipeline-constants';
 import { constructFinalState, executePipelineLogic } from './pipeline-logic';
 
@@ -59,27 +59,18 @@ export function usePipelineRunner({
         }
     };
 
-    // Helper: Validate inputs (CC = 2)
+    // Helper: Validate inputs (Refactored CC = 1)
     const validateInputs = () => {
         const parsed = parseTelemetry(inputState.telemetryJson);
-        const telemetry = parsed?.features as unknown as EngineFeatures;
+        const features = parsed?.features as unknown as EngineFeatures;
         
-        if (!telemetry) {
+        if (!features) {
           setInputState((prev) => ({ ...prev, telemetryError: 'Invalid telemetry JSON' }));
           return null;
         }
 
         const userId = parsed?.userId || 'unknown-user';
-        const deathEvents = inputState.deathEventsJson ? parseDeathEvents(inputState.deathEventsJson) : [];
-        
-        // Merge death count directly into features (Unified Payload)
-        // This removes the need to track deaths separately downstream
-        const deathCount = deathEvents.length > 0 ? deathEvents[0].deathCount || 0 : 0;
-        
-        const unifiedTelemetry = {
-            ...telemetry,
-            deathCount: deathCount
-        };
+        const unifiedTelemetry = mergeTelemetryWithDeaths(features, inputState.deathEventsJson);
 
         return { userId, telemetry: unifiedTelemetry };
     };
