@@ -1,14 +1,14 @@
 'use client';
 
-import { EducationalDrawer } from '@/components/analytics/educational-drawer';
-import { MembershipDiagnostics } from '@/components/analytics/membership-diagnostics';
+import { MembershipDiagnostics } from '@/components/analytics/diagnostics/membership-diagnostics';
+import { EducationalDrawer } from '@/components/analytics/shared/educational-drawer';
+import { MetricDetailModal } from '@/components/analytics/shared/metric-detail-modal';
 import { Card } from '@/components/ui/card';
 import { useAnalytics } from '@/lib/hooks/use-analytics';
-import { usePipeline } from '@/lib/pipeline-context';
+import { usePipeline } from '@/lib/session/pipeline-context';
 import { BehaviorCategory } from '@/lib/types';
 import { GlobeLock, Scan, ScanEye, SeparatorVertical } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { MetricDetailModal } from '../../analytics/metric-detail-modal';
 import { RadarChart } from '../radar-chart';
 import { ArchetypeCategoryPanel } from './archetypes/archetype-category-panel';
 

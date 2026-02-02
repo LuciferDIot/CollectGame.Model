@@ -1,8 +1,8 @@
 'use client';
 
-import { EducationalDrawer } from '@/components/analytics/educational-drawer';
+import { EducationalDrawer } from '@/components/analytics/shared/educational-drawer';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
-import { usePipeline } from '@/lib/pipeline-context';
+import { usePipeline } from '@/lib/session/pipeline-context';
 import * as Dialog from '@radix-ui/react-dialog';
 import { BarChart3, Info, TrendingUp, X } from 'lucide-react';
 import { AnalyticsMetricsCards } from './analytics-metrics-cards';

@@ -1,15 +1,15 @@
 'use client';
 
 import {
-    buildSessionAnalytics,
-    DEFAULT_ANALYTICS_CONFIG,
-    detectClampSaturation,
-    getDominantArchetype,
-    RoundAnalytics,
-    SessionAnalytics,
-    validateMembershipSum
+  buildSessionAnalytics,
+  DEFAULT_ANALYTICS_CONFIG,
+  detectClampSaturation,
+  getDominantArchetype,
+  RoundAnalytics,
+  SessionAnalytics,
+  validateMembershipSum
 } from '@/lib/analytics';
-import { usePipeline } from '@/lib/pipeline-context';
+import { usePipeline } from '@/lib/session/pipeline-context';
 import { PipelineState } from '@/lib/types';
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 

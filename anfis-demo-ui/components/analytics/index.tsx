@@ -1,11 +1,12 @@
 // Export all analytics components
-export { ClampMonitor } from './clamp-monitor';
-export { ComparativePanel } from './comparative-panel';
-export { DeltaMonitor } from './delta-monitor';
-export { FeatureContribution } from './feature-contribution';
-export { MembershipDiagnostics } from './membership-diagnostics';
-export { ModelEvaluationCard } from './model-evaluation-card';
-export { PredictionHealth } from './prediction-health';
-export { ResponsivenessIndicator } from './responsiveness-indicator';
-export { SessionSummary } from './session-summary';
+export * from './cards/model-evaluation-card';
+export * from './diagnostics/feature-contribution';
+export * from './diagnostics/membership-diagnostics';
+export * from './diagnostics/prediction-health';
+export * from './monitors/clamp-monitor';
+export * from './monitors/delta-monitor';
+export * from './monitors/responsiveness-indicator';
+export * from './views/comparative-panel';
+export * from './views/executive-health-panel';
+export * from './views/session-summary';
 
