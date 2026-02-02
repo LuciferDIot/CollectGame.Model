@@ -3,6 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { Archetype, RoundAnalytics, SessionAnalytics } from '@/lib/analytics';
 import { calculateCounterfactuals } from '@/lib/analytics/counterfactuals';
+import { ARCHETYPE_DEFINITIONS, ARCHETYPE_ID_MAP } from '@/lib/config/models';
 import { Activity, BarChart3, Binary, Cpu, HelpCircle, Layers } from 'lucide-react';
 import { EducationalDrawer } from '../shared/educational-drawer';
 import { HelpfulTooltip } from '../shared/helpful-tooltip';
@@ -15,11 +16,12 @@ interface MembershipDiagnosticsProps {
   currentRound: RoundAnalytics | null;
 }
 
-const archetypeBarColors: Record<Archetype, string> = {
-    combat: 'bg-red-500',
-    collect: 'bg-cyan-500',
-    explore: 'bg-emerald-500',
-  };
+// Colors derived from config
+const archetypeBarColors = {
+  combat: 'bg-red-500',
+  collect: 'bg-cyan-500',
+  explore: 'bg-emerald-500', 
+};
 
 export function MembershipDiagnostics({ session, currentRound }: MembershipDiagnosticsProps) {
   if (!session || !currentRound) {
@@ -79,23 +81,39 @@ export function MembershipDiagnostics({ session, currentRound }: MembershipDiagn
             </div>
             
             <div className="relative h-6 bg-slate-900/60 rounded-sm overflow-hidden flex border border-slate-800/50">
-                 {/* Stacked Bar */}
-                 <div className="h-full bg-red-500/80 hover:bg-red-500 transition-colors flex items-center justify-center relative group" style={{ width: `${softMembership.combat * 100}%` }}>
-                    <div className="absolute inset-0 bg-[url('/scanline.png')] opacity-10" />
-                 </div>
-                 <div className="h-full bg-cyan-500/80 hover:bg-cyan-500 transition-colors flex items-center justify-center relative group" style={{ width: `${softMembership.collect * 100}%` }}>
-                    <div className="absolute inset-0 bg-[url('/scanline.png')] opacity-10" />
-                 </div>
-                 <div className="h-full bg-emerald-500/80 hover:bg-emerald-500 transition-colors flex items-center justify-center relative group" style={{ width: `${softMembership.explore * 100}%` }}>
-                    <div className="absolute inset-0 bg-[url('/scanline.png')] opacity-10" />
-                 </div>
+                 {/* Stacked Bar - Dynamic */}
+                 {ARCHETYPE_DEFINITIONS.map((def) => {
+                    const key = ARCHETYPE_ID_MAP[def.name];
+                    const pct = softMembership[key];
+                    // Map generic colors to tailwind classes if needed, or use the centralized map
+                    // For now using the existing color variables for safety
+                    const colorClass = archetypeBarColors[key]; 
+                    
+                    return (
+                        <div 
+                            key={key}
+                            className={`h-full ${colorClass}/80 hover:${colorClass} transition-colors flex items-center justify-center relative group`} 
+                            style={{ width: `${pct * 100}%` }}
+                        >
+                            <div className="absolute inset-0 bg-[url('/scanline.png')] opacity-10" />
+                        </div>
+                    );
+                 })}
             </div>
 
-            {/* Micro Legends */}
+            {/* Micro Legends - Dynamic */}
             <div className="grid grid-cols-3 gap-2">
-                <ArchetypeStat type="combat" pct={softMembership.combat} isDominant={dominantArchetype === 'combat'} />
-                <ArchetypeStat type="collect" pct={softMembership.collect} isDominant={dominantArchetype === 'collect'} />
-                <ArchetypeStat type="explore" pct={softMembership.explore} isDominant={dominantArchetype === 'explore'} />
+                {ARCHETYPE_DEFINITIONS.map((def) => {
+                     const key = ARCHETYPE_ID_MAP[def.name];
+                     return (
+                        <ArchetypeStat 
+                            key={key} 
+                            type={key} 
+                            pct={softMembership[key]} 
+                            isDominant={dominantArchetype === key} 
+                        />
+                     );
+                })}
             </div>
         </div>
 
