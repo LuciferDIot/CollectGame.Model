@@ -1,12 +1,14 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import EXAMPLE_DATASETS from '@/lib/data/examples.json';
 import { usePipeline } from '@/lib/session/pipeline-context';
 import { cn } from '@/lib/utils';
-import { BarChart3, Download, PlayCircle, Terminal, Upload, XCircle } from 'lucide-react';
+import { BarChart3, Database, Download, PlayCircle, Terminal, Upload, XCircle } from 'lucide-react';
 import { useState } from 'react';
 import { AnalyticsSlideOver } from './analytics-slide-over';
+import { LeftPanel } from './left-panel';
 
 export function TopBar() {
   const { runSimulation, resetDashboard, pipelineState, inputState } = usePipeline();
@@ -81,18 +83,36 @@ export function TopBar() {
         {/* Glow Line */}
         <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent opacity-50" />
 
-        <div className="flex-1 w-full md:w-auto">
+        <div className="flex-1 w-full md:w-auto flex items-center justify-between md:justify-start">
           <div className="flex items-center gap-3">
              <div className="p-2 rounded bg-cyan-950/30 border border-cyan-500/20 shadow-[0_0_10px_rgba(6,182,212,0.1)]">
                 <Terminal className="w-5 h-5 text-cyan-400" />
              </div>
              <div className="flex flex-col">
                 <h1 className="text-sm font-bold tracking-widest uppercase text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
-                    Adaptive Telemetry Dashboard
+                    Adaptive Dashboard
                 </h1>
-                <p className="text-[10px] text-slate-500 font-mono tracking-wider">ANFIS PIPELINE v2.2.0-ALPHA</p>
+                <p className="text-[10px] text-slate-500 font-mono tracking-wider">ANFIS PIPELINE v2.2.0</p>
              </div>
           </div>
+          
+          {/* Mobile Inputs Toggle */}
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button size="sm" variant="outline" className="md:hidden border-slate-700 bg-slate-900/50 text-slate-400">
+                <Database className="w-4 h-4 mr-2" />
+                Inputs
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-[300px] p-0 border-r border-slate-800 bg-slate-950">
+               <SheetHeader className="px-4 py-3 border-b border-slate-800">
+                  <SheetTitle className="text-sm font-semibold text-slate-200">Telemetry Inputs</SheetTitle>
+               </SheetHeader>
+               <div className="h-full overflow-y-auto">
+                 <LeftPanel />
+               </div>
+            </SheetContent>
+          </Sheet>
         </div>
 
         <div className="flex flex-wrap items-center gap-3 w-full md:w-auto md:ml-auto">
