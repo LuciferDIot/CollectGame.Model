@@ -11,7 +11,7 @@ export interface DeathEvent {
 }
 
 export interface NormalizedFeatures {
-  [key: string]: number[];
+  [key: string]: number | number[];
 }
 
 export interface SoftMembership {

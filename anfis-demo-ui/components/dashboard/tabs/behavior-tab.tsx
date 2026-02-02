@@ -1,15 +1,15 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
-import { usePipeline } from '@/lib/pipeline-context';
+import { usePipeline } from '@/lib/session/pipeline-context';
 import { Activity } from 'lucide-react';
 import { ArchetypePanel } from './behavior/archetype-panel';
 import { RulesPanel } from './behavior/rules-panel';
 import { TelemetryPanel } from './behavior/telemetry-panel';
 
-import { EducationalDrawer } from '@/components/analytics/educational-drawer';
+import { EducationalDrawer } from '@/components/analytics/shared/educational-drawer';
+import { MetricDetailModal } from '@/components/analytics/shared/metric-detail-modal';
 import { useState } from 'react';
-import { MetricDetailModal } from '../../analytics/metric-detail-modal';
 
 export function BehaviorTab() {
   const { pipelineState } = usePipeline();

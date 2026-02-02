@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import EXAMPLE_DATASETS from '@/lib/data/examples.json';
-import { usePipeline } from '@/lib/pipeline-context';
+import { usePipeline } from '@/lib/session/pipeline-context';
 import { cn } from '@/lib/utils';
 import { BarChart3, Download, PlayCircle, Terminal, Upload, XCircle } from 'lucide-react';
 import { useState } from 'react';

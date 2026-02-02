@@ -2,8 +2,8 @@
 
 import { Info } from 'lucide-react';
 import { useState } from 'react';
-import { ExecutiveHealthPanel } from '../../analytics/executive-health-panel';
-import { MetricDetailModal } from '../../analytics/metric-detail-modal';
+import { MetricDetailModal } from '../../analytics/shared/metric-detail-modal';
+import { ExecutiveHealthPanel } from '../../analytics/views/executive-health-panel';
 
 export function ModelTab() {
   const [selectedMetric, setSelectedMetric] = useState<string | null>(null);

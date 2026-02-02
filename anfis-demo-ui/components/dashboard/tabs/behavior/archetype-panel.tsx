@@ -1,6 +1,6 @@
 'use client';
 
-import { EducationalDrawer } from '@/components/analytics/educational-drawer';
+import { EducationalDrawer } from '@/components/analytics/shared/educational-drawer';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { BehaviorCategory } from '@/lib/types';
