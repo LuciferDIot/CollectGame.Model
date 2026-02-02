@@ -10,6 +10,11 @@ import { DEFAULT_ANALYTICS_CONFIG } from './types';
 
 // Import computations
 import {
+  calculateAbsoluteSum,
+  calculateMean,
+  calculateStandardDeviation
+} from '@/lib/math/statistics';
+import {
   computeArchetypeDistribution
 } from './computations/behavior';
 import {
@@ -19,6 +24,7 @@ import {
   computeAvgDeltaMagnitude,
   computeResponsiveness
 } from './computations/responsiveness';
+
 import {
   computeRollingCorrelation,
   computeRollingStats
@@ -52,7 +58,7 @@ export function buildSessionAnalytics(
   // Correlate |Delta Behavior| with |Delta Multiplier|
   // Needs arrays of magnitudes
   const deltaBehaviorMagnitudes = rounds.map(r => 
-    Math.abs(r.deltas.combat) + Math.abs(r.deltas.collect) + Math.abs(r.deltas.explore)
+    calculateAbsoluteSum([r.deltas.combat, r.deltas.collect, r.deltas.explore])
   );
   const deltaMultiplierMagnitudes = rounds.map(r => 
     r.deltaFromPrevious !== null ? Math.abs(r.deltaFromPrevious) : 0
@@ -65,18 +71,8 @@ export function buildSessionAnalytics(
   );
 
   // Overall statistics
-  const avgMultiplier =
-    multipliers.length > 0
-      ? multipliers.reduce((sum, val) => sum + val, 0) / multipliers.length
-      : 0;
-  
-  const stdMultiplier =
-    multipliers.length > 1
-      ? Math.sqrt(
-          multipliers.reduce((sum, val) => sum + Math.pow(val - avgMultiplier, 2), 0) /
-            (multipliers.length - 1)
-        )
-      : 0;
+  const avgMultiplier = calculateMean(multipliers);
+  const stdMultiplier = calculateStandardDeviation(multipliers);
   
   return {
     rounds,

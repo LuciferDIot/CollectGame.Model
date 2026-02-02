@@ -1,7 +1,7 @@
 'use client';
 
 import { Card } from '@/components/ui/card';
-import { usePipeline } from '@/lib/pipeline-context';
+import { usePipeline } from '@/lib/session/pipeline-context';
 import { AlertCircle, CheckCircle, ChevronDown } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { JsonEditorDialog } from './json-editor-dialog';

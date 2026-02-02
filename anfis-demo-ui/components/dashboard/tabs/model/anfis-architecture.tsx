@@ -1,6 +1,6 @@
 
 import { Card } from '@/components/ui/card';
-import { usePipeline } from '@/lib/pipeline-context';
+import { usePipeline } from '@/lib/session/pipeline-context';
 
 export function AnfisArchitecture() {
   const { pipelineState } = usePipeline();

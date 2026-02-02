@@ -1,6 +1,6 @@
 'use client';
 
-import { EducationalDrawer } from '@/components/analytics/educational-drawer';
+import { EducationalDrawer } from '@/components/analytics/shared/educational-drawer';
 import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {

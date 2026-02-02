@@ -38,3 +38,10 @@ export const getCategoryColor = (cat: string) => {
       default: return 'bg-amber-500 text-amber-500';
     }
   };
+
+export function isSmallObject(value: any): boolean {
+    return typeof value === 'object' && 
+           value !== null &&
+           !Array.isArray(value) && 
+           Object.keys(value).length < 5;
+}

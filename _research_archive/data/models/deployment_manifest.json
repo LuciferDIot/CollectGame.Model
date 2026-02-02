@@ -1,0 +1,46 @@
+{
+  "version": "2.0",
+  "status": "FROZEN",
+  "export_date": "2026-01-28T19:46:28.468998",
+  "pipeline": {
+    "features": [
+      "enemiesHit",
+      "damageDone",
+      "timeInCombat",
+      "kills",
+      "itemsCollected",
+      "pickupAttempts",
+      "timeNearInteractables",
+      "distanceTraveled",
+      "timeSprinting",
+      "timeOutOfCombat"
+    ],
+    "num_features": 10,
+    "k_clusters": 3,
+    "anfis_architecture": "6-16-8-1",
+    "training_samples": 3164
+  },
+  "artifacts": {
+    "scaler": "scaler_params.json",
+    "centroids": "cluster_centroids.json",
+    "mlp_model": "anfis_mlp_weights.json",
+    "stats": "training_stats.json"
+  },
+  "hard_constraints": {
+    "duration_min_minutes": 20,
+    "duration_cap_minutes": 45,
+    "target_multiplier_range": [
+      0.5,
+      1.5
+    ],
+    "archetype_modifier_range": [
+      0.85,
+      1.15
+    ]
+  },
+  "feature_calculations": {
+    "pct_combat": "(enemiesHit + damageDone + timeInCombat + kills) / 4",
+    "pct_collect": "(itemsCollected + pickupAttempts + timeNearInteractables) / 3",
+    "pct_explore": "(distanceTraveled + timeSprinting + timeOutOfCombat) / 3"
+  }
+}

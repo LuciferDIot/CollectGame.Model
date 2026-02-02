@@ -1,3 +1,5 @@
+import { calculateMean, calculateStandardDeviation } from '@/lib/math/statistics';
+
 /**
  * Compute Pearson correlation coefficient over sliding window
  */
@@ -11,8 +13,8 @@ export function computeRollingCorrelation(
   const xSlice = x.slice(-window);
   const ySlice = y.slice(-window);
   
-  const xMean = xSlice.reduce((a, b) => a + b, 0) / window;
-  const yMean = ySlice.reduce((a, b) => a + b, 0) / window;
+  const xMean = calculateMean(xSlice);
+  const yMean = calculateMean(ySlice);
   
   let numerator = 0;
   let denomX = 0;
@@ -60,16 +62,8 @@ export function computeRollingStats(
   const slice = values.slice(-window);
   if (slice.length === 0) return null;
   
-  const mean = slice.reduce((sum, val) => sum + val, 0) / slice.length;
-  
-  if (slice.length === 1) {
-    return { mean, std: 0 };
-  }
-  
-  const variance =
-    slice.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) /
-    (slice.length - 1);
-  const std = Math.sqrt(variance);
-  
-  return { mean, std };
+  return {
+      mean: calculateMean(slice),
+      std: slice.length > 1 ? calculateStandardDeviation(slice) : 0
+  };
 }

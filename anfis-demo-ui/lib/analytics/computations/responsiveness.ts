@@ -1,3 +1,7 @@
+import {
+    calculateAbsoluteSum,
+    calculateMean
+} from '@/lib/math/statistics';
 import { ResponsivenessLevel, RoundAnalytics } from '../types';
 
 /**
@@ -6,15 +10,11 @@ import { ResponsivenessLevel, RoundAnalytics } from '../types';
 export function computeAvgDeltaMagnitude(rounds: RoundAnalytics[]): number {
   if (rounds.length === 0) return 0;
   
-  const totalMagnitude = rounds.reduce((sum, round) => {
-    const magnitude =
-      Math.abs(round.deltas.combat) +
-      Math.abs(round.deltas.collect) +
-      Math.abs(round.deltas.explore);
-    return sum + magnitude;
-  }, 0);
+  const magnitudes = rounds.map(r => 
+    calculateAbsoluteSum([r.deltas.combat, r.deltas.collect, r.deltas.explore])
+  );
   
-  return totalMagnitude / rounds.length;
+  return calculateMean(magnitudes);
 }
 
 /**
@@ -29,23 +29,21 @@ export function computeResponsiveness(
   const recent = rounds.slice(-3);
   
   // Calculate average absolute delta magnitude across all behavioral deltas
-  const avgBehaviorDelta =
-    recent.reduce((sum, r) => {
-      return (
-        sum +
-        Math.abs(r.deltas.combat) +
-        Math.abs(r.deltas.collect) +
-        Math.abs(r.deltas.explore)
-      );
-    }, 0) /
-    (recent.length * 3);
+  // Total magnitude sum divided by total number of components
+  const allDeltaComponents = recent.flatMap(r => [
+      r.deltas.combat, 
+      r.deltas.collect, 
+      r.deltas.explore
+  ]);
+
+  const avgBehaviorDelta = calculateMean(allDeltaComponents.map(Math.abs));
   
   // Calculate average absolute change in multiplier
-  const avgMultiplierDelta =
-    recent
+  const validMultiplierDeltas = recent
       .filter(r => r.deltaFromPrevious !== null)
-      .reduce((sum, r) => sum + Math.abs(r.deltaFromPrevious!), 0) /
-    recent.filter(r => r.deltaFromPrevious !== null).length;
+      .map(r => Math.abs(r.deltaFromPrevious!));
+
+  const avgMultiplierDelta = calculateMean(validMultiplierDeltas);
   
   const behaviorChanging = avgBehaviorDelta > noiseThreshold;
   const multiplierChanging = avgMultiplierDelta > noiseThreshold;

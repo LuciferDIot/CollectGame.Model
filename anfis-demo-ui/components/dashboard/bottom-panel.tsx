@@ -2,7 +2,7 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAnalytics } from '@/lib/hooks/use-analytics';
-import { usePipeline } from '@/lib/pipeline-context';
+import { usePipeline } from '@/lib/session/pipeline-context';
 import { Activity, Database, GlobeLock, Terminal, TrendingUp } from 'lucide-react';
 import { MetricCard } from './metric-card';
 import { RuleInspectorDrawer } from './rule-inspector-drawer';
