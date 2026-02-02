@@ -1,11 +1,11 @@
 'use client';
 
-import { EducationalDrawer } from '@/components/analytics/educational-drawer';
-import { usePipeline } from '@/lib/pipeline-context';
+import { EducationalDrawer } from '@/components/analytics/shared/educational-drawer';
+import { MetricDetailModal } from '@/components/analytics/shared/metric-detail-modal';
+import { usePipeline } from '@/lib/session/pipeline-context';
 import { cn } from '@/lib/utils';
 import { History, SeparatorVertical, SlidersHorizontal } from 'lucide-react';
 import { useState } from 'react';
-import { MetricDetailModal } from '../../analytics/metric-detail-modal'; // Explicit relative path
 
 export function AdaptationTab() {
   const { pipelineState } = usePipeline();

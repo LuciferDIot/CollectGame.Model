@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { usePipeline } from '@/lib/pipeline-context';
+import { usePipeline } from '@/lib/session/pipeline-context';
 import { Activity, BrainCircuit, GitBranch } from 'lucide-react';
 
 export function RuleInspectorDrawer() {

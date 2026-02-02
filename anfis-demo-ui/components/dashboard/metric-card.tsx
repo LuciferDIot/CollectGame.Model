@@ -1,4 +1,4 @@
-import { HelpfulTooltip } from '@/components/analytics/helpful-tooltip';
+import { HelpfulTooltip } from '@/components/analytics/shared/helpful-tooltip';
 import { Card } from '@/components/ui/card';
 import { TrendingDown, TrendingUp } from 'lucide-react';
 
