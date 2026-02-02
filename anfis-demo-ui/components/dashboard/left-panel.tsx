@@ -17,6 +17,7 @@ const TELEMETRY_SCHEMA = [
   { field: 'distanceTraveled', type: 'number', required: true, description: 'Total movement distance' },
   { field: 'timeSprinting', type: 'number', required: true, description: 'Seconds spent sprinting' },
   { field: 'timeOutOfCombat', type: 'number', required: true, description: 'Seconds exploring/idle' },
+  { field: 'deathCount', type: 'number', required: false, description: 'Total deaths in this window (Optional)' },
 ];
 
 export function LeftPanel() {
@@ -27,7 +28,7 @@ export function LeftPanel() {
     const handleLoadExample = (event: Event) => {
       const customEvent = event as CustomEvent;
       setTelemetryJson(customEvent.detail.telemetry);
-      setDeathEventsJson(customEvent.detail.deathEvents);
+      // setDeathEventsJson removed - unified payload
     };
 
     window.addEventListener('loadExample', handleLoadExample);
@@ -73,32 +74,7 @@ export function LeftPanel() {
           </div>
 
           {/* Death Events Section */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wide">
-                Death Events (Optional)
-                </label>
-                <JsonEditorDialog 
-                    title="Death Events Editor" 
-                    value={inputState.deathEventsJson} 
-                    onChange={setDeathEventsJson}
-                    description="Paste your death events array here."
-                />
-            </div>
-            <textarea
-              value={inputState.deathEventsJson}
-              onChange={(e) => setDeathEventsJson(e.target.value)}
-              placeholder="Paste death events JSON here..."
-              className="w-full h-28 p-3 bg-slate-800/50 border border-slate-700 rounded-lg text-slate-100 text-xs font-mono placeholder:text-slate-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 focus:bg-slate-800 transition-all resize-none"
-              spellCheck="false"
-            />
-            {inputState.deathEventsError && (
-              <div className="flex items-center gap-2 text-xs text-amber-400 bg-amber-950/20 border border-amber-900/30 rounded px-3 py-2">
-                <AlertCircle size={14} className="flex-shrink-0" />
-                <span>{inputState.deathEventsError}</span>
-              </div>
-            )}
-          </div>
+          {/* Death Events Section Removed - Merged into Telemetry */}
 
           {/* Schema Section */}
           <Card className="bg-slate-800/30 border-slate-700">
@@ -162,32 +138,7 @@ export function LeftPanel() {
               return null;
             })()}
             
-            {(() => {
-              let deathEventCount = 0;
-              try {
-                if (inputState.deathEventsJson) {
-                  const parsed = JSON.parse(inputState.deathEventsJson);
-                  if (Array.isArray(parsed)) {
-                    deathEventCount = parsed.length;
-                  }
-                }
-              } catch (e) {
-                // Invalid JSON
-              }
-              
-              if (deathEventCount > 0) {
-                return (
-                  <Card className="bg-amber-950/30 border-amber-900/50">
-                    <div className="p-3">
-                      <p className="text-xs text-amber-300">
-                        <span className="font-semibold">Death Events:</span> {deathEventCount} event{deathEventCount !== 1 ? 's' : ''}
-                      </p>
-                    </div>
-                  </Card>
-                );
-              }
-              return null;
-            })()}
+            {/* Death Event Summary Removed */}
           </div>
         </div>
       </div>

@@ -79,7 +79,12 @@ export class ANFISPipeline {
 
     // Step 5: Defuzzification & Temporal Dynamics
     // Eq 4.2: Delta Calculation (Velocity)
-    const deltas = this.step5_ComputeDeltas(telemetry.userId, softMembership);
+    // Parse timestamp if available (handles ISO strings)
+    const timestamp = telemetry.timestamp 
+        ? new Date(telemetry.timestamp).getTime() 
+        : Date.now();
+        
+    const deltas = this.step5_ComputeDeltas(telemetry.userId, softMembership, timestamp);
 
     // Step 6: Inference Engine (Rules Layer)
     // Neural Surrogate Forward Pass
@@ -168,10 +173,9 @@ export class ANFISPipeline {
    * Step 5: Temporal Delta Computation
    * Calculates the rate of change (Velocity) of the user's state.
    * Delta = Current_Membership - Previous_Membership
-   * Critical for breaking the "Static State Variance Collapse" (Thesis Section 5.3).
    */
-  private step5_ComputeDeltas(userId: string, currentMembership: any) {
-    return this.sessionManager.computeDeltasAndUpdate(userId, currentMembership);
+  private step5_ComputeDeltas(userId: string, currentMembership: any, timestamp?: number) {
+    return this.sessionManager.computeDeltasAndUpdate(userId, currentMembership, timestamp);
   }
 
   /**
