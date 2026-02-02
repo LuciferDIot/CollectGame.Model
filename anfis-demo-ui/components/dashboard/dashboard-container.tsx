@@ -6,21 +6,23 @@ import { TopBar } from './top-bar';
 
 export function DashboardContainer() {
   return (
-    <div className="grid grid-rows-[80px_1fr] h-screen w-full bg-background font-sans overflow-hidden">
-      {/* Top Bar Container */}
-      <div className="col-span-full border-b border-border bg-background/60 backdrop-blur-md overflow-hidden z-20">
+    <div className="flex flex-col h-screen w-full bg-background font-sans overflow-hidden">
+      {/* Top Bar Container - Always visible */}
+      <div className="shrink-0 border-b border-border bg-background/60 backdrop-blur-md z-20">
         <TopBar />
       </div>
 
-      {/* Main Content Wrapper */}
-      <div className="col-span-full grid grid-cols-[280px_1fr] overflow-hidden min-h-0">
-        {/* Left Panel Container */}
-        <div className="flex flex-col border-r border-border bg-background/30 overflow-y-auto overflow-x-hidden min-h-0">
+      {/* Main Content Wrapper - Flex-col on mobile, Grid on desktop */}
+      <div className="flex-1 flex flex-col lg:grid lg:grid-cols-[280px_1fr] overflow-hidden min-h-0">
+        {/* Left Panel Container - Hidden on mobile, visible on Desktop
+            On mobile, this is accessed via the Sheet in TopBar
+        */}
+        <div className="hidden lg:flex flex-col border-r border-border bg-background/30 overflow-y-auto overflow-x-hidden min-h-0">
           <LeftPanel />
         </div>
 
-        {/* Center Panel Container */}
-        <div className="flex flex-col border-r border-border bg-background/20 overflow-hidden min-h-0">
+        {/* Center Panel Container - Full width on mobile */}
+        <div className="flex flex-col bg-background/20 overflow-hidden min-h-0 flex-1">
           <CenterPanel />
         </div>
       </div>
