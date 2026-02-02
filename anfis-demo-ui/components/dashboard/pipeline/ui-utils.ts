@@ -10,8 +10,8 @@ export function getStatusColorClasses(status: string): string {
 
 export function getCardBackgroundClasses(isRunning: boolean): string {
     return isRunning 
-        ? 'bg-card/90 backdrop-blur-md border-primary/40 shadow-[0_0_15px_rgba(var(--primary-rgb),0.15)]' 
-        : 'bg-card/50 backdrop-blur-sm border-border/30 hover:border-primary/25 hover:bg-card/70 transition-all duration-300';
+        ? 'bg-card/20 backdrop-blur-md border-primary/30 shadow-[0_0_15px_rgba(var(--primary-rgb),0.10)]' 
+        : 'bg-card/10 backdrop-blur-sm border-border/20 hover:border-primary/20 hover:bg-card/15 transition-all duration-300';
 }
 
 export function getHeaderTitleColor(isRunning: boolean): string {

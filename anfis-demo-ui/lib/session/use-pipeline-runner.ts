@@ -59,18 +59,28 @@ export function usePipelineRunner({
         }
     };
 
-    const runSimulation = async (stepByStep: boolean = false) => {
+    // Helper: Validate inputs (CC = 2)
+    const validateInputs = () => {
         const parsed = parseTelemetry(inputState.telemetryJson);
         const telemetry = parsed?.features as unknown as EngineFeatures;
         
         if (!telemetry) {
           setInputState((prev) => ({ ...prev, telemetryError: 'Invalid telemetry JSON' }));
-          return;
+          return null;
         }
 
         const userId = parsed?.userId || 'unknown-user';
         const deathEvents = inputState.deathEventsJson ? parseDeathEvents(inputState.deathEventsJson) : [];
-    
+        
+        return { userId, telemetry, deathEvents };
+    };
+
+    // Main simulation runner (CC = 3)
+    const runSimulation = async (stepByStep: boolean = false) => {
+        const inputs = validateInputs();
+        if (!inputs) return;
+        
+        const { userId, telemetry, deathEvents } = inputs;
         initSimulationState(stepByStep);
     
         try {
