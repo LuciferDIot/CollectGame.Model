@@ -81,16 +81,9 @@ export async function POST(request: NextRequest) {
     // 5. Think! (Execution)
     // The Brain processes the data and decides on difficulty changes.
     // Construct backward-compatible death event from features
-    const deathCount = telemetry.features?.deathCount || 0;
-    const inferredDeaths = deathCount > 0 ? {
-        userId: telemetry.userId,
-        timestamp: telemetry.timestamp || Date.now(),
-        deathCount: deathCount
-    } : undefined;
 
     const result = pipeline.process(
-      telemetry as TelemetryWindow,
-      inferredDeaths
+      telemetry as TelemetryWindow
     );
 
     // 6. Reply (Response)

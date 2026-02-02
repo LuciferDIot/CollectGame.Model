@@ -1,4 +1,4 @@
-import { DeathEvent } from '@/lib/engine/types';
+import { DeathEvent, TelemetryFeatures as EngineFeatures } from '@/lib/engine/types';
 import type { TelemetryFeatures } from '@/lib/types';
 import { getTelemetrySource, getUserId, mapTelemetryFeatures } from './parser-helpers';
 
@@ -40,4 +40,27 @@ export const parseDeathEvents = (json: string): DeathEvent[] | null => {
     } catch {
       return null;
     }
+};
+
+/**
+ * Merge parsed telemetry features with death events to create a unified payload.
+ * This extracts the merging logic from validateInputs to reduce complexity.
+ * 
+ * @param features - Parsed telemetry features
+ * @param deathEventsJson - Raw JSON string for death events (optional)
+ * @returns Unified telemetry object with deathCount
+ */
+export const mergeTelemetryWithDeaths = (
+    features: EngineFeatures, 
+    deathEventsJson: string
+): EngineFeatures => {
+    const deathEvents = (deathEventsJson ? parseDeathEvents(deathEventsJson) : []) || [];
+    
+    // Merge death count directly into features (Unified Payload)
+    const deathCount = deathEvents.length > 0 ? deathEvents[0].deathCount || 0 : 0;
+    
+    return {
+        ...features,
+        deathCount: deathCount
+    };
 };
