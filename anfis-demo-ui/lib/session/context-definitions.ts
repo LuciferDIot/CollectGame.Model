@@ -12,6 +12,7 @@ export interface PipelineContextType {
   advanceStep: () => void;
   parseTelemetry: (json: string) => { userId: string, features: TelemetryFeatures } | null;
   parseDeathEvents: (json: string) => DeathEvent[] | null;
+  setPipelineState: React.Dispatch<React.SetStateAction<PipelineState>>;
 }
 
 export const PipelineContext = createContext<PipelineContextType | undefined>(undefined);

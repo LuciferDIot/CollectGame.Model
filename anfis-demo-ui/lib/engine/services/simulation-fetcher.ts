@@ -110,13 +110,8 @@ export async function fetchSimulationResults(
     };
 
     const requestBody = { 
-        // Single unified object
-        telemetry: { 
-            userId: userId,                        // Who is this?
-            timestamp: new Date().toISOString(),   // When did they play? (ISO 8601)
-            features: featuresWithDeaths           // What did they do? (Includes deathCount)
-        }, 
-        // 'deaths' root object removed - simplified API
+        userId: userId,
+        telemetry: featuresWithDeaths, 
         reset: false 
     };
     
@@ -124,7 +119,8 @@ export async function fetchSimulationResults(
         endpoint: '/api/pipeline',
         player: userId,
         actionsTracked: Object.keys(telemetry).length,
-        deaths: finalDeathCount
+        deaths: finalDeathCount,
+        fullRequest: requestBody // Log the full request body
     });
     
     // ========================================
@@ -146,12 +142,23 @@ export async function fetchSimulationResults(
     // Did something go wrong?
     
     if (!response.ok) {
+        let errorMessage = response.statusText;
+        try {
+            const errorBody = await response.json();
+            if (errorBody.error) {
+                errorMessage = errorBody.error;
+            }
+        } catch (e) {
+            // If parsing fails, stick to statusText
+        }
+
         console.error('❌ API request failed:', {
             status: response.status,
-            statusText: response.statusText
+            statusText: response.statusText,
+            detail: errorMessage
         });
         
-        throw new Error(`API Error: ${response.statusText}`);
+        throw new Error(errorMessage);
     }
 
     // ========================================
@@ -161,10 +168,13 @@ export async function fetchSimulationResults(
     
     const result = await response.json();
     
+    const timestamp = new Date().toISOString();
     console.log('✅ Received AI recommendations:', {
+        timestamp,
         multiplier: result.target_multiplier,
         playerStyle: result.soft_membership,
-        processingTime: result.performance_timings?.total
+        processingTime: result.performance_timings?.total,
+        fullResponse: result // Log the entire response body
     });
 
     return result;

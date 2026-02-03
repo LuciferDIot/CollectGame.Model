@@ -44,6 +44,7 @@ export function PipelineProvider({ children }: { children: React.ReactNode }) {
     setTelemetryJson, setDeathEventsJson,
     runSimulation, resetDashboard, advanceStep,
     parseTelemetry, parseDeathEvents,
+    setPipelineState
   };
 
   return <PipelineContext.Provider value={value}>{children}</PipelineContext.Provider>;
