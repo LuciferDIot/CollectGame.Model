@@ -93,91 +93,90 @@ export async function fetchSimulationResults(
     userId: string = 'sim-user'
 ): Promise<BackendPipelineOutput> {
     
-    // ========================================
-    // STEP 1: PREPARE THE REQUEST PAYLOAD
-    // ========================================
-    // Package all the data into a format the API expects
+    // 1. Prepare Data
+    const requestBody = preparePayload(telemetry, deathEvents, userId);
     
-    // Extract death count if available
+    // 2. Log Request
+    logRequest(userId, telemetry, requestBody);
+    
+    // 3. Send Request
+    const response = await fetch('/api/pipeline', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody)
+    });
+
+    // 4. Handle Errors
+    await handleResponseError(response);
+
+    // 5. Process Response
+    const result = await response.json();
+    logResponse(result);
+
+    return result;
+}
+
+// ============================================================================
+// HELPER FUNCTIONS (Refactoring to reduce complexity)
+// ============================================================================
+
+function preparePayload(
+    telemetry: TelemetryFeatures, 
+    deathEvents: DeathEvent[] | null, 
+    userId: string
+) {
     const deathEventsCount = deathEvents?.[0]?.deathCount || 0;
     const telemetryDeathCount = telemetry.deathCount || 0;
     const finalDeathCount = Math.max(deathEventsCount, telemetryDeathCount);
 
-    // Inject death count into features for simpler API contract
-    const featuresWithDeaths = {
-        ...telemetry,
-        deathCount: finalDeathCount
-    };
-
-    const requestBody = { 
-        userId: userId,
-        telemetry: featuresWithDeaths, 
+    return { 
+        userId,
+        telemetry: { ...telemetry, deathCount: finalDeathCount }, 
         reset: false 
     };
-    
+}
+
+function logRequest(userId: string, originalTelemetry: TelemetryFeatures, requestBody: any) {
     console.log('📤 Sending request to API:', {
         endpoint: '/api/pipeline',
         player: userId,
-        actionsTracked: Object.keys(telemetry).length,
-        deaths: finalDeathCount,
-        fullRequest: requestBody // Log the full request body
+        actionsTracked: Object.keys(originalTelemetry).length,
+        deaths: requestBody.telemetry.deathCount,
+        fullRequest: requestBody
     });
-    
-    // ========================================
-    // STEP 2: MAKE THE API REQUEST
-    // ========================================
-    // Send data to the backend and wait for response
-    
-    const response = await fetch('/api/pipeline', {
-        method: 'POST',                          // We're sending data
-        headers: { 
-            'Content-Type': 'application/json'   // Data format
-        },
-        body: JSON.stringify(requestBody)       // Convert to JSON string
-    });
+}
 
-    // ========================================
-    // STEP 3: CHECK FOR ERRORS
-    // ========================================
-    // Did something go wrong?
-    
-    if (!response.ok) {
-        let errorMessage = response.statusText;
-        try {
-            const errorBody = await response.json();
-            if (errorBody.error) {
-                errorMessage = errorBody.error;
-            }
-        } catch (e) {
-            // If parsing fails, stick to statusText
+async function handleResponseError(response: Response) {
+    if (response.ok) return;
+
+    let errorMessage = response.statusText;
+    try {
+        const errorBody = await response.json();
+        if (errorBody.error) {
+            errorMessage = errorBody.error;
         }
-
-        console.error('❌ API request failed:', {
-            status: response.status,
-            statusText: response.statusText,
-            detail: errorMessage
-        });
-        
-        throw new Error(errorMessage);
+    } catch (e) {
+        // Fallback to statusText if JSON parsing fails
     }
 
-    // ========================================
-    // STEP 4: PARSE AND RETURN THE RESPONSE
-    // ========================================
-    // Convert the JSON response back into JavaScript objects
+    console.error('❌ API request failed:', {
+        status: response.status,
+        statusText: response.statusText,
+        detail: errorMessage
+    });
     
-    const result = await response.json();
-    
+    throw new Error(errorMessage);
+}
+
+function logResponse(result: any) {
     const timestamp = new Date().toISOString();
     console.log('✅ Received AI recommendations:', {
         timestamp,
         multiplier: result.target_multiplier,
         playerStyle: result.soft_membership,
         processingTime: result.performance_timings?.total,
-        fullResponse: result // Log the entire response body
+        fullResponse: result
     });
-
-    return result;
 }
 
 /**
