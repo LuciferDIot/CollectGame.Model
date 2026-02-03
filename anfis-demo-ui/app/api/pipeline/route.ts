@@ -63,12 +63,13 @@ export async function POST(request: NextRequest) {
     // NEW SCHEMA: userId is at root, telemetry contains the features directly
     const { userId, telemetry, reset } = body;
 
-    console.log('\n🔵 [API] Incoming Pipeline Request:');
-    console.log(JSON.stringify({ userId, telemetry, reset }, null, 2));
+    console.error('\n🔵 [API] Incoming Pipeline Request:');
+    console.error(JSON.stringify({ userId, telemetry, reset }, null, 2));
 
     // 3. Check the Rules (Validation)
     const validationError = validatePayload(telemetry, userId);
     if (validationError) {
+      console.error('❌ [API] Validation Failed:', validationError);
       return NextResponse.json({ error: validationError }, { status: 400 });
     }
 
@@ -88,8 +89,8 @@ export async function POST(request: NextRequest) {
 
     const result = pipeline.process(internalTelemetry);
 
-    console.log('🟢 [API] Outgoing Pipeline Response:');
-    console.log(JSON.stringify(result, null, 2));
+    console.error('🟢 [API] Outgoing Pipeline Response:');
+    console.error(JSON.stringify(result, null, 2));
 
     // 6. Reply (Response)
     return NextResponse.json(result);

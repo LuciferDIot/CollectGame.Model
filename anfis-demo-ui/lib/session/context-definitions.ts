@@ -13,6 +13,7 @@ export interface PipelineContextType {
   parseTelemetry: (json: string) => { userId: string, features: TelemetryFeatures } | null;
   parseDeathEvents: (json: string) => DeathEvent[] | null;
   setPipelineState: React.Dispatch<React.SetStateAction<PipelineState>>;
+  setInputState: React.Dispatch<React.SetStateAction<DashboardInputState>>;
 }
 
 export const PipelineContext = createContext<PipelineContextType | undefined>(undefined);
