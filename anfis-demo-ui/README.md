@@ -119,11 +119,8 @@ The "Pipeline Visualization" center panel now tracks state history.
 ### Request Body Schema
 ```json
 {
+  "userId": "player_01",    // [REQUIRED] Unique Session ID
   "telemetry": {
-    "userId": "player_01",    // [REQUIRED] Unique Session ID
-    "timestamp": 1704225600,  // [REQUIRED] Epoch Timestamp or ISO String
-    "duration": 30,           // Window duration in seconds
-    "features": {
       "enemiesHit": 15,       // integer
       "damageDone": 850.5,    // float
       "timeInCombat": 12.5,
@@ -135,8 +132,7 @@ The "Pipeline Visualization" center panel now tracks state history.
       "timeSprinting": 45.0,
       "timeOutOfCombat": 10.0,
       "deathCount": 0         // [OPTIONAL] Total deaths in this window
-    }
-  },
+    },
   "reset": false              // Set true to force new session state
 }
 ```

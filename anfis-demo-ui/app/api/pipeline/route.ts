@@ -60,34 +60,38 @@ export async function POST(request: NextRequest) {
     
     // 2. Read the Message
     const body = await request.json();
-    const { telemetry, reset } = body;
+    // NEW SCHEMA: userId is at root, telemetry contains the features directly
+    const { userId, telemetry, reset } = body;
+
+    console.log('\n🔵 [API] Incoming Pipeline Request:');
+    console.log(JSON.stringify({ userId, telemetry, reset }, null, 2));
 
     // 3. Check the Rules (Validation)
-    // We make sure the message has the parts we need (UserId, Features).
-    const validationError = validatePayload(telemetry);
+    const validationError = validatePayload(telemetry, userId);
     if (validationError) {
-      // If bad data, reject it nicely.
       return NextResponse.json({ error: validationError }, { status: 400 });
     }
 
     // 4. Reset Memory (Optional)
-    // If the game says "New Game", we wipe the brain's short-term memory.
     if (reset) {
       pipeline.reset();
     }
 
     // 5. Think! (Execution)
-    // The Brain processes the data and decides on difficulty changes.
-    // 5. Think! (Execution)
-    // The Brain processes the data and decides on difficulty changes.
-    // Construct backward-compatible death event from features
+    // Construct internal TelemetryWindow from the new flattened API schema
+    const internalTelemetry: TelemetryWindow = {
+        userId: userId,
+        timestamp: new Date().toISOString(), // Generate server-side timestamp
+        features: telemetry, // The 'telemetry' in body IS the features object now
+        duration: 30 // Default to trained window duration
+    };
 
-    const result = pipeline.process(
-      telemetry as TelemetryWindow
-    );
+    const result = pipeline.process(internalTelemetry);
+
+    console.log('🟢 [API] Outgoing Pipeline Response:');
+    console.log(JSON.stringify(result, null, 2));
 
     // 6. Reply (Response)
-    // Send the result back to the game.
     return NextResponse.json(result);
     
   } catch (error) {
@@ -101,22 +105,35 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Simple check to see if the server is running
-export async function GET() {
-  return NextResponse.json({
-    status: 'online',
-    version: manifest.version,
-    architecture: manifest.pipeline.anfis_architecture,
-  });
-}
+// ... existing GET ...
 
 // ------------------------------------------------------------------
 // HELPER: VALIDATOR (The Bouncer)
 // ------------------------------------------------------------------
-// Checks if the incoming data is allowed in.
-function validatePayload(telemetry: any): string | null {
-  if (!telemetry) return 'Missing telemetry object (Empty envelope)';
-  if (!telemetry.features) return 'Invalid Contract: Missing features (No game stats)';
-  if (!telemetry.userId) return 'Invalid Contract: Missing userId (Who are you?)';
+const REQUIRED_TELEMETRY_FIELDS = [
+  'enemiesHit',
+  'damageDone',
+  'timeInCombat',
+  'kills',
+  'itemsCollected',
+  'pickupAttempts',
+  'timeNearInteractables',
+  'distanceTraveled',
+  'timeSprinting',
+  'timeOutOfCombat',
+  'deathCount'
+];
+
+function validatePayload(features: any, userId: any): string | null {
+  if (!userId) return 'Invalid Contract: Missing userId (Who are you?)';
+  if (!features) return 'Missing telemetry object (Empty envelope)';
+  
+  // Strict check for every required field
+  for (const field of REQUIRED_TELEMETRY_FIELDS) {
+    if (features[field] === undefined || features[field] === null) {
+      return `Invalid Contract: Missing required telemetry field '${field}'`;
+    }
+  }
+
   return null;
 }

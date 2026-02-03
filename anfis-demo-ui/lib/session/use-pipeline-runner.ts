@@ -97,9 +97,13 @@ export function usePipelineRunner({
             setSimulationResult(finalState);
     
             await handleSimulationPlayback(stepByStep, result, finalState, executionTime);
-        } catch (e) {
+        } catch (e: any) {
             console.error("Simulation failed", e);
-            setPipelineState(prev => ({ ...prev, isRunning: false }));
+            setPipelineState(prev => ({ 
+                ...prev, 
+                isRunning: false,
+                error: e.message || "Unknown error occurred"
+            }));
         }
     };
 
