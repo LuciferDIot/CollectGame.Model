@@ -204,7 +204,7 @@ In Phase 1, the scaler was **not actually applied** — `fit_transform()` was ne
 
 ### What It Does
 
-Groups the 10 normalized features into three archetype scores and computes percentage contributions:
+Groups the 10 normalised features into three archetype scores and computes percentage contributions:
 
 ```python
 score_combat  = enemiesHit + damageDone + timeInCombat + kills
@@ -220,11 +220,11 @@ pct_explore = score_explore / score_total
 
 ### Why Percentages?
 
-Raw scores are additive sums of normalized features. Converting to percentages creates a **compositional representation** — each window's behaviour is described as a proportion of each archetype, always summing to 1.0.
+Raw scores are additive sums of normalised features. Converting to percentages creates a **compositional representation** — each window's behaviour is described as a proportion of each archetype, always summing to 1.0.
 
 ### Critical Bug (Phase 1)
 
-The column selector accidentally included both normalized features AND raw `rawJson.*` columns. A raw `distanceTraveled` value of 4,500 plus a normalized value of 0.5 produced a score of 4,500.5, completely drowning out Combat (score ~0.5). See [Critical Bugs](#16-critical-bugs-encountered--fixed).
+The column selector accidentally included both normalised features AND raw `rawJson.*` columns. A raw `distanceTraveled` value of 4,500 plus a normalised value of 0.5 produced a score of 4,500.5, completely drowning out Combat (score ~0.5). See [Critical Bugs](#16-critical-bugs-encountered--fixed).
 
 ### Output
 
