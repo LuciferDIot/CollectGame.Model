@@ -6,13 +6,472 @@
 
 ## 📋 Table of Contents
 
-1. [The Big Picture](#the-big-picture)
-2. [Complete Request-Response Journey](#complete-request-response-journey)
-3. [The 8-Step ANFIS Pipeline](#the-8-step-anfis-pipeline)
-4. [Code Architecture & File Map](#code-architecture--file-map)
-5. [Key Algorithms Explained Simply](#key-algorithms-explained-simply)
-6. [Data Structures & Formats](#data-structures--formats)
-7. [Error Handling & Safety](#error-handling--safety)
+1. [API Endpoints Reference](#api-endpoints-reference)
+2. [The Big Picture](#the-big-picture)
+3. [Complete Request-Response Journey](#complete-request-response-journey)
+4. [The 8-Step ANFIS Pipeline](#the-8-step-anfis-pipeline)
+5. [Code Architecture & File Map](#code-architecture--file-map)
+6. [Key Algorithms Explained Simply](#key-algorithms-explained-simply)
+7. [Data Structures & Formats](#data-structures--formats)
+8. [Error Handling & Safety](#error-handling--safety)
+
+---
+
+## 🔌 API Endpoints Reference
+
+> This section documents **every** backend endpoint with exact request/response JSON. All values shown are realistic demo values.
+
+### Endpoint: `POST /api/pipeline`
+
+**File:** `app/api/pipeline/route.ts`
+**Purpose:** Process player telemetry through the ANFIS pipeline and return adapted game parameters.
+
+---
+
+#### ✅ Request
+
+```http
+POST /api/pipeline
+Content-Type: application/json
+```
+
+```json
+{
+  "userId": "player_123",
+  "telemetry": {
+    "enemiesHit": 25,
+    "damageDone": 1500,
+    "timeInCombat": 120,
+    "kills": 8,
+    "itemsCollected": 15,
+    "pickupAttempts": 20,
+    "timeNearInteractables": 45,
+    "distanceTraveled": 2500,
+    "timeSprinting": 90,
+    "timeOutOfCombat": 180,
+    "deathCount": 3
+  },
+  "reset": false
+}
+```
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `userId` | `string` | ✅ Yes | Unique player identifier for session tracking |
+| `telemetry` | `object` | ✅ Yes | Flat object with all 11 gameplay feature fields |
+| `telemetry.enemiesHit` | `number` | ✅ Yes | Number of successful hits on enemies |
+| `telemetry.damageDone` | `number` | ✅ Yes | Total damage dealt to enemies |
+| `telemetry.timeInCombat` | `number` | ✅ Yes | Seconds spent in combat |
+| `telemetry.kills` | `number` | ✅ Yes | Number of enemy kills |
+| `telemetry.itemsCollected` | `number` | ✅ Yes | Number of collectibles picked up |
+| `telemetry.pickupAttempts` | `number` | ✅ Yes | Number of pickup interactions attempted |
+| `telemetry.timeNearInteractables` | `number` | ✅ Yes | Seconds spent near interactable objects |
+| `telemetry.distanceTraveled` | `number` | ✅ Yes | Distance traveled in meters |
+| `telemetry.timeSprinting` | `number` | ✅ Yes | Seconds spent sprinting |
+| `telemetry.timeOutOfCombat` | `number` | ✅ Yes | Seconds spent outside combat |
+| `telemetry.deathCount` | `number` | ✅ Yes | Number of player deaths this window |
+| `reset` | `boolean` | ❌ No | If `true`, resets session memory before processing |
+
+---
+
+#### ✅ Success Response (`200 OK`)
+
+```json
+{
+  "filtering": {
+    "passed": true,
+    "duration_seconds": 30
+  },
+  "normalized_features": {
+    "enemiesHit": 0.625,
+    "damageDone": 0.500,
+    "timeInCombat": 0.400,
+    "kills": 0.800,
+    "itemsCollected": 0.375,
+    "pickupAttempts": 0.500,
+    "timeNearInteractables": 0.225,
+    "distanceTraveled": 0.714,
+    "timeSprinting": 0.450,
+    "timeOutOfCombat": 0.600,
+    "deathCount": 0.300
+  },
+  "activity_scores": {
+    "pct_combat": 0.5812,
+    "pct_collect": 0.2346,
+    "pct_explore": 0.1842
+  },
+  "soft_membership": {
+    "soft_combat": 0.6823,
+    "soft_collect": 0.1985,
+    "soft_explore": 0.1192
+  },
+  "deltas": {
+    "delta_combat": 0.1523,
+    "delta_collect": -0.0485,
+    "delta_explore": -0.1038
+  },
+  "anfis_input": [0.6823, 0.1985, 0.1192, 0.1523, -0.0485, -0.1038],
+  "mlp_output": 0.1726,
+  "inference": {
+    "rulesFired": [
+      { "ruleName": "Hidden Neuron #3", "strength": 0.9214 },
+      { "ruleName": "Hidden Neuron #1", "strength": 0.8102 },
+      { "ruleName": "Hidden Neuron #7", "strength": 0.6543 },
+      { "ruleName": "Hidden Neuron #5", "strength": 0.4891 },
+      { "ruleName": "Hidden Neuron #2", "strength": 0.3217 },
+      { "ruleName": "Hidden Neuron #8", "strength": 0.2105 },
+      { "ruleName": "Hidden Neuron #4", "strength": 0.1432 },
+      { "ruleName": "Hidden Neuron #6", "strength": 0.0723 }
+    ]
+  },
+  "target_multiplier": 1.1726,
+  "adapted_parameters": {
+    "enemy_spawn_interval": {
+      "id": "enemy_spawn_interval",
+      "base": 40,
+      "final": 33.12,
+      "clamped": false,
+      "metadata": {
+        "id": "enemy_spawn_interval",
+        "baseValue": 40,
+        "min": 20,
+        "max": 80,
+        "scaling": "Inverse",
+        "archetypeInfluence": { "enabled": true, "weights": { "combat": 0.3 } }
+      }
+    },
+    "global_enemy_cap": {
+      "id": "global_enemy_cap",
+      "base": 35,
+      "final": 42.18,
+      "clamped": false,
+      "metadata": {
+        "id": "global_enemy_cap",
+        "baseValue": 35,
+        "min": 15,
+        "max": 60,
+        "scaling": "Direct",
+        "archetypeInfluence": { "enabled": true, "weights": { "combat": 0.3 } }
+      }
+    },
+    "enemy_damage_intensity": {
+      "id": "enemy_damage_intensity",
+      "base": 10,
+      "final": 12.05,
+      "clamped": false,
+      "metadata": {
+        "id": "enemy_damage_intensity",
+        "baseValue": 10,
+        "min": 5,
+        "max": 18,
+        "scaling": "Direct",
+        "archetypeInfluence": { "enabled": true, "weights": { "combat": 0.3 } }
+      }
+    },
+    "enemy_max_health": {
+      "id": "enemy_max_health",
+      "base": 100,
+      "final": 120.47,
+      "clamped": false,
+      "metadata": {
+        "id": "enemy_max_health",
+        "baseValue": 100,
+        "min": 60,
+        "max": 180,
+        "scaling": "Direct",
+        "archetypeInfluence": { "enabled": true, "weights": { "combat": 0.3 } }
+      }
+    },
+    "stamina_regen": {
+      "id": "stamina_regen",
+      "base": 12,
+      "final": 10.35,
+      "clamped": false,
+      "metadata": {
+        "id": "stamina_regen",
+        "baseValue": 12,
+        "min": 6,
+        "max": 24,
+        "scaling": "Inverse",
+        "archetypeInfluence": { "enabled": true, "weights": { "explore": 0.3 } }
+      }
+    },
+    "stamina_damage": {
+      "id": "stamina_damage",
+      "base": 5,
+      "final": 5.82,
+      "clamped": false,
+      "metadata": {
+        "id": "stamina_damage",
+        "baseValue": 5,
+        "min": 2,
+        "max": 10,
+        "scaling": "Direct",
+        "archetypeInfluence": { "enabled": true, "weights": { "explore": 0.3 } }
+      }
+    },
+    "dash_cooldown": {
+      "id": "dash_cooldown",
+      "base": 3,
+      "final": 3.49,
+      "clamped": false,
+      "metadata": {
+        "id": "dash_cooldown",
+        "baseValue": 3,
+        "min": 1.5,
+        "max": 5,
+        "scaling": "Direct",
+        "archetypeInfluence": { "enabled": true, "weights": { "explore": 0.3 } }
+      }
+    },
+    "collectible_count": {
+      "id": "collectible_count",
+      "base": 120,
+      "final": 103.14,
+      "clamped": false,
+      "metadata": {
+        "id": "collectible_count",
+        "baseValue": 120,
+        "min": 60,
+        "max": 240,
+        "scaling": "Inverse",
+        "archetypeInfluence": { "enabled": true, "weights": { "collect": 0.3 } }
+      }
+    },
+    "collectible_spawn_interval": {
+      "id": "collectible_spawn_interval",
+      "base": 40,
+      "final": 46.56,
+      "clamped": false,
+      "metadata": {
+        "id": "collectible_spawn_interval",
+        "baseValue": 40,
+        "min": 20,
+        "max": 80,
+        "scaling": "Direct",
+        "archetypeInfluence": { "enabled": true, "weights": { "collect": 0.3 } }
+      }
+    },
+    "collectible_lifetime": {
+      "id": "collectible_lifetime",
+      "base": 30,
+      "final": 25.82,
+      "clamped": false,
+      "metadata": {
+        "id": "collectible_lifetime",
+        "baseValue": 30,
+        "min": 15,
+        "max": 60,
+        "scaling": "Inverse",
+        "archetypeInfluence": { "enabled": true, "weights": { "collect": 0.3 } }
+      }
+    },
+    "player_damage_intensity": {
+      "id": "player_damage_intensity",
+      "base": 16,
+      "final": 13.64,
+      "clamped": false,
+      "metadata": {
+        "id": "player_damage_intensity",
+        "baseValue": 16,
+        "min": 10,
+        "max": 32,
+        "scaling": "Inverse",
+        "archetypeInfluence": { "enabled": false }
+      }
+    },
+    "player_max_health": {
+      "id": "player_max_health",
+      "base": 180,
+      "final": 153.49,
+      "clamped": false,
+      "metadata": {
+        "id": "player_max_health",
+        "baseValue": 180,
+        "min": 120,
+        "max": 360,
+        "scaling": "Inverse",
+        "archetypeInfluence": { "enabled": false }
+      }
+    }
+  },
+  "validation": {
+    "membership_sum": 1.0000,
+    "delta_range_ok": true,
+    "multiplier_clamped": false,
+    "all_params_in_bounds": true
+  },
+  "performance_timings": {
+    "total": 42.31
+  }
+}
+```
+
+**Response Fields Summary:**
+
+| Section | Key | Type | Description |
+|---------|-----|------|-------------|
+| `filtering` | `passed` | `boolean` | Whether input passed duration validation |
+| `filtering` | `duration_seconds` | `number` | Telemetry window duration (default `30`) |
+| `normalized_features` | `{feature}: number` | `object` | All 11 features normalized to [0, 1] via Min-Max scaling |
+| `activity_scores` | `pct_combat` | `number` | Heuristic combat activity percentage |
+| `activity_scores` | `pct_collect` | `number` | Heuristic collection activity percentage |
+| `activity_scores` | `pct_explore` | `number` | Heuristic exploration activity percentage |
+| `soft_membership` | `soft_combat` | `number` | Fuzzy membership degree for Combat archetype |
+| `soft_membership` | `soft_collect` | `number` | Fuzzy membership degree for Collection archetype |
+| `soft_membership` | `soft_explore` | `number` | Fuzzy membership degree for Exploration archetype |
+| `deltas` | `delta_combat` | `number` | Change velocity for Combat (current − previous) |
+| `deltas` | `delta_collect` | `number` | Change velocity for Collection |
+| `deltas` | `delta_explore` | `number` | Change velocity for Exploration |
+| `anfis_input` | — | `number[]` | 6-element vector: [3 memberships, 3 deltas] |
+| `mlp_output` | — | `number` | Raw MLP neural network output |
+| `inference.rulesFired` | — | `array` | Hidden neuron activations sorted by strength (8 neurons) |
+| `target_multiplier` | — | `number` | Final clamped difficulty multiplier [0.6, 1.4] |
+| `adapted_parameters` | `{param_id}` | `AdaptedParameter` | Per-parameter adaptation with `id`, `base`, `final`, `clamped`, `metadata` |
+| `validation` | `membership_sum` | `number` | Sum of soft memberships (should ≈ 1.0) |
+| `validation` | `delta_range_ok` | `boolean` | Whether all deltas are within [-1.05, 1.05] |
+| `validation` | `multiplier_clamped` | `boolean` | Whether multiplier hit the [0.6, 1.4] boundary |
+| `validation` | `all_params_in_bounds` | `boolean` | Whether all adapted parameters are within their min/max |
+| `performance_timings` | `total` | `number` | Total processing time in milliseconds |
+
+**All 12 Adapted Game Parameters:**
+
+| Parameter | Base | Min | Max | Scaling | Archetype Influence |
+|-----------|------|-----|-----|---------|---------------------|
+| `enemy_spawn_interval` | 40 | 20 | 80 | Inverse | Combat (0.3) |
+| `global_enemy_cap` | 35 | 15 | 60 | Direct | Combat (0.3) |
+| `enemy_damage_intensity` | 10 | 5 | 18 | Direct | Combat (0.3) |
+| `enemy_max_health` | 100 | 60 | 180 | Direct | Combat (0.3) |
+| `stamina_regen` | 12 | 6 | 24 | Inverse | Explore (0.3) |
+| `stamina_damage` | 5 | 2 | 10 | Direct | Explore (0.3) |
+| `dash_cooldown` | 3 | 1.5 | 5 | Direct | Explore (0.3) |
+| `collectible_count` | 120 | 60 | 240 | Inverse | Collect (0.3) |
+| `collectible_spawn_interval` | 40 | 20 | 80 | Direct | Collect (0.3) |
+| `collectible_lifetime` | 30 | 15 | 60 | Inverse | Collect (0.3) |
+| `player_damage_intensity` | 16 | 10 | 32 | Inverse | None |
+| `player_max_health` | 180 | 120 | 360 | Inverse | None |
+
+---
+
+#### ❌ Error Response: Validation Failure (`400 Bad Request`)
+
+**Missing `userId`:**
+```json
+{
+  "error": "Invalid Contract: Missing userId (Who are you?)"
+}
+```
+
+**Missing `telemetry` object:**
+```json
+{
+  "error": "Missing telemetry object (Empty envelope)"
+}
+```
+
+**Missing a required telemetry field (e.g. `deathCount`):**
+```json
+{
+  "error": "Invalid Contract: Missing required telemetry field 'deathCount'"
+}
+```
+
+---
+
+#### ❌ Error Response: Server Error (`500 Internal Server Error`)
+
+```json
+{
+  "error": "Unknown Internal Error"
+}
+```
+
+Or with a specific error message:
+```json
+{
+  "error": "Pipeline Initialization Failed: Model weights file not found"
+}
+```
+
+---
+
+#### 🔄 Reset Session Example
+
+To clear session memory for a user before processing (resets delta tracking):
+
+**Request:**
+```json
+{
+  "userId": "player_123",
+  "telemetry": {
+    "enemiesHit": 0,
+    "damageDone": 0,
+    "timeInCombat": 0,
+    "kills": 0,
+    "itemsCollected": 0,
+    "pickupAttempts": 0,
+    "timeNearInteractables": 0,
+    "distanceTraveled": 0,
+    "timeSprinting": 0,
+    "timeOutOfCombat": 0,
+    "deathCount": 0
+  },
+  "reset": true
+}
+```
+
+**Response:** Same structure as a normal success response. All deltas will be `0.0000` since there is no previous session to compare against.
+
+```json
+{
+  "filtering": { "passed": true, "duration_seconds": 30 },
+  "normalized_features": {
+    "enemiesHit": 0.0, "damageDone": 0.0, "timeInCombat": 0.0,
+    "kills": 0.0, "itemsCollected": 0.0, "pickupAttempts": 0.0,
+    "timeNearInteractables": 0.0, "distanceTraveled": 0.0,
+    "timeSprinting": 0.0, "timeOutOfCombat": 0.0, "deathCount": 0.0
+  },
+  "activity_scores": { "pct_combat": 0.3333, "pct_collect": 0.3333, "pct_explore": 0.3334 },
+  "soft_membership": { "soft_combat": 0.3333, "soft_collect": 0.3333, "soft_explore": 0.3334 },
+  "deltas": { "delta_combat": 0.0000, "delta_collect": 0.0000, "delta_explore": 0.0000 },
+  "anfis_input": [0.3333, 0.3333, 0.3334, 0.0000, 0.0000, 0.0000],
+  "mlp_output": 0.0012,
+  "inference": {
+    "rulesFired": [
+      { "ruleName": "Hidden Neuron #1", "strength": 0.5012 },
+      { "ruleName": "Hidden Neuron #3", "strength": 0.4998 },
+      { "ruleName": "Hidden Neuron #7", "strength": 0.4987 },
+      { "ruleName": "Hidden Neuron #5", "strength": 0.4901 },
+      { "ruleName": "Hidden Neuron #2", "strength": 0.4856 },
+      { "ruleName": "Hidden Neuron #8", "strength": 0.4712 },
+      { "ruleName": "Hidden Neuron #4", "strength": 0.4543 },
+      { "ruleName": "Hidden Neuron #6", "strength": 0.4321 }
+    ]
+  },
+  "target_multiplier": 1.0012,
+  "adapted_parameters": {
+    "enemy_spawn_interval":      { "id": "enemy_spawn_interval",      "base": 40,  "final": 39.95, "clamped": false },
+    "global_enemy_cap":          { "id": "global_enemy_cap",          "base": 35,  "final": 35.04, "clamped": false },
+    "enemy_damage_intensity":    { "id": "enemy_damage_intensity",    "base": 10,  "final": 10.01, "clamped": false },
+    "enemy_max_health":          { "id": "enemy_max_health",          "base": 100, "final": 100.12, "clamped": false },
+    "stamina_regen":             { "id": "stamina_regen",             "base": 12,  "final": 11.99, "clamped": false },
+    "stamina_damage":            { "id": "stamina_damage",            "base": 5,   "final": 5.01,  "clamped": false },
+    "dash_cooldown":             { "id": "dash_cooldown",             "base": 3,   "final": 3.00,  "clamped": false },
+    "collectible_count":         { "id": "collectible_count",         "base": 120, "final": 119.86, "clamped": false },
+    "collectible_spawn_interval":{ "id": "collectible_spawn_interval","base": 40,  "final": 40.05, "clamped": false },
+    "collectible_lifetime":      { "id": "collectible_lifetime",      "base": 30,  "final": 29.96, "clamped": false },
+    "player_damage_intensity":   { "id": "player_damage_intensity",   "base": 16,  "final": 15.98, "clamped": false },
+    "player_max_health":         { "id": "player_max_health",         "base": 180, "final": 179.78, "clamped": false }
+  },
+  "validation": {
+    "membership_sum": 1.0000,
+    "delta_range_ok": true,
+    "multiplier_clamped": false,
+    "all_params_in_bounds": true
+  },
+  "performance_timings": { "total": 38.14 }
+}
+```
 
 ---
 
