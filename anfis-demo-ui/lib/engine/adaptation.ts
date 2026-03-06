@@ -39,7 +39,7 @@ export const DEFAULT_PARAMETER_REGISTRY: AdaptationRegistry = {
     min: 20,
     max: 80,
     scaling: 'Inverse',
-    archetypeInfluence: { enabled: true, weights: { combat: SENSITIVITY.SPAWN_DELAY } }
+    archetypeInfluence: { enabled: true, weights: { soft_combat: SENSITIVITY.SPAWN_DELAY } }
   },
   global_enemy_cap: {
     id: 'global_enemy_cap',
@@ -47,7 +47,7 @@ export const DEFAULT_PARAMETER_REGISTRY: AdaptationRegistry = {
     min: 15,
     max: 60,
     scaling: 'Direct',
-    archetypeInfluence: { enabled: true, weights: { combat: SENSITIVITY.SPAWN_RATE } }
+    archetypeInfluence: { enabled: true, weights: { soft_combat: SENSITIVITY.SPAWN_RATE } }
   },
   enemy_damage_intensity: {
     id: 'enemy_damage_intensity',
@@ -55,7 +55,7 @@ export const DEFAULT_PARAMETER_REGISTRY: AdaptationRegistry = {
     min: 5,
     max: 18,
     scaling: 'Direct',
-    archetypeInfluence: { enabled: true, weights: { combat: SENSITIVITY.ENEMY_DAMAGE } }
+    archetypeInfluence: { enabled: true, weights: { soft_combat: SENSITIVITY.ENEMY_DAMAGE } }
   },
   enemy_max_health: {
     id: 'enemy_max_health',
@@ -63,7 +63,7 @@ export const DEFAULT_PARAMETER_REGISTRY: AdaptationRegistry = {
     min: 60,
     max: 180,
     scaling: 'Direct',
-    archetypeInfluence: { enabled: true, weights: { combat: SENSITIVITY.ENEMY_HEALTH } }
+    archetypeInfluence: { enabled: true, weights: { soft_combat: SENSITIVITY.ENEMY_HEALTH } }
   },
 
   // Exploration Parameters
@@ -73,7 +73,7 @@ export const DEFAULT_PARAMETER_REGISTRY: AdaptationRegistry = {
     min: 6,
     max: 24,
     scaling: 'Inverse',
-    archetypeInfluence: { enabled: true, weights: { explore: 0.3 } }
+    archetypeInfluence: { enabled: true, weights: { soft_explore: 0.3 } }
   },
   stamina_damage: {
     id: 'stamina_damage',
@@ -81,7 +81,7 @@ export const DEFAULT_PARAMETER_REGISTRY: AdaptationRegistry = {
     min: 2,
     max: 10,
     scaling: 'Direct',
-    archetypeInfluence: { enabled: true, weights: { explore: 0.3 } }
+    archetypeInfluence: { enabled: true, weights: { soft_explore: 0.3 } }
   },
   dash_cooldown: {
     id: 'dash_cooldown',
@@ -89,7 +89,7 @@ export const DEFAULT_PARAMETER_REGISTRY: AdaptationRegistry = {
     min: 1.5,
     max: 5,
     scaling: 'Direct',
-    archetypeInfluence: { enabled: true, weights: { explore: 0.3 } }
+    archetypeInfluence: { enabled: true, weights: { soft_explore: 0.3 } }
   },
 
   // Collection Parameters
@@ -99,7 +99,7 @@ export const DEFAULT_PARAMETER_REGISTRY: AdaptationRegistry = {
     min: 60,
     max: 240,
     scaling: 'Inverse',
-    archetypeInfluence: { enabled: true, weights: { collect: 0.3 } }
+    archetypeInfluence: { enabled: true, weights: { soft_collect: 0.3 } }
   },
   collectible_spawn_interval: {
     id: 'collectible_spawn_interval',
@@ -107,7 +107,7 @@ export const DEFAULT_PARAMETER_REGISTRY: AdaptationRegistry = {
     min: 20,
     max: 80,
     scaling: 'Direct',
-    archetypeInfluence: { enabled: true, weights: { collect: 0.3 } }
+    archetypeInfluence: { enabled: true, weights: { soft_collect: 0.3 } }
   },
   collectible_lifetime: {
     id: 'collectible_lifetime',
@@ -115,7 +115,7 @@ export const DEFAULT_PARAMETER_REGISTRY: AdaptationRegistry = {
     min: 15,
     max: 60,
     scaling: 'Inverse',
-    archetypeInfluence: { enabled: true, weights: { collect: 0.3 } }
+    archetypeInfluence: { enabled: true, weights: { soft_collect: 0.3 } }
   },
 
   // Neutral / Player Parameters
