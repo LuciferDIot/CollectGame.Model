@@ -27,5 +27,21 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Verify model files
+        run: |
+          echo "Verifying model files..."
+          if [ ! -f "models/anfis_mlp_weights.json" ]; then
+            echo "Error: anfis_mlp_weights.json not found!"
+            exit 1
+          fi
+          if [ ! -f "models/cluster_centroids.json" ]; then
+            echo "Error: cluster_centroids.json not found!"
+            exit 1
+          fi
+          echo "Model files verified."
+
+      - name: Run builds test
+        run: npm run build
+
       - name: Run tests
         run: npm run test
