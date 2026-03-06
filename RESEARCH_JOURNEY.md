@@ -2,7 +2,7 @@
 
 > A complete record of every option explored, experiment conducted, decision made, and path taken during the development of the ANFIS-based adaptive difficulty model for CollectGame.
 
-**Last Updated**: February 14, 2026
+**Last Updated**: March 6, 2026
 
 ---
 
@@ -29,6 +29,7 @@
 19. [Final Metrics & Production Configuration](#19-final-metrics--production-configuration)
 20. [Frozen Decisions Summary](#20-frozen-decisions-summary)
 21. [Activity Scoring Revision (v2.1) — March 2026](#21-activity-scoring-revision-v21--march-2026)
+22. [Derived Features & Sensitivity Breakthrough (v2.2) — March 2026](#22-derived-features--sensitivity-breakthrough-v22--march-2026)
 
 ---
 
@@ -58,9 +59,9 @@ Build an **ANFIS (Adaptive Neuro-Fuzzy Inference System)–based adaptive diffic
 | **Collection** | `itemsCollected`, `pickupAttempts`, `timeNearInteractables` |
 | **Exploration** | `distanceTraveled`, `timeSprinting` _(`timeOutOfCombat` removed — see v2.1)_ |
 
-**Why these 10?** They map directly to the three gameplay pillars designed into CollectGame. Each category represents a fundamentally different play style that the difficulty system must adapt to differently.
+**Why these 12?** They map directly to the three gameplay pillars. The addition of derived features in v2.2 (Damage per Hit and Pickup Rate) ensures that precision combat and intentional gathering are correctly weighted relative to raw volume.
 
-> **v2.1 Note**: `timeOutOfCombat` is collected but intentionally excluded from the activity scoring formula. See Section 21 for rationale.
+> **v2.2 Note**: `damagePerHit` and `pickupAttemptRate` are now first-class inputs to the activity scoring and clustering pipeline.
 
 ---
 
@@ -1014,3 +1015,40 @@ Notebooks 04 → 05 → 06 → 07 were rerun with the v2.1 formula.
 - Architecture: 6-16-8-1
 
 The pipeline is now correctly aligned with the v2.1 activity scoring formula. All deployed artifacts (`cluster_centroids.json`, `anfis_mlp_weights.json`) reflect the new formula.
+
+---
+
+## 22. Derived Features & Sensitivity Breakthrough (v2.2) — March 2026
+
+**Date**: March 6, 2026  
+**Status**: ✅ COMPLETE
+
+### Motivation
+Two weaknesses identified in the v2.1 activity scoring:
+1. **Sniper blind spot**: `enemiesHit` alone penalises high-damage-per-shot players (snipers, shotguns). A player landing 3 heavy shots deals far more combat impact than one landing 30 weak pellets — yet only hit count was considered.
+2. **Explorer contamination**: Explorers passing near items incidentally scored collection credit even without interaction intent. `pickupAttemptRate` separates deliberate collectors from passive passers-by.
+
+### Changes Applied
+
+| Area | Change |
+|---|---|
+| `03_Normalization.ipynb` | Added derived feature cells + scaler export cell |
+| `04_Activity_Contributions.ipynb` | Combat ÷5, Collect ÷4 |
+| `lib/engine/index.ts` | Pre-compute `damage_per_hit` / `pickup_attempt_rate` (snake_case) |
+| `lib/engine/activity.ts` | Updated divisors and fallback `?? 0` |
+| `lib/session/session-manager.ts` | Timeout 40s → 90s |
+| `lib/engine/adaptation.ts` | `SENSITIVITY` registry replaces global 0.3 |
+| `models/scaler_params.json` | 10 → 12 features |
+| `models/deployment_manifest.json` | v2.0/FROZEN → v2.2/PRODUCTION |
+
+### Pipeline Rerun Outcome (NB 03 → 07)
+
+All notebooks reruns as of 2026-03-06:
+
+| Artifact | Key Result |
+|---|---|
+| `scaler_params.json` | 12 features (added `damage_per_hit`, `pickup_attempt_rate`) |
+| `anfis_mlp_weights.json` | Test R²: 0.9392, Test MAE: 0.0112 |
+| `cluster_centroids.json` | 3 centroids re-computed on v2.2 activity scores |
+
+**Case sensitivity bug fix**: The engine initially computed features as `damagePerHit`/`pickupAttemptRate` (camelCase) but the scaler expected `damage_per_hit`/`pickup_attempt_rate` (snake_case). Fixed in `lib/engine/index.ts`.

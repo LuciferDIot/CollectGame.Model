@@ -5,6 +5,49 @@
 
 ---
 
+## [2.2.0] - 2026-03-06 - DERIVED FEATURES & SENSITIVITY UPDATE
+
+### Summary
+Introduced two derived features to improve archetype discrimination, replaced the global uniform
+sensitivity constant with a principled per-parameter registry, and extended the session timeout
+to tolerate network latency and loading screens between telemetry windows.
+
+### Added
+- **`damage_per_hit`** derived feature: `damageDone_raw / max(enemiesHit_raw, 1)`
+  - Captures weapon-class-agnostic combat intensity (sniper vs spray-fire archetypes)
+  - Computed before MinMaxScaler and normalized as the 11th feature
+  - Added to `pct_combat` average: ÷5 instead of ÷4
+- **`pickup_attempt_rate`** derived feature: `pickupAttempts_raw / max(timeNearInteractables_raw, 1)`
+  - Disambiguates deliberate collectors (high rate) from incidental explorers (low rate)
+  - Normalized as the 12th feature
+  - Added to `pct_collect` average: ÷4 instead of ÷3
+- **Per-parameter sensitivity registry** in `adaptation.ts`:
+  - `ENEMY_HEALTH: 0.20`, `ENEMY_DAMAGE: 0.25`, `SPAWN_RATE: 0.35`, `SPAWN_DELAY: 0.30`
+  - Replaces the previous uniform `0.3` constant for all parameters
+
+### Changed
+- **`session-manager.ts`**: `STATE_TIMEOUT_MS` increased `40000 → 90000` (3× window cadence)
+- **`scaler_params.json`**: Updated from 10 → 12 features including derived features
+- **`deployment_manifest.json`**: Version → 2.2, status → PRODUCTION, feature_calculations updated
+- **`03_Normalization.ipynb`**: Added scaler export cell; derived features computed before scaling
+- **`04_Activity_Contributions.ipynb`**: Updated formulae for both combat (÷5) and collect (÷4)
+- **`educational-content.ts`**: Added tooltip entries for `damagePerHit` and `pickupAttemptRate`
+- **`pipeline-constants.ts`**: Updated step descriptions to reference v2.2
+
+### Artifacts Regenerated (Notebooks 03 → 07)
+- `data/processed/3_normalized_telemetry.csv`
+- `data/processed/4_activity_contributions.csv`
+- `data/processed/5_clustered_telemetry.csv`
+- `data/processed/6_anfis_dataset.csv`
+- `data/models/scaler_params.json` (12 features)
+- `data/models/anfis_mlp_weights.json` (Test R²: 0.9392, MAE: 0.0112)
+- `anfis-demo-ui/models/` (all synced)
+
+### Engine Fix
+- Fixed `camelCase` → `snake_case` mismatch in `lib/engine/index.ts` for derived feature keys
+
+---
+
 ## [2.1.0] - 2026-03-06 - ACTIVITY SCORING REVISION
 
 ### Summary
@@ -124,8 +167,8 @@ Complete system with delta integration. All experimental validation finished, ar
 
 ## Status
 
-**Version**: 2.1.0 (PRODUCTION)
-**Status**: ✅ FROZEN - Activity scoring revised (v2.1), pipeline regenerated 2026-03-06
+**Version**: 2.2.0 (PRODUCTION)  
+**Status**: ✅ ACTIVE — Derived features integrated, pipeline regenerated, artifacts synced 2026-03-06  
 **Next Phase**: Thesis write-up and deployment
 
 ---

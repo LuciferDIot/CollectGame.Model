@@ -49,7 +49,9 @@ Content-Type: application/json
     "distanceTraveled": 2500,
     "timeSprinting": 90,
     "timeOutOfCombat": 180,
-    "deathCount": 3
+    "deathCount": 3,
+    "damagePerHit": 187.5,
+    "pickupAttemptRate": 0.44
   },
   "reset": false
 }
@@ -70,6 +72,8 @@ Content-Type: application/json
 | `telemetry.timeSprinting` | `number` | ✅ Yes | Seconds spent sprinting |
 | `telemetry.timeOutOfCombat` | `number` | ✅ Yes | Seconds spent outside combat |
 | `telemetry.deathCount` | `number` | ✅ Yes | Number of player deaths this window |
+| `telemetry.damagePerHit` | `number` | ✅ Yes | Derived: `damageDone / max(enemiesHit, 1)` (v2.2) |
+| `telemetry.pickupAttemptRate` | `number` | ✅ Yes | Derived: `pickupAttempts / max(timeNearInteractables, 1)` (v2.2) |
 | `reset` | `boolean` | ❌ No | If `true`, resets session memory before processing |
 
 ---
@@ -93,7 +97,9 @@ Content-Type: application/json
     "distanceTraveled": 0.714,
     "timeSprinting": 0.450,
     "timeOutOfCombat": 0.600,
-    "deathCount": 0.300
+    "deathCount": 0.300,
+    "damagePerHit": 0.525,
+    "pickupAttemptRate": 0.410
   },
   "activity_scores": {
     "pct_combat": 0.5812,
@@ -684,12 +690,16 @@ AFTER:  Health = 0.5 (normalized)
 
 BEFORE: Distance = 1500 meters
 AFTER:  Distance = 0.75 (normalized to typical range)
+
+**Derived Feature (v2.2):**
+BEFORE: DamagePerHit = 250
+AFTER:  DamagePerHit = 0.82 (High normalized value)
 ```
 
 **Why We Need This:**
-- AI can't understand raw numbers
-- Needs everything on the same scale to compare fairly
-- Like converting currencies to one standard unit
+- AI can't understand raw numbers (1500 vs 0.5).
+- Normalization converts physical units (meters, damage) into "signal strength" [0,1].
+- Derived features like **DamagePerHit** are calculated *before* normalization to ensure they are properly scaled for the AI input.
 
 **Code Location:** `lib/engine/normalization.ts`
 
@@ -700,11 +710,11 @@ AFTER:  Distance = 0.75 (normalized to typical range)
 - "Rule of Thumb" guessing
 - Uses simple logic to estimate what the player is doing
 
-**Formula (v2.1):**
+**Formula (v2.2):**
 ```
-score_combat  = avg(enemiesHit, damageDone, timeInCombat, kills)           → [0, 1]
-score_collect = avg(itemsCollected, pickupAttempts, timeNearInteractables)  → [0, 1]
-score_explore = avg(distanceTraveled, timeSprinting)                        → [0, 1]
+score_combat  = avg(enemiesHit, damageDone, timeInCombat, kills, damagePerHit)      → [0, 1]
+score_collect = avg(itemsCollected, pickupAttempts, timeNearInteractables, pickupAttemptRate) → [0, 1]
+score_explore = avg(distanceTraveled, timeSprinting)                               → [0, 1]
 
 pct_combat  = score_combat  / (score_combat + score_collect + score_explore)
 pct_collect = score_collect / (score_combat + score_collect + score_explore)
@@ -712,9 +722,11 @@ pct_explore = score_explore / (score_combat + score_collect + score_explore)
 ```
 
 **Design Decisions:**
-- **Averages, not sums**: Each archetype has a max score of 1.0 regardless of feature count.
-  Using sums gave Combat (4 features) a structural raw-score advantage over Collection (3)
-  and Exploration (2). Averaging removes this bias.
+- **v2.2 Derived Signals**: 
+    - **`damagePerHit` (Combat)**: Raw enemy hits underrepresents per-shot impact (snipers). Including Damage per Hit ensures precision playstyles are recognized.
+    - **`pickupAttemptRate` (Collection)**: Distinguishes intentional loot interaction from incidental proximity while exploring.
+- **Averages, not sums (v2.1)**: Each archetype has a max score of 1.0 regardless of feature count.
+  Using sums gave Combat (now 5 features) a major raw-score advantage over Exploration (2). Averaging removes this bias.
 - **`timeOutOfCombat` excluded from Exploration**: This signal is passive — it increases
   whenever the player is not in combat, regardless of intent. On maps with sparse enemy
   spawns, a combat-seeking player accumulates high Exploration score purely from waiting.
@@ -840,23 +852,16 @@ Difficulty Multiplier: 1.15 (increase difficulty by 15%)
 
 **The Translation:**
 ```
-AI Says: "Make it 20% harder"
-
-We Translate To:
-  ✓ Enemy Health: × 1.20
-  ✓ Enemy Damage: × 1.15
-  ✓ Health Pickups: × 0.90 (fewer pickups)
-  ✓ Ammo Drops: × 1.05 (slightly more ammo to compensate)
+  ✓ Enemy Health: (Base × Multiplier) × Sensitivity [S=0.20]
+  ✓ Enemy Damage: (Base × Multiplier) × Sensitivity [S=0.25]
+  ✓ Spawn Rate:   (Base × Multiplier) × Sensitivity [S=0.35]
 ```
 
-**The Safety:**
-```
-BEFORE Safety: Multiplier = 2.5 (way too hard!)
-AFTER Safety:  Multiplier = 1.4 (clamped to maximum)
+**The Safety & Sensitivity (v2.2):**
+- **Per-Parameter Tuning**: We no longer apply a uniform 0.3 sensitivity to all variables. Combat density (Spawn Rate) has high sensitivity (0.35) because it is highly perceptible to players. Stat changes like Enemy Health have lower sensitivity (0.20) to ensure balanced, natural-feeling progression.
+- ** Safety Guards**: Multipliers are clamped at the system level before parameter application to ensure game values never exceed "impossible" or "trivial" thresholds.
+- **Acceptable Multiplier Range**: 0.6x to 1.4x
 
-Acceptable Range: 0.6x to 1.4x
-(Game never becomes impossible or trivially easy)
-```
 
 **Why We Need This:**
 - Converts abstract number to concrete changes

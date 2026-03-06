@@ -1,7 +1,7 @@
 {
   "version": "2.2",
   "status": "PRODUCTION",
-  "export_date": "2026-03-06T15:35:00.000000",
+  "export_date": "2026-03-06T16:17:54+05:30",
   "pipeline": {
     "features": [
       "enemiesHit",
@@ -14,13 +14,13 @@
       "distanceTraveled",
       "timeSprinting",
       "timeOutOfCombat",
-      "damagePerHit",
-      "pickupAttemptRate"
+      "damage_per_hit",
+      "pickup_attempt_rate"
     ],
     "num_features": 12,
     "k_clusters": 3,
     "anfis_architecture": "6-16-8-1",
-    "training_samples": 3164
+    "training_samples": 3240
   },
   "artifacts": {
     "scaler": "scaler_params.json",
@@ -41,19 +41,23 @@
     ]
   },
   "feature_calculations": {
-    "pct_combat": "avg(enemiesHit, damageDone, timeInCombat, kills, damagePerHit) — 5 features (v2.2)",
-    "pct_collect": "avg(itemsCollected, pickupAttempts, timeNearInteractables, pickupAttemptRate) — 4 features (v2.2)",
-    "pct_explore": "avg(distanceTraveled, timeSprinting) — 2 active features; timeOutOfCombat excluded (v2.1)"
+    "derived": {
+      "damage_per_hit": "damageDone_raw / max(enemiesHit_raw, 1)",
+      "pickup_attempt_rate": "pickupAttempts_raw / max(timeNearInteractables_raw, 1)"
+    },
+    "pct_combat": "(enemiesHit + damageDone + timeInCombat + kills + damage_per_hit) / 5",
+    "pct_collect": "(itemsCollected + pickupAttempts + timeNearInteractables + pickup_attempt_rate) / 4",
+    "pct_explore": "(distanceTraveled + timeSprinting) / 2"
   },
-  "scoring_notes": {
-    "method": "per-archetype average so each archetype has equal ceiling of 1.0 regardless of feature count",
-    "timeOutOfCombat_excluded": true,
-    "timeOutOfCombat_reason": "Passive signal: accumulates when no enemies are available, regardless of player intent. Arithmetic complement of timeInCombat — including both is redundant. Exploration measured by active signals only.",
-    "damagePerHit_added": true,
-    "damagePerHit_formula": "damageDone_raw / max(enemiesHit_raw, 1) — weapon-class-agnostic combat intensity, captures sniper/heavy archetypes",
-    "pickupAttemptRate_added": true,
-    "pickupAttemptRate_formula": "pickupAttempts_raw / max(timeNearInteractables_raw, 1) — deliberateness of collection intent, reduces Collect/Explore cluster contamination",
-    "centroids_regenerated": true,
-    "regeneration_steps": "Notebooks 03 → 04 → 05 → 06 → 07 rerun with v2.2 formula"
+  "session": {
+    "timeout_ms": 90000,
+    "window_cadence_s": 30
+  },
+  "sensitivity_registry": {
+    "enemy_health": 0.20,
+    "enemy_damage": 0.25,
+    "spawn_rate": 0.35,
+    "spawn_delay": 0.30,
+    "default": 0.30
   }
 }

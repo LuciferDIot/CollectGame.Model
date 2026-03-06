@@ -3,7 +3,8 @@
 **Project**: ANFIS Adaptive Difficulty System - Demo UI  
 **Framework**: Next.js 16.0.10 with App Router  
 **Status**: ✅ Production Ready  
-**Last Updated**: February 15, 2026
+**Last Updated**: March 6, 2026
+**Version**: 2.2 Status: Production
 
 ---
 
@@ -126,7 +127,8 @@ The **ANFIS Adaptive Difficulty System** is a machine learning-powered game diff
 | Jan 2026 | Dashboard MVP | Basic telemetry input + output display |
 | Feb 2026 | Analytics System | Context-based metrics computation |
 | Feb 2026 | Component Library | 90+ components with full documentation |
-| Feb 2026 | Production Ready | TypeScript strict, tests passing, docs complete |
+| Mar 2026 | v2.2 Release | Derived Features & Sensitivity Tuning |
+| Mar 2026 | Production Ready | v2.2 Finalized, tests passing, thesis alignment complete |
 
 ---
 
@@ -929,6 +931,9 @@ export { Button, buttonVariants }
 - **Variants**: `class-variance-authority` for type-safe variants
 - **Composition**: `asChild` prop for Radix Slot pattern
 - **Forwarding**: `forwardRef` for ref access
+- **Session Timeout**: 90,000ms (v2.2) to tolerate network/loading latency.
+- **Sensitivity Registry**: Per-parameter non-uniform weights (0.20 to 0.35).
+- **Derived Features**: `damagePerHit` and `pickupAttemptRate` pre-computed before normalization.
 - **Tailwind**: Utility classes for styling
 - **Accessibility**: Radix primitives handle ARIA attributes
 
