@@ -243,7 +243,7 @@ These operations, particularly navmesh queries, are GPU-accelerated in modern ga
 | K-Means clustering | ✅ Validated offline | Silhouette = 0.3752 |
 | Soft membership (IDW) | ✅ Validated offline | Numerically stable |
 | Temporal delta computation | ✅ Validated offline | r=0.808 for Δexplore |
-| MLP inference | ✅ Validated offline | R² = 0.9566 |
+| MLP inference | ✅ Validated offline | R² = 0.9391 (v2.2 rerun) |
 | Scalar parameter adaptation | ✅ Validated in demo UI | Health/speed/damage multipliers |
 | **Global enemy cap adaptation** | ❌ **Not implemented** | PCG infrastructure required |
 | **Full real-time closed-loop** | ❌ **Not validated** | GPU resource constraint |
@@ -303,8 +303,8 @@ The limitations above are documented for completeness. Within the thesis, the fo
 
 5. **GPU resource constraints prevented full PCG integration** — the ANFIS pipeline is validated in simulation. The global enemy cap adaptation and closed-loop real-time testing are identified as future work requiring production GPU infrastructure. This is consistent with standard practice in adaptive game AI research, where the learned controller is validated separately from the game engine integration.
 
-The thesis argues that despite these limitations, the system achieves its core objective: producing a statistically valid, generalizing model (R² = 0.9566) that adapts difficulty based on real behavioral signals. Future work can address each limitation incrementally as telemetry infrastructure matures.
+The thesis argues that despite these limitations, the system achieves its core objective: producing a statistically valid, generalizing model (R² = 0.9391, v2.2) that adapts difficulty based on real behavioral signals. Future work can address each limitation incrementally as telemetry infrastructure matures.
 
 ---
 
-*Created: 2026-03-06 | Version: v2.1 | Status: THESIS-READY*
+*Created: 2026-03-06 | Updated: 2026-03-07 | Version: v2.2 | Status: THESIS-READY*

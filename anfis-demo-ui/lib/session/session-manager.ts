@@ -100,7 +100,7 @@ interface UserSessionState {
  *    - Update state
  * 
  * 3. **STALE SESSION** (Long Break)
- *    - Has previous state BUT it's too old
+ *    - Has previous state BUT it's too old (> 90 seconds)
  *    - Treat as new session (delta = 0)
  *    - Reset state
  * 
@@ -201,7 +201,7 @@ export class PipelineSessionManager {
      * - Overwrite old state with current
      * 
      * **CASE 3: ACTIVE SESSION**
-     * - Player recently played (< 40 seconds ago)
+     * - Player recently played (< 90 seconds ago)
      * - Previous state is still relevant
      * - Calculate deltas = current - previous
      * - Update state with current values
@@ -477,10 +477,10 @@ export class PipelineSessionManager {
  * Example:
  * ```typescript
  * hasSessionTimedOut(
- *   Date.now() - 50000,  // 50 seconds ago
- *   40000                // 40 second timeout 
+ *   Date.now() - 100000,  // 100 seconds ago
+ *   90000                 // 90 second timeout (v2.2)
  * );
- * // Returns: true (50s > 40s threshold)
+ * // Returns: true (100s > 90s threshold)
  * ```
  * 
  * Location: `lib/engine/utils.ts`
@@ -508,17 +508,19 @@ export class PipelineSessionManager {
  * - No built-in size
  * - Harder to iterate
  * 
- * === WHY 40 SECOND TIMEOUT? ===
- * 
- * Based on telemetry analysis:
- * - Average session: 30-60 seconds
- * - P50 time between sessions: 15 seconds
- * - P95 time between sessions: 35 seconds
- * 
- * 40 seconds chosen because:
- * - Covers 95% of continuous sessions
- * - Allows for brief pauses
- * - Prevents old data from affecting new behavior
+ * === WHY 90 SECOND TIMEOUT? ===
+ *
+ * Updated from 40s → 90s in v2.2 based on the following rationale:
+ * - Window cadence is 30s. A 40s timeout = only 1.33 windows of buffer.
+ * - 90s = 3× the window cadence, tolerating:
+ *     • Network delays and retries
+ *     • In-game loading screens and cutscenes
+ *     • Short pauses (phone calls, AFK moments)
+ *
+ * 90 seconds chosen because:
+ * - Prevents valid sessions from losing delta history mid-play
+ * - Still short enough to reset after a genuine break (> 1.5 min)
+ * - Aligns with the deployment manifest session.timeout_ms = 90000
  * 
  * === THREAD SAFETY ===
  * 

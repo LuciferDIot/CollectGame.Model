@@ -140,11 +140,11 @@ import type { ActivityScores, NormalizedFeatures } from './types';
  *
  * Step-by-Step Calculation:
  *
- * 1. Combat Score (average of 4 features):
- *    (0.8 + 0.9 + 0.7 + 0.6) / 4 = 0.75
+ * 1. Combat Score (average of 5 features incl. damage_per_hit):
+ *    (0.8 + 0.9 + 0.7 + 0.6 + damage_per_hit) / 5 ≈ 0.75
  *
- * 2. Collection Score (average of 3 features):
- *    (0.2 + 0.3 + 0.1) / 3 = 0.20
+ * 2. Collection Score (average of 4 features incl. pickup_attempt_rate):
+ *    (0.2 + 0.3 + 0.1 + pickup_attempt_rate) / 4 ≈ 0.20
  *
  * 3. Exploration Score (average of 2 active features):
  *    (0.4 + 0.5) / 2 = 0.45

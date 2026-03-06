@@ -32,8 +32,8 @@
     "duration_min_minutes": 20,
     "duration_cap_minutes": 45,
     "target_multiplier_range": [
-      0.5,
-      1.5
+      0.6,
+      1.4
     ],
     "archetype_modifier_range": [
       0.85,
@@ -54,10 +54,10 @@
     "window_cadence_s": 30
   },
   "sensitivity_registry": {
-    "enemy_health": 0.20,
+    "enemy_health": 0.2,
     "enemy_damage": 0.25,
     "spawn_rate": 0.35,
-    "spawn_delay": 0.30,
-    "default": 0.30
+    "spawn_delay": 0.3,
+    "default": 0.3
   }
 }

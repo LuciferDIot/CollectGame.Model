@@ -2,14 +2,14 @@
 
 ## 6.4 Evaluation of Runtime Stability and Correctness
 
-While the ANFIS model architecture was validated using offline metrics (Section 6.2, $R^2 = 0.956$), the deployment of an adaptive difficulty system in a real-time game environment requires additional verification of *runtime behavioral correctness*. Unlike static prediction tasks, the online inference process cannot be evaluated using ground-truth error metrics (as "correct" difficulty is subjective and unlabeled during gameplay).
+While the ANFIS model architecture was validated using offline metrics (Section 6.2, $R^2 = 0.939$), the deployment of an adaptive difficulty system in a real-time game environment requires additional verification of *runtime behavioral correctness*. Unlike static prediction tasks, the online inference process cannot be evaluated using ground-truth error metrics (as "correct" difficulty is subjective and unlabeled during gameplay).
 
 To address this, we developed a rigid **Runtime Analytics Engine** (Figure 6.4.1) to monitor the system's decision-making integrity without altering the frozen model parameters. This evaluation framework distinguishes between *Offline Predictive Accuracy* and *Runtime Inference Validity*.
 
 ### 6.4.1 Methodology: The "Trust Anchor" Approach
 The evaluation strategy relies on a "Trust Anchor" architecture, visualised in the web dashboard:
 
-1.  **Offline Trust Anchor**: We first establish the model's theoretical upper bound using the held-out test set metrics ($R^2=0.956$, $MAE=0.012$). These static values confirm the capability of the surrogate model to approximate the logic surface.
+1.  **Offline Trust Anchor**: We first establish the model's theoretical upper bound using the held-out test set metrics ($R^2=0.939$, $MAE=0.011$). These static values confirm the capability of the surrogate model to approximate the logic surface.
 2.  **Online Distribution Checking**: Rather than calculating error, we verify that real-time inputs and predictions remain within the *validated statistical envelope* of the training data.
 3.  **Behavioral Responsiveness**: We introduce a rolling Pearson correlation coefficient ($r$) between the magnitude of behavioral change ($|\Delta B|$) and the adaptive signal ($|\Delta M|$) to quantify functional accuracy.
 
