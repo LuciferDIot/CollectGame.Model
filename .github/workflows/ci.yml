@@ -7,7 +7,7 @@ on:
     branches: [ main, master ]
 
 jobs:
-  test:
+  Production-Ready-Check:
     runs-on: ubuntu-latest
     
     defaults:
