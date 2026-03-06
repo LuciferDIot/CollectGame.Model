@@ -70,9 +70,9 @@ export interface AdaptedParameter {
 export type ScalingMode = 'Direct' | 'Inverse';
 
 export interface ArchetypeWeights {
-  combat?: number;
-  collect?: number;
-  explore?: number;
+  soft_combat?: number;
+  soft_collect?: number;
+  soft_explore?: number;
 }
 
 export interface ParameterMetadata {
@@ -108,17 +108,17 @@ export interface PipelineOutput {
     rulesFired: any[];
   };
   behavior_analysis?: {
-      classification?: {
-          active_behaviors: string[];
-      };
+    classification?: {
+      active_behaviors: string[];
+    };
   };
   fuzzification?: {
-      soft_membership: SoftMembership;
+    soft_membership: SoftMembership;
   };
   target_multiplier: number;
   adapted_parameters: any;
   adaptation?: {
-      parameter_adjustments: Record<string, number>;
+    parameter_adjustments: Record<string, number>;
   };
   validation: {
     membership_sum: number;

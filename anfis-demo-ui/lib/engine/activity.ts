@@ -199,7 +199,7 @@ export function calculateActivityScores(normalized: NormalizedFeatures): Activit
     normalized.damageDone as number,
     normalized.timeInCombat as number,
     normalized.kills as number,
-    (normalized.damagePerHit as number) ?? 0,  // derived feature (v2.2)
+    (normalized.damage_per_hit as number) ?? 0,  // derived feature (v2.2)
   ]) / 5;
 
   /**
@@ -217,7 +217,7 @@ export function calculateActivityScores(normalized: NormalizedFeatures): Activit
     normalized.itemsCollected as number,
     normalized.pickupAttempts as number,
     normalized.timeNearInteractables as number,
-    (normalized.pickupAttemptRate as number) ?? 0,  // derived feature (v2.2)
+    (normalized.pickup_attempt_rate as number) ?? 0,  // derived feature (v2.2)
   ]) / 4;
 
   /**
@@ -233,8 +233,8 @@ export function calculateActivityScores(normalized: NormalizedFeatures): Activit
    * movement signals are used here.
    */
   const score_explore = calculateComponentSum([
-    normalized.distanceTraveled as number,
-    normalized.timeSprinting as number,
+    (normalized.distanceTraveled as number) ?? 0,
+    (normalized.timeSprinting as number) ?? 0,
   ]) / 2;
 
   // ==========================================================================

@@ -151,7 +151,7 @@ interface ArchetypeInfluence {
  * ============================================================================
  */
 export function getArchetypeInfluence(
-    config: ParameterMetadata, 
+    config: ParameterMetadata,
     membership: SoftMembership
 ): ArchetypeInfluence {
     // ========================================
@@ -159,7 +159,7 @@ export function getArchetypeInfluence(
     // ========================================
     // Some parameters are static - they don't change based on playstyle
     // Example: Base movement speed, UI scale, audio volume
-    
+
     if (!config.archetypeInfluence?.enabled || !config.archetypeInfluence.weights) {
         // Return zero influence - parameter not affected by playstyle
         return { influence: 0, sensitivity: 0 };
@@ -183,36 +183,36 @@ export function getArchetypeInfluence(
     // Check which archetype has a non-zero weight
     // Priority: Combat → Exploration → Collection
     // (Only one archetype can influence each parameter)
-    
+
     /**
      * === COMBAT CHECK ===
      * If combat weight exists and is non-zero:
      * - Use player's combat membership
      * - Use combat sensitivity value
      */
-    if (weights.combat) {
+    if (weights.soft_combat) {
         result.influence = membership.soft_combat;
-        result.sensitivity = weights.combat;
-    } 
+        result.sensitivity = weights.soft_combat;
+    }
     /**
      * === EXPLORATION CHECK ===
      * If exploration weight exists and is non-zero:
      * - Use player's exploration membership
      * - Use exploration sensitivity value
      */
-    else if (weights.explore) {
+    else if (weights.soft_explore) {
         result.influence = membership.soft_explore;
-        result.sensitivity = weights.explore;
-    } 
+        result.sensitivity = weights.soft_explore;
+    }
     /**
      * === COLLECTION CHECK ===
      * If collection weight exists and is non-zero:
      * - Use player's collection membership
      * - Use collection sensitivity value
      */
-    else if (weights.collect) {
+    else if (weights.soft_collect) {
         result.influence = membership.soft_collect;
-        result.sensitivity = weights.collect;
+        result.sensitivity = weights.soft_collect;
     }
 
     // ========================================
@@ -280,8 +280,8 @@ export function getArchetypeInfluence(
  * 
  * ============================================================================
  */
-export function calculateComponentSum(values: number[]): number {
-    return values.reduce((sum, val) => sum + val, 0);
+export function calculateComponentSum(values: (number | undefined | null)[]): number {
+    return values.reduce((sum: number, val) => sum + (val ?? 0), 0);
 }
 
 /**
@@ -405,7 +405,7 @@ export function calculatePercentage(part: number, total: number): number {
     // If total is zero, we can't divide
     // Return balanced default (33.33%) instead of crashing
     if (total === 0) return 0.3333;
-    
+
     // ========================================
     // NORMAL CASE: CALCULATE PERCENTAGE
     // ========================================
