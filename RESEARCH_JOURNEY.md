@@ -2,7 +2,7 @@
 
 > A complete record of every option explored, experiment conducted, decision made, and path taken during the development of the ANFIS-based adaptive difficulty model for CollectGame.
 
-**Last Updated**: February 14, 2026
+**Last Updated**: March 6, 2026
 
 ---
 
@@ -28,6 +28,8 @@
 18. [Independent Analyses](#18-independent-analyses)
 19. [Final Metrics & Production Configuration](#19-final-metrics--production-configuration)
 20. [Frozen Decisions Summary](#20-frozen-decisions-summary)
+21. [Activity Scoring Revision (v2.1) — March 2026](#21-activity-scoring-revision-v21--march-2026)
+22. [Derived Features & Sensitivity Breakthrough (v2.2) — March 2026](#22-derived-features--sensitivity-breakthrough-v22--march-2026)
 
 ---
 
@@ -55,9 +57,11 @@ Build an **ANFIS (Adaptive Neuro-Fuzzy Inference System)–based adaptive diffic
 |----------|----------|
 | **Combat** | `enemiesHit`, `damageDone`, `timeInCombat`, `kills` |
 | **Collection** | `itemsCollected`, `pickupAttempts`, `timeNearInteractables` |
-| **Exploration** | `distanceTraveled`, `timeSprinting`, `timeOutOfCombat` |
+| **Exploration** | `distanceTraveled`, `timeSprinting` _(`timeOutOfCombat` removed — see v2.1)_ |
 
-**Why these 10?** They map directly to the three gameplay pillars designed into CollectGame. Each category represents a fundamentally different play style that the difficulty system must adapt to differently.
+**Why these 12?** They map directly to the three gameplay pillars. The addition of derived features in v2.2 (Damage per Hit and Pickup Rate) ensures that precision combat and intentional gathering are correctly weighted relative to raw volume.
+
+> **v2.2 Note**: `damagePerHit` and `pickupAttemptRate` are now first-class inputs to the activity scoring and clustering pipeline.
 
 ---
 
@@ -900,3 +904,151 @@ CollectGame.Model/
 │
 └── anfis-demo-ui/                     ← Web demo (Next.js)
 ```
+
+---
+
+## 21. Activity Scoring Revision (v2.1) — March 2026
+
+### Background
+
+Following live gameplay observation with real users, a systematic classification error was
+identified: players who clearly intended to play as Attackers (Combat archetype) were being
+classified as Explorers during the early portion of game sessions when enemy density was low.
+The game spawns a small number of enemies at start; new enemies take time to appear. During
+this window, an attacker-intent player walks around searching for enemies but cannot engage.
+
+### Root Cause Analysis
+
+The v2.0 Exploration score included `timeOutOfCombat`:
+
+```
+score_explore_v2 = distanceTraveled + timeSprinting + timeOutOfCombat   (sums)
+pct_explore      = score_explore / (score_combat + score_collect + score_explore)
+```
+
+Two structural problems were identified:
+
+**Problem 1 — Passive Accumulation**
+`timeOutOfCombat` measures the absence of combat, not the presence of exploration. A player
+standing still in an empty area accumulates this signal identically to a player deliberately
+mapping terrain. On a sparse-enemy map, every second of searching for enemies that do not
+yet exist becomes an Exploration vote. The player's true intent — combat — is invisible to
+the system until enemies arrive.
+
+**Problem 2 — Redundancy with `timeInCombat`**
+`timeInCombat` + `timeOutOfCombat` = total session window duration (30 seconds).
+Including both features introduces a hard linear dependency: as combat time rises, out-of-
+combat time falls by exactly the same amount. This creates inverse coupling that structurally
+suppresses Combat classification whenever `timeInCombat` is low, even if that is purely
+because no enemies were available.
+
+**Problem 3 — Feature Count Asymmetry (also fixed)**
+The sum-based formula gave Combat (4 features, raw range [0, 4]) a higher raw ceiling than
+Collection (3 features, [0, 3]) or Exploration ([0, 3] in v2, [0, 2] in v2.1). While this
+partially cancelled in the percentage calculation, it created subtle imbalances in mixed
+sessions. Switching to averages gives every archetype an equal ceiling of 1.0.
+
+### Solution (v2.1)
+
+```
+# v2.1 formula
+score_combat  = avg(enemiesHit, damageDone, timeInCombat, kills)          → [0, 1]
+score_collect = avg(itemsCollected, pickupAttempts, timeNearInteractables) → [0, 1]
+score_explore = avg(distanceTraveled, timeSprinting)                       → [0, 1]
+
+pct_X = score_X / (score_combat + score_collect + score_explore)
+```
+
+Exploration now measures only **deliberate movement**: covering distance and sprinting.
+A player who stands still searching for enemies contributes 0 to Exploration score —
+which accurately reflects their intent.
+
+### Expected Behavioural Impact
+
+| Scenario | v2.0 Classification | v2.1 Classification |
+|----------|--------------------|--------------------|
+| Attacker waiting for enemies to spawn (stationary) | Explorer (passive `timeOutOfCombat`) | Neutral (33/33/33 — no activity) |
+| Attacker moving to search for enemies | Explorer (movement + `timeOutOfCombat`) | Mixed Combat/Explorer (movement only, corrected) |
+| Attacker killing enemies | Combat ✅ | Combat ✅ |
+| Pure Explorer traversing map | Explorer ✅ | Explorer ✅ (now requires actual movement) |
+
+### Limitations of This Fix
+
+The remaining ambiguity: a player moving around a map while searching for enemies still
+accumulates Exploration score from `distanceTraveled` and `timeSprinting`, because these
+are the same physical actions as exploration. Without a new telemetry signal (e.g.,
+`enemiesInSightline`, `movementTowardEnemyDirection`), movement-as-searching is
+indistinguishable from movement-as-exploration using the current 10-feature dataset.
+
+The fix addresses the worst case (passive accumulation) within existing data constraints.
+The residual ambiguity is documented for thesis transparency.
+
+### Pipeline Regeneration Required
+
+The centroids in `cluster_centroids.json` and model weights in `anfis_mlp_weights.json`
+were computed with the v2.0 formula and must be regenerated:
+
+```
+Rerun: 04 → 05 → 06 → 07
+```
+
+Notebook 05 now includes an automatic export cell that writes `cluster_centroids.json`
+directly to `anfis-demo-ui/models/` upon completion.
+
+### Pipeline Regeneration Status — Completed 2026-03-06
+
+Notebooks 04 → 05 → 06 → 07 were rerun with the v2.1 formula.
+
+**New cluster centroids (post-rerun):**
+
+| Cluster | Archetype | pct_combat | pct_collect | pct_explore |
+|---------|-----------|------------|-------------|-------------|
+| 0 | Collection | 0.1303 | 0.3474 | 0.5223 |
+| 1 | Exploration | 0.0467 | 0.1042 | 0.8491 |
+| 2 | Combat | 0.5110 | 0.0581 | 0.4309 |
+
+**Key shift from v2.0 → v2.1 centroids**: The Exploration centroid now requires `pct_explore = 0.849` to reach (up from 0.879 in v2.0 using inflated old formula), but the Combat centroid's `pct_explore` dropped from 0.430 to 0.431 (minor), confirming that passive `timeOutOfCombat` inflation was the dominant driver of the old formula's biases. The Collection centroid's `pct_explore` component dropped from 0.630 to 0.522, correctly de-coupling collection behavior from exploration scoring.
+
+**New model metrics (post-rerun):**
+- train_mae: 0.0125
+- test_mae: 0.0107
+- Architecture: 6-16-8-1
+
+The pipeline is now correctly aligned with the v2.1 activity scoring formula. All deployed artifacts (`cluster_centroids.json`, `anfis_mlp_weights.json`) reflect the new formula.
+
+---
+
+## 22. Derived Features & Sensitivity Breakthrough (v2.2) — March 2026
+
+**Date**: March 6, 2026  
+**Status**: ✅ COMPLETE
+
+### Motivation
+Two weaknesses identified in the v2.1 activity scoring:
+1. **Sniper blind spot**: `enemiesHit` alone penalises high-damage-per-shot players (snipers, shotguns). A player landing 3 heavy shots deals far more combat impact than one landing 30 weak pellets — yet only hit count was considered.
+2. **Explorer contamination**: Explorers passing near items incidentally scored collection credit even without interaction intent. `pickupAttemptRate` separates deliberate collectors from passive passers-by.
+
+### Changes Applied
+
+| Area | Change |
+|---|---|
+| `03_Normalization.ipynb` | Added derived feature cells + scaler export cell |
+| `04_Activity_Contributions.ipynb` | Combat ÷5, Collect ÷4 |
+| `lib/engine/index.ts` | Pre-compute `damage_per_hit` / `pickup_attempt_rate` (snake_case) |
+| `lib/engine/activity.ts` | Updated divisors and fallback `?? 0` |
+| `lib/session/session-manager.ts` | Timeout 40s → 90s |
+| `lib/engine/adaptation.ts` | `SENSITIVITY` registry replaces global 0.3 |
+| `models/scaler_params.json` | 10 → 12 features |
+| `models/deployment_manifest.json` | v2.0/FROZEN → v2.2/PRODUCTION |
+
+### Pipeline Rerun Outcome (NB 03 → 07)
+
+All notebooks reruns as of 2026-03-06:
+
+| Artifact | Key Result |
+|---|---|
+| `scaler_params.json` | 12 features (added `damage_per_hit`, `pickup_attempt_rate`) |
+| `anfis_mlp_weights.json` | Test R²: 0.9392, Test MAE: 0.0112 |
+| `cluster_centroids.json` | 3 centroids re-computed on v2.2 activity scores |
+
+**Case sensitivity bug fix**: The engine initially computed features as `damagePerHit`/`pickupAttemptRate` (camelCase) but the scaler expected `damage_per_hit`/`pickup_attempt_rate` (snake_case). Fixed in `lib/engine/index.ts`.

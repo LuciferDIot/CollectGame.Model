@@ -1,0 +1,47 @@
+name: ANFIS Backend CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: anfis-demo-ui
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+          cache-dependency-path: anfis-demo-ui/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify model files
+        run: |
+          echo "Verifying model files..."
+          if [ ! -f "models/anfis_mlp_weights.json" ]; then
+            echo "Error: anfis_mlp_weights.json not found!"
+            exit 1
+          fi
+          if [ ! -f "models/cluster_centroids.json" ]; then
+            echo "Error: cluster_centroids.json not found!"
+            exit 1
+          fi
+          echo "Model files verified."
+
+      - name: Run builds test
+        run: npm run build
+
+      - name: Run tests
+        run: npm run test

@@ -1,0 +1,25 @@
+# ============================================================
+# Requirements for ANFIS Adaptive Difficulty Pipeline
+# Notebooks: 01 → 10
+# Install with: pip install -r requirements.txt
+# ============================================================
+
+# Core Data Science
+numpy>=1.24.0
+pandas>=2.0.0
+scipy>=1.11.0
+
+# Machine Learning
+scikit-learn>=1.3.0
+
+# Visualisation
+matplotlib>=3.7.0
+seaborn>=0.13.0
+
+# Jupyter Notebook Runner
+notebook>=7.0.0
+ipykernel>=6.25.0
+nbconvert>=7.8.0
+
+# Utilities (stdlib — already included, listed for clarity)
+# json, os, pathlib, copy, warnings — no install needed

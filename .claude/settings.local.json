@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c \"import pandas as pd; df = pd.read_csv\\(''3_normalized_telemetry.csv''\\); print\\(df.columns.tolist\\(\\)\\)\")",
+      "Bash(python3 -c \"import pandas as pd; df = pd.read_csv\\(''3_normalized_telemetry.csv''\\); print\\(df.columns.tolist\\(\\)\\)\")",
+      "Bash(python -c \"import pandas as pd; df = pd.read_csv\\(''4_activity_contributions.csv''\\); print\\(df.columns.tolist\\(\\)\\); print\\(''---''\\); print\\(df[[''score_combat'',''score_collect'',''score_explore'']].describe\\(\\)\\)\")"
+    ]
+  }
+}

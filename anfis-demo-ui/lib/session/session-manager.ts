@@ -138,7 +138,7 @@ interface UserSessionState {
  */
 export class PipelineSessionManager {
     // === INTERNAL STATE ===
-    
+
     /**
      * The memory bank: stores each player's last known state
      * 
@@ -159,20 +159,22 @@ export class PipelineSessionManager {
      * - Easier to check if user exists
      */
     private userStates: Map<string, UserSessionState> = new Map();
-    
+
     /**
      * Session timeout duration (milliseconds)
-     * 
-     * If player hasn't played in 40 seconds, we consider it a "new" session
+     *
+     * If player hasn't played in 90 seconds, we consider it a "new" session
      * and reset deltas to zero.
-     * 
-     * Why 40 seconds?
-     * - Typical gameplay session: 30-60 seconds
-     * - Allows for brief pauses (checking phone, etc.)
-     * - Prevents stale data from affecting recommendations
-     * - Tuned based on gameplay telemetry analysis
+     *
+     * Why 90 seconds? (changed from 40s in v2.2)
+     * - Window cadence is 30s. A 40s timeout was only 1.33 windows of buffer.
+     * - 90s = 3× the window cadence, tolerating:
+     *     • Network delays and retries
+     *     • In-game loading screens and cutscenes
+     *     • Short pauses (phone, bathroom, etc.)
+     * - Prevents valid sessions from losing delta history mid-play.
      */
-    private readonly STATE_TIMEOUT_MS = 40000; // 40 seconds
+    private readonly STATE_TIMEOUT_MS = 90000; // 90 seconds
 
     /**
      * ==========================================================================
@@ -192,7 +194,7 @@ export class PipelineSessionManager {
      * - Save current state for next time
      * 
      * **CASE 2: STALE SESSION (TIMEOUT)**
-     * - Player hasn't played in > 40 seconds
+     * - Player hasn't played in > 90 seconds
      * - Previous state is too old to be relevant
      * - Maybe they took a break, changed mindset
      * - Return zero deltas (fresh start)
@@ -249,10 +251,10 @@ export class PipelineSessionManager {
      * 
      * Scenario C: Stale Session (Timeout)
      * ```typescript
-     * // Memory: { soft: {0.60, 0.25, 0.15}, timestamp: 60_seconds_ago }
-     * 
+     * // Memory: { soft: {0.60, 0.25, 0.15}, timestamp: 100_seconds_ago }
+     *
      * Result: {
-     *   delta_combat: 0,    // Reset - session too old
+     *   delta_combat: 0,    // Reset — session > 90s = fresh start
      *   delta_collect: 0,
      *   delta_explore: 0
      * }
@@ -273,9 +275,9 @@ export class PipelineSessionManager {
         const userState = this.userStates.get(userId);  // Get saved state
         const now = Date.now();                          // Current timestamp
         const emptyDeltas = {                            // Zero-change deltas
-            delta_combat: 0, 
-            delta_collect: 0, 
-            delta_explore: 0 
+            delta_combat: 0,
+            delta_collect: 0,
+            delta_explore: 0
         };
 
         // ========================================
@@ -285,7 +287,7 @@ export class PipelineSessionManager {
         if (!userState) {
             // Save their current state for next time
             this.updateState(userId, currentSoft, now);
-            
+
             // Return zero deltas (no previous state to compare)
             return emptyDeltas;
         }
@@ -297,10 +299,10 @@ export class PipelineSessionManager {
         if (hasSessionTimedOut(userState.lastTimestamp, this.STATE_TIMEOUT_MS)) {
             // Log for debugging/monitoring
             console.log(`[SessionManager] Timeout for ${userId}. Resetting Deltas.`);
-            
+
             // Reset their state (treat as new session)
             this.updateState(userId, currentSoft, now);
-            
+
             // Return zero deltas (session break = fresh start)
             return emptyDeltas;
         }
@@ -309,7 +311,7 @@ export class PipelineSessionManager {
         // CASE 3: ACTIVE SESSION (CALCULATE DELTAS)
         // ========================================
         // Player is actively playing - calculate behavioral changes
-        
+
         /**
          * calculateDeltaVector() computes:
          *   delta = current - previous
@@ -326,7 +328,7 @@ export class PipelineSessionManager {
 
         // Update memory with current state for next time
         this.updateState(userId, currentSoft, now);
-        
+
         // Return the calculated changes
         return deltas;
     }

@@ -167,4 +167,47 @@ This work demonstrates that:
 
 **Option B successfully restored ANFIS learnability** by addressing the root cause (variance collapse) rather than symptoms (low R²). The MLP surrogate now achieves near-perfect generalization and is ready for thesis documentation and production deployment.
 
+---
+
+## Addendum: v2.1 Activity Scoring Revision (March 2026)
+
+### Context
+Following production deployment of v2.2 (Option B), live gameplay observation revealed a systematic classification error in the activity scoring step that precedes K-Means clustering. This revision is documented separately as it affects the *input space* of clustering, not the target formula or MLP architecture.
+
+### Change to Activity Scoring (Notebook 04)
+
+| Aspect | v2.0 Formula | v2.1 Formula |
+|--------|-------------|-------------|
+| Combat score | sum(4 features) → [0,4] | avg(4 features) → [0,1] |
+| Collection score | sum(3 features) → [0,3] | avg(3 features) → [0,1] |
+| Exploration score | sum(distanceTraveled, timeSprinting, **timeOutOfCombat**) → [0,3] | avg(distanceTraveled, timeSprinting) → [0,1] |
+
+### Impact on Model Artifacts
+
+The change to activity scoring required regenerating all downstream artifacts:
+1. `4_activity_contributions.csv` — new activity scores per window
+2. `5_clustered_telemetry.csv` — new cluster assignments
+3. `cluster_centroids.json` — new centroid positions in pct_combat/collect/explore space
+4. `6_anfis_dataset.csv` — new soft membership and delta values
+5. `anfis_mlp_weights.json` — retrained MLP on new inputs
+
+### Post-Rerun Metrics (2026-03-06)
+
+| Metric | Value |
+|--------|-------|
+| train_mae | 0.0125 |
+| test_mae | 0.0107 |
+| Architecture | 6-16-8-1 |
+
+The model continues to generalize well (test_mae < train_mae). The R² structure from Option B is preserved as the target formula and MLP architecture were not changed — only the upstream activity score computation was corrected.
+
+### Thesis Significance
+
+This revision demonstrates that **feature engineering decisions made early in the pipeline (Step 3: Activity Scoring) have cascading effects on all downstream components** (clustering, soft membership, deltas, ANFIS inputs). It also illustrates the importance of:
+1. Real-world validation beyond offline metrics
+2. Distinguishing passive signals from active behavioral indicators
+3. Principled equal-ceiling scoring to prevent structural archetype bias
+
+---
+
 **Final Status**: VALIDATED ✅ | DEPLOYABLE ✅ | THESIS-READY ✅

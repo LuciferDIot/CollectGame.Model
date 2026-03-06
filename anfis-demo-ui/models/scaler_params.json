@@ -9,9 +9,13 @@
     "timeNearInteractables",
     "distanceTraveled",
     "timeSprinting",
-    "timeOutOfCombat"
+    "timeOutOfCombat",
+    "damage_per_hit",
+    "pickup_attempt_rate"
   ],
   "data_min": [
+    0.0,
+    0.0,
     0.0,
     0.0,
     0.0,
@@ -33,7 +37,9 @@
     45.0,
     16785.265844003807,
     30.5,
-    30.5
+    30.5,
+    18.666666666666668,
+    42.0
   ],
   "data_range": [
     94.0,
@@ -45,7 +51,9 @@
     45.0,
     16785.265844003807,
     30.5,
-    30.5
+    30.5,
+    18.666666666666668,
+    42.0
   ],
   "min_value": 0.0,
   "max_value": 1.0

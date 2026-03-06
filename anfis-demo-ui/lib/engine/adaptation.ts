@@ -7,10 +7,30 @@ import type {
 } from './types';
 
 /**
- * Default Configuration for Gameplay Parameters.
- * This acts as the central registry for all adaptable values.
- * Values are migrated from the original hardcoded implementation.
+ * Perceived-difficulty sensitivity per parameter.
+ *
+ * These replace the previous uniform 0.3. Each value reflects how perceptible
+ * a change in that parameter is to a player. Higher = player notices smaller
+ * deltas → system makes subtler adjustments before the player feels it.
+ *
+ * Rationale:
+ *   ENEMY_HEALTH  0.20 — health only manifests as time-to-kill; subtle at small deltas
+ *   ENEMY_DAMAGE  0.25 — damage spike is felt immediately on being hit; moderate
+ *   SPAWN_RATE    0.35 — more enemies on screen is immediately obvious
+ *   SPAWN_DELAY   0.30 — faster respawns are noticed within 1–2 encounters
+ *
+ * Parameters not listed here (collectible_*, stamina_*, player_*, dash_cooldown)
+ * retain 0.3 as a neutral default pending dedicated gameplay tuning data.
  */
+const SENSITIVITY = {
+  ENEMY_HEALTH: 0.20,
+  ENEMY_DAMAGE: 0.25,
+  SPAWN_RATE: 0.35,
+  SPAWN_DELAY: 0.30,
+  DEFAULT: 0.30,  // kept as named constant for traceability
+} as const;
+
+
 export const DEFAULT_PARAMETER_REGISTRY: AdaptationRegistry = {
   // Combat Parameters
   enemy_spawn_interval: {
@@ -19,7 +39,7 @@ export const DEFAULT_PARAMETER_REGISTRY: AdaptationRegistry = {
     min: 20,
     max: 80,
     scaling: 'Inverse',
-    archetypeInfluence: { enabled: true, weights: { combat: 0.3 } } // Sensitivity 0.3
+    archetypeInfluence: { enabled: true, weights: { soft_combat: SENSITIVITY.SPAWN_DELAY } }
   },
   global_enemy_cap: {
     id: 'global_enemy_cap',
@@ -27,7 +47,7 @@ export const DEFAULT_PARAMETER_REGISTRY: AdaptationRegistry = {
     min: 15,
     max: 60,
     scaling: 'Direct',
-    archetypeInfluence: { enabled: true, weights: { combat: 0.3 } }
+    archetypeInfluence: { enabled: true, weights: { soft_combat: SENSITIVITY.SPAWN_RATE } }
   },
   enemy_damage_intensity: {
     id: 'enemy_damage_intensity',
@@ -35,7 +55,7 @@ export const DEFAULT_PARAMETER_REGISTRY: AdaptationRegistry = {
     min: 5,
     max: 18,
     scaling: 'Direct',
-    archetypeInfluence: { enabled: true, weights: { combat: 0.3 } }
+    archetypeInfluence: { enabled: true, weights: { soft_combat: SENSITIVITY.ENEMY_DAMAGE } }
   },
   enemy_max_health: {
     id: 'enemy_max_health',
@@ -43,7 +63,7 @@ export const DEFAULT_PARAMETER_REGISTRY: AdaptationRegistry = {
     min: 60,
     max: 180,
     scaling: 'Direct',
-    archetypeInfluence: { enabled: true, weights: { combat: 0.3 } }
+    archetypeInfluence: { enabled: true, weights: { soft_combat: SENSITIVITY.ENEMY_HEALTH } }
   },
 
   // Exploration Parameters
@@ -53,7 +73,7 @@ export const DEFAULT_PARAMETER_REGISTRY: AdaptationRegistry = {
     min: 6,
     max: 24,
     scaling: 'Inverse',
-    archetypeInfluence: { enabled: true, weights: { explore: 0.3 } }
+    archetypeInfluence: { enabled: true, weights: { soft_explore: 0.3 } }
   },
   stamina_damage: {
     id: 'stamina_damage',
@@ -61,7 +81,7 @@ export const DEFAULT_PARAMETER_REGISTRY: AdaptationRegistry = {
     min: 2,
     max: 10,
     scaling: 'Direct',
-    archetypeInfluence: { enabled: true, weights: { explore: 0.3 } }
+    archetypeInfluence: { enabled: true, weights: { soft_explore: 0.3 } }
   },
   dash_cooldown: {
     id: 'dash_cooldown',
@@ -69,7 +89,7 @@ export const DEFAULT_PARAMETER_REGISTRY: AdaptationRegistry = {
     min: 1.5,
     max: 5,
     scaling: 'Direct',
-    archetypeInfluence: { enabled: true, weights: { explore: 0.3 } }
+    archetypeInfluence: { enabled: true, weights: { soft_explore: 0.3 } }
   },
 
   // Collection Parameters
@@ -79,7 +99,7 @@ export const DEFAULT_PARAMETER_REGISTRY: AdaptationRegistry = {
     min: 60,
     max: 240,
     scaling: 'Inverse',
-    archetypeInfluence: { enabled: true, weights: { collect: 0.3 } }
+    archetypeInfluence: { enabled: true, weights: { soft_collect: 0.3 } }
   },
   collectible_spawn_interval: {
     id: 'collectible_spawn_interval',
@@ -87,7 +107,7 @@ export const DEFAULT_PARAMETER_REGISTRY: AdaptationRegistry = {
     min: 20,
     max: 80,
     scaling: 'Direct',
-    archetypeInfluence: { enabled: true, weights: { collect: 0.3 } }
+    archetypeInfluence: { enabled: true, weights: { soft_collect: 0.3 } }
   },
   collectible_lifetime: {
     id: 'collectible_lifetime',
@@ -95,7 +115,7 @@ export const DEFAULT_PARAMETER_REGISTRY: AdaptationRegistry = {
     min: 15,
     max: 60,
     scaling: 'Inverse',
-    archetypeInfluence: { enabled: true, weights: { collect: 0.3 } }
+    archetypeInfluence: { enabled: true, weights: { soft_collect: 0.3 } }
   },
 
   // Neutral / Player Parameters
@@ -134,7 +154,7 @@ import {
 // ... (Registry Omitted, unchanged) ...
 
 export class AdaptationBackend {
-  constructor(private registry: AdaptationRegistry = DEFAULT_PARAMETER_REGISTRY) {}
+  constructor(private registry: AdaptationRegistry = DEFAULT_PARAMETER_REGISTRY) { }
 
   /**
    * Main entry point for adaptation.
@@ -163,17 +183,17 @@ export class AdaptationBackend {
   ): AdaptedParameter {
     // 1. Calculate Aggregate Modifiers from Game Mechanics
     const { influence, sensitivity } = getArchetypeInfluence(config, softMembership);
-    
+
     // 2. Pure Math: Calculate Canonical Modifier
-    const archMod = (sensitivity > 0) 
-        ? calculateCanonicalModifier(influence, sensitivity) 
-        : 1.0;
-    
+    const archMod = (sensitivity > 0)
+      ? calculateCanonicalModifier(influence, sensitivity)
+      : 1.0;
+
     // 3. Pure Math: Apply Scaling (Direct vs Inverse)
     const totalMultiplier = multiplier * archMod;
     const rawValue = (config.scaling === 'Inverse')
-        ? applyInverseScaling(config.baseValue, totalMultiplier)
-        : applyDirectScaling(config.baseValue, totalMultiplier);
+      ? applyInverseScaling(config.baseValue, totalMultiplier)
+      : applyDirectScaling(config.baseValue, totalMultiplier);
 
     // 4. Pure Math: Safety Clamping
     const finalValue = clamp(rawValue, config.min, config.max);

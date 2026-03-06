@@ -2,55 +2,76 @@
  * ============================================================================
  * ACTIVITY SCORING - The "Rule of Thumb" Classifier
  * ============================================================================
- * 
+ *
  * === WHAT IS THIS FILE? ===
  * This file implements a simple "heuristic" (rule of thumb) to quickly guess
  * what type of activity the player is doing based on their game actions.
- * 
+ *
  * === WHY DO WE NEED IT? ===
- * 
+ *
  * Before running the complex AI, we do a quick sanity check:
  * - Did they fight a lot? → Probably Combat-focused
  * - Did they collect items? → Probably Collection-focused
  * - Did they move around? → Probably Exploration-focused
- * 
+ *
  * This helps the AI make better decisions later!
- * 
+ *
  * === THE THREE CATEGORIES ===
- * 
+ *
  * 1. **COMBAT**
  *    - Hitting enemies
  *    - Dealing damage
  *    - Time spent in combat
  *    - Enemy kills
- * 
+ *
  * 2. **COLLECTION**
  *    - Items collected
  *    - Pickup attempts
  *    - Time near collectible items
- * 
+ *
  * 3. **EXPLORATION**
  *    - Distance traveled
  *    - Time spent sprinting
- *    - Time out of combat
- * 
+ *
  * === HOW IT WORKS ===
- * 
- * 1. Add up relevant features for each category
+ *
+ * 1. Average relevant features for each category (divide by feature count)
  * 2. Calculate total across all categories
  * 3. Convert to percentages (must sum to 100%)
- * 
+ *
+ * === WHY AVERAGES INSTEAD OF SUMS? ===
+ *
+ * Using sums gives Combat (4 features) a structural advantage over Collection
+ * and Exploration (3 and 2 features). A player maxing all features in each
+ * category would score 4:3:2 rather than 1:1:1. Averaging normalises this
+ * so each archetype has an equal ceiling of 1.0, making the percentages
+ * reflect true behavioural emphasis rather than feature count.
+ *
  * Example:
- *   Combat score: 0.8
- *   Collection score: 0.3
- *   Exploration score: 0.4
- *   Total: 1.5
- *   
+ *   Combat avg: 0.75  (all 4 features at 0.75)
+ *   Collection avg: 0.30
+ *   Exploration avg: 0.40
+ *   Total: 1.45
+ *
  *   Percentages:
- *   - Combat: 0.8/1.5 = 53%
- *   - Collection: 0.3/1.5 = 20%
- *   - Exploration: 0.4/1.5 = 27%
- * 
+ *   - Combat: 0.75/1.45 = 51.7%
+ *   - Collection: 0.30/1.45 = 20.7%
+ *   - Exploration: 0.40/1.45 = 27.6%
+ *
+ * === WHY timeOutOfCombat WAS REMOVED FROM EXPLORATION ===
+ *
+ * `timeOutOfCombat` was previously included in the Exploration score. However,
+ * this feature accumulates PASSIVELY — it increases any time the player is not
+ * in combat, regardless of intent. A player actively searching for enemies on
+ * a sparse map (clear Combat intent) would accumulate a high Exploration score
+ * simply because no enemies were available to fight.
+ *
+ * `timeOutOfCombat` is also the arithmetic complement of `timeInCombat` — the
+ * two features sum to total session time. Including both is redundant and
+ * creates an inverse coupling that punishes combat players during low-enemy
+ * periods. Exploration is now measured by ACTIVE signals only:
+ * distanceTraveled + timeSprinting.
+ *
  * ============================================================================
  */
 
@@ -66,40 +87,40 @@ import type { ActivityScores, NormalizedFeatures } from './types';
  * Takes normalized game features (values from 0-1) and calculates what
  * percentage of the player's activity falls into each category.
  * 
- * === THE FORMULA (FROM DEPLOYMENT MANIFEST) ===
- * 
+ * === THE FORMULA ===
+ *
  * Combat Score = Average of:
  *   - enemiesHit (how many shots landed)
  *   - damageDone (total damage dealt)
  *   - timeInCombat (seconds fighting)
  *   - kills (enemies defeated)
- * 
+ *
  * Collection Score = Average of:
  *   - itemsCollected (loot picked up)
  *   - pickupAttempts (times tried to pick up items)
  *   - timeNearInteractables (time near collectibles)
- * 
+ *
  * Exploration Score = Average of:
  *   - distanceTraveled (meters moved)
  *   - timeSprinting (seconds running)
- *   - timeOutOfCombat (seconds exploring)
- * 
+ *   NOTE: timeOutOfCombat intentionally excluded — see file header.
+ *
  * === WHY THESE SPECIFIC FEATURES? ===
- * 
+ *
  * Combat Features:
  * - If you're hitting enemies and dealing damage, you're clearly fighting!
  * - Time in combat confirms active engagement
  * - Kills prove combat effectiveness
- * 
+ *
  * Collection Features:
  * - Items collected shows intentional resource gathering
  * - Pickup attempts shows interest in loot (even if inventory full)
  * - Time near items shows seeking behavior
- * 
+ *
  * Exploration Features:
  * - Distance traveled shows map coverage
  * - Sprinting shows active movement (not camping)
- * - Time out of combat confirms peaceful exploration
+ * - Both are ACTIVE signals that require deliberate player movement
  * 
  * === EXAMPLE WALKTHROUGH ===
  * 
@@ -114,38 +135,38 @@ import type { ActivityScores, NormalizedFeatures } from './types';
  *   timeNearInteractables: 0.1,  // 10% of max time
  *   distanceTraveled: 0.4,       // 40% of max distance
  *   timeSprinting: 0.5,          // 50% of max sprint time
- *   timeOutOfCombat: 0.3         // 30% of max peaceful time
+ *   // timeOutOfCombat: excluded — passive, not used
  * }
- * 
+ *
  * Step-by-Step Calculation:
- * 
- * 1. Combat Score:
+ *
+ * 1. Combat Score (average of 4 features):
  *    (0.8 + 0.9 + 0.7 + 0.6) / 4 = 0.75
- * 
- * 2. Collection Score:
+ *
+ * 2. Collection Score (average of 3 features):
  *    (0.2 + 0.3 + 0.1) / 3 = 0.20
- * 
- * 3. Exploration Score:
- *    (0.4 + 0.5 + 0.3) / 3 = 0.40
- * 
+ *
+ * 3. Exploration Score (average of 2 active features):
+ *    (0.4 + 0.5) / 2 = 0.45
+ *
  * 4. Total Score:
- *    0.75 + 0.20 + 0.40 = 1.35
- * 
+ *    0.75 + 0.20 + 0.45 = 1.40
+ *
  * 5. Convert to Percentages:
- *    - Combat: 0.75/1.35 = 55.6%      → Main focus!
- *    - Collection: 0.20/1.35 = 14.8%  → Minor activity
- *    - Exploration: 0.40/1.35 = 29.6% → Secondary focus
- * 
+ *    - Combat: 0.75/1.40 = 53.6%      → Main focus!
+ *    - Collection: 0.20/1.40 = 14.3%  → Minor activity
+ *    - Exploration: 0.45/1.40 = 32.1% → Secondary focus
+ *
  * Output:
  * {
- *   pct_combat: 0.556,
- *   pct_collect: 0.148,
- *   pct_explore: 0.296
+ *   pct_combat: 0.536,
+ *   pct_collect: 0.143,
+ *   pct_explore: 0.321
  * }
- * 
+ *
  * Interpretation:
- * "This is primarily a **combat-focused** player (55.6%) who does some
- *  exploration (29.6%) and minimal collection (14.8%)."
+ * "This is primarily a **combat-focused** player (53.6%) who does some
+ *  exploration (32.1%) and minimal collection (14.3%)."
  * 
  * @param normalized - Game features already normalized to 0-1 scale
  * @returns Activity percentages (must sum to 1.0 = 100%)
@@ -154,98 +175,89 @@ import type { ActivityScores, NormalizedFeatures } from './types';
  */
 export function calculateActivityScores(normalized: NormalizedFeatures): ActivityScores {
   // ==========================================================================
-  // STEP 1: CALCULATE RAW COMPONENT SCORES
+  // STEP 1: CALCULATE AVERAGE COMPONENT SCORES
   // ==========================================================================
-  // For each category, we sum up the relevant features
-  // This gives us the "raw score" before converting to percentages
-  
+  // For each category, we AVERAGE the relevant features (sum ÷ feature count).
+  // This ensures each archetype has an equal ceiling of 1.0 regardless of
+  // how many features it uses, preventing structural bias toward archetypes
+  // with more features.
+
   /**
-   * === COMBAT SCORE ===
-   * 
-   * Sums four combat-related features:
-   * 1. enemiesHit - Accuracy/engagement (did they land shots?)
-   * 2. damageDone - Effectiveness (how much hurt did they inflict?)
-   * 3. timeInCombat - Commitment (how long were they fighting?)
-   * 4. kills - Success (did they actually defeat enemies?)
-   * 
-   * Why sum instead of average?
-   * - We want total "combat activity", not per-feature average
-   * - Will convert to percentage later anyway
-   * - Higher sum = more combat emphasis
+   * === COMBAT SCORE (5 features, avg range [0, 1]) ===
+   *
+   * 1. enemiesHit       - Accuracy/engagement (did they land shots?)
+   * 2. damageDone       - Effectiveness (how much hurt did they inflict?)
+   * 3. timeInCombat     - Commitment (how long were they fighting?)
+   * 4. kills            - Success (did they actually defeat enemies?)
+   * 5. damagePerHit     - Weapon-class intensity (sniper vs spray archetype).
+   *    Snipers land few hits but deal heavy damage per hit. Without this feature,
+   *    purely hit-count-based scoring underrepresents heavy-weapon combat players.
+   *    Formula: damageDone_raw / max(enemiesHit_raw, 1) — pre-computed in step2.
    */
   const score_combat = calculateComponentSum([
     normalized.enemiesHit as number,
     normalized.damageDone as number,
     normalized.timeInCombat as number,
-    normalized.kills as number
-  ]);
+    normalized.kills as number,
+    (normalized.damage_per_hit as number) ?? 0,  // derived feature (v2.2)
+  ]) / 5;
 
   /**
-   * === COLLECTION SCORE ===
-   * 
-   * Sums three collection-related features:
-   * 1. itemsCollected - Success (did they actually get items?)
-   * 2. pickupAttempts - Intent (were they trying to collect?)
+   * === COLLECTION SCORE (4 features, avg range [0, 1]) ===
+   *
+   * 1. itemsCollected        - Success (did they actually get items?)
+   * 2. pickupAttempts        - Intent (were they trying to collect?)
    * 3. timeNearInteractables - Seeking (did they hang around loot?)
-   * 
-   * Why these three?
-   * - Together they show intentional resource-gathering behavior
-   * - Not just accidental pickups
-   * - Demonstrates collection as a playstyle choice
+   * 4. pickupAttemptRate     - Deliberateness of collection intent.
+   *    Explorers who pass near items incidentally have low pickupAttemptRate;
+   *    true collectors who actively attempt pickups have high rate.
+   *    Formula: pickupAttempts_raw / max(timeNearInteractables_raw, 1) — pre-computed in step2.
    */
   const score_collect = calculateComponentSum([
     normalized.itemsCollected as number,
     normalized.pickupAttempts as number,
-    normalized.timeNearInteractables as number
-  ]);
+    normalized.timeNearInteractables as number,
+    (normalized.pickup_attempt_rate as number) ?? 0,  // derived feature (v2.2)
+  ]) / 4;
 
   /**
-   * === EXPLORATION SCORE ===
-   * 
-   * Sums three exploration-related features:
-   * 1. distanceTraveled - Coverage (how much of map did they see?)
-   * 2. timeSprinting - Movement style (actively exploring vs camping?)
-   * 3. timeOutOfCombat - Peaceful time (exploring vs fighting?)
-   * 
-   * Why these three?
-   * - Distance shows map coverage
-   * - Sprint shows intentional movement (not standing still)
-   * - Time out of combat confirms exploration vs combat focus
+   * === EXPLORATION SCORE (2 active features, avg range [0, 1]) ===
+   *
+   * 1. distanceTraveled - Coverage (how much of the map did they see?)
+   * 2. timeSprinting    - Movement style (actively moving vs camping?)
+   *
+   * NOTE: timeOutOfCombat was intentionally removed. It accumulated passively
+   * for any player not in combat — including combat-intent players waiting for
+   * enemies to spawn. It is also the arithmetic complement of timeInCombat,
+   * making the two features redundant and inversely correlated. Only active
+   * movement signals are used here.
    */
   const score_explore = calculateComponentSum([
-    normalized.distanceTraveled as number,
-    normalized.timeSprinting as number,
-    normalized.timeOutOfCombat as number
-  ]);
+    (normalized.distanceTraveled as number) ?? 0,
+    (normalized.timeSprinting as number) ?? 0,
+  ]) / 2;
 
   // ==========================================================================
   // STEP 2: CALCULATE TOTAL SCORE
   // ==========================================================================
-  // Add all three scores together
-  // This becomes our denominator for percentage calculation
-  // 
+  // Each score is now in [0, 1]. Sum becomes the denominator for percentages.
+  //
   // Example:
-  //   score_combat = 2.5
-  //   score_collect = 0.8
-  //   score_explore = 1.2
-  //   score_total = 4.5
+  //   score_combat  = 0.75
+  //   score_collect = 0.20
+  //   score_explore = 0.45
+  //   score_total   = 1.40
   const score_total = score_combat + score_collect + score_explore;
 
   // ==========================================================================
   // STEP 3: NORMALIZE TO PERCENTAGES
   // ==========================================================================
-  // Convert raw scores to percentages that sum to 100%
-  // 
-  // Formula: percentage = (category_score / total_score)
-  // 
-  // Why percentages?
-  // - Easier to interpret (70% combat vs score of 2.5)
-  // - Guaranteed to sum to 100% (no ambiguity)
-  // - Directly comparable across different sessions
-  // 
-  // Safety:
-  // - calculatePercentage() handles division by zero
-  // - If total is 0 (no activity), returns 0 for all
+  // Convert averaged scores to percentages that sum to 100%.
+  //
+  // Formula: percentage = (category_avg / total_avg_sum)
+  //
+  // Safety: calculatePercentage() handles division by zero (returns 0.3333
+  // as equal-weight default when the player has no recorded activity).
   return {
     pct_combat: calculatePercentage(score_combat, score_total),
     pct_collect: calculatePercentage(score_collect, score_total),

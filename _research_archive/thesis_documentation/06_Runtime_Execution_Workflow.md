@@ -1,5 +1,7 @@
 # Runtime Execution Workflow Specification (v2.0)
 
+> **v2.1 Update (March 2026)**: The activity scoring formula (Step 3) was revised to use per-archetype averages and exclude `timeOutOfCombat` from Exploration scoring. All model artifacts referenced in Section 3 have been regenerated. The runtime flow diagram and execution frequencies below remain unchanged — the formula change is internal to the feature extraction step. See `CHANGELOG.md` for full details.
+
 ## 1. Runtime Flow Diagram
 
 ```mermaid
@@ -63,4 +65,4 @@ For each active player session, the runtime system must maintain a minimal state
 
 ## 6. Verification
 
-This workflow uses the frozen v2.0 models exactly as trained and is safe for production runtime deployment.
+This workflow uses the v2.1 models regenerated on 2026-03-06. The activity scoring formula was corrected (averages, timeOutOfCombat excluded from Exploration). All other pipeline steps, execution frequencies, and failure-safe behaviors remain as specified above.

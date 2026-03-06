@@ -105,7 +105,7 @@ export const METRIC_EXPLANATIONS: Record<string, EducationalContent> = {
   'feature_enemiesHit': {
     title: 'Input: Enemies Hit',
     what: 'Total number of successful hits landed on enemies during the window.',
-    why: 'Core indicator of combat engagement intensity.',
+    why: 'Primary indicator of combat engagement. Used in conjunction with Damage Dealt to derive combat intensity.',
     computed: 'Count of hit events aggregated over the telemetry window.',
     reading: 'Normalized to [0–1]. Higher values indicate active combat.',
   },
@@ -113,9 +113,17 @@ export const METRIC_EXPLANATIONS: Record<string, EducationalContent> = {
   'feature_damageDone': {
     title: 'Input: Damage Dealt',
     what: 'Total damage inflicted on enemies during the window.',
-    why: 'Represents combat effectiveness beyond hit frequency.',
+    why: 'Represents combat effectiveness. Essential for calculating Damage per Hit.',
     computed: 'Sum of damage values over the telemetry window.',
     reading: 'Normalized to [0–1].',
+  },
+
+  'feature_damagePerHit': {
+    title: 'Input: Damage per Hit',
+    what: 'A derived v2.2 feature measuring the average damage dealt per individual hit landed.',
+    why: 'Crucial for identifying weapon-class archetypes. Sniper/heavy-weapon players deal high damage with few hits; spray-weapon players deal low damage with many hits. Without this, snipers are underrepresented in combat scoring.',
+    computed: 'damageDone_raw / max(enemiesHit_raw, 1).',
+    reading: 'High values (0.7+) signal precision/heavy playstyles. Moderate values (0.3-0.6) signal hybrid playstyles.',
   },
 
   'feature_timeInCombat': {
@@ -145,15 +153,23 @@ export const METRIC_EXPLANATIONS: Record<string, EducationalContent> = {
   'feature_pickupAttempts': {
     title: 'Input: Pickup Attempts',
     what: 'Number of attempts made to collect items.',
-    why: 'Used to infer intent and efficiency of collection.',
+    why: 'Core indicator of deliberate interaction intent. Used to derive pickup success/attempt rates.',
     computed: 'Count of interaction attempts.',
     reading: 'Normalized to [0–1].',
   },
 
+  'feature_pickupAttemptRate': {
+    title: 'Input: Pickup Attempt Rate',
+    what: 'A derived v2.2 feature measuring the frequency of pickup attempts relative to time spent near items.',
+    why: 'Distinguishes intentional collectors from incidental explorers. Explorers may pass near many items (high timeNearInteractables) without attempting to pick them up (low rate). Collectors actively engage.',
+    computed: 'pickupAttempts_raw / max(timeNearInteractables_raw, 1).',
+    reading: 'High values indicate high collection intent. Low values with high proximity indicate exploration focus.',
+  },
+
   'feature_timeNearInteractables': {
     title: 'Input: Time Near Interactables',
-    what: 'Time spent near collectible or interactive objects.',
-    why: 'Captures collection intent even without successful pickups.',
+    what: 'Time spent within interaction proximity of collectible objects.',
+    why: 'Signals potential collection intent or navigation through loot-heavy areas.',
     computed: 'Accumulated seconds within interaction radius.',
     reading: 'Normalized to [0–1].',
   },
@@ -175,11 +191,19 @@ export const METRIC_EXPLANATIONS: Record<string, EducationalContent> = {
   },
 
   'feature_timeOutOfCombat': {
-    title: 'Input: Time Out of Combat',
-    what: 'Time spent outside combat during the window.',
-    why: 'Supports exploration and recovery behavior detection.',
-    computed: 'Window duration minus combat time.',
-    reading: 'Normalized to [0–1].',
+    title: 'Input: Time Out of Combat (Telemetry Only)',
+    what: 'Time spent outside combat during the window. Received but excluded from scoring since v2.1.',
+    why: 'Excluded from activity scoring to avoid "passive signal" bias. Players waiting for spawns on sparse maps would previously be mis-categorized as explorers. Scoring now uses active signals exclusively.',
+    computed: 'Window duration minus timeInCombat.',
+    reading: 'Visible in telemetry logs but contributes 0% weight to archetype memberships.',
+  },
+
+  'system_session_timeout': {
+    title: 'System: Session Persistence',
+    what: 'The duration for which the system maintains player state memory (deltas).',
+    why: 'Increased to 90s in v2.2 to accommodate loading screens and network latency without resetting adaptation progress.',
+    computed: 'Hardcoded temporal constant (90,000ms).',
+    reading: 'Ensures smooth adaptation across short gameplay interruptions.',
   },
 
   // --- ADAPTATION PARAMETERS ---
@@ -280,20 +304,20 @@ export const METRIC_EXPLANATIONS: Record<string, EducationalContent> = {
   },
 
   'adaptive_parameter_tuning': {
-    title: 'Adaptive Parameter Tuning',
-    what: 'Real-time modulation of game constants based on ANFIS output.',
-    why: 'Keeps gameplay within the flow zone between boredom and frustration.',
-    computed: 'Base value × difficulty multiplier × archetype influence.',
-    reading: 'Dynamic.',
+    title: 'Process: Per-Parameter Sensitivity',
+    what: 'Modulation of game constants using non-uniform sensitivity weights (v2.2).',
+    why: 'Not all game changes are equally perceptible. Spawning more enemies (0.35) is more obvious than increasing health (0.20). Tuning these weights ensures adaptation feels tailored and natural.',
+    computed: 'Config-driven archetype weights (ranging 0.20 to 0.35).',
+    reading: 'Determines the "steepness" of adaptation for each specific game variable.',
   },
 
   // --- SYSTEM OVERVIEW ---
   'input_normalization': {
-    title: 'Process: Input Normalization',
-    what: 'Conversion of raw telemetry into fuzzy-compatible values.',
-    why: 'Allows heterogeneous inputs to be compared consistently.',
-    computed: 'Linear scaling to [0,1] using training min–max bounds.',
-    reading: 'Ensures inputs accurately reflect game state.',
+    title: 'Process: Input Normalization (v2.2)',
+    what: 'Conversion of raw telemetry (10 features) and derived signals (2 features) into fuzzy-compatible values.',
+    why: 'Allows heterogeneous inputs (e.g., meters vs. damage points) to be compared consistently. v2.2 includes Damage per Hit and Pickup Attempt Rate to better capture playstyle nuances.',
+    computed: 'Linear scaling to [0,1] using training min–max bounds across 12 feature dimensions.',
+    reading: 'Ensures inputs accurately reflect game state without magnitude bias.',
   },
 
   'rule_firing_strength': {

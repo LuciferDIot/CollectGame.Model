@@ -226,8 +226,24 @@ If you want even MORE documentation:
 
 ---
 
+## 🔄 v2.1 Update (March 2026)
+
+### Changed Files
+- **`activity.ts`**: Activity scoring formula corrected — per-archetype averages, `timeOutOfCombat` excluded from Exploration
+- **`educational-content.ts`**: `feature_timeOutOfCombat` tooltip updated to reflect excluded status
+- **`pipeline-constants.ts`**: Step 3 renamed to "Activity Scoring"; Step 4 renamed to "Soft Membership"
+
+### Model Artifacts Updated
+- `deployment_manifest.json` v2.1 — corrected `feature_calculations` and added `scoring_notes`
+- `cluster_centroids.json` — regenerated after notebook rerun (2026-03-06)
+
+### Documentation Status
+All inline code comments in `activity.ts` were already updated in the previous session to document the rationale for the v2.1 change (why averages, why timeOutOfCombat was excluded). The documentation is complete and thesis-ready.
+
+---
+
 **Status**: ✅ COMPLETE - All core pipeline files fully documented
 **Build Status**: ✅ PASSING - No TypeScript errors
 **Quality**: ⭐⭐⭐⭐⭐ - Tutorial-grade documentation
 
-*Last Updated: February 2, 2026*
+*Last Updated: March 6, 2026*
