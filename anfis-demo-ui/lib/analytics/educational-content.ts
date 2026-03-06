@@ -175,11 +175,11 @@ export const METRIC_EXPLANATIONS: Record<string, EducationalContent> = {
   },
 
   'feature_timeOutOfCombat': {
-    title: 'Input: Time Out of Combat',
-    what: 'Time spent outside combat during the window.',
-    why: 'Supports exploration and recovery behavior detection.',
-    computed: 'Window duration minus combat time.',
-    reading: 'Normalized to [0–1].',
+    title: 'Input: Time Out of Combat (Telemetry Only)',
+    what: 'Time spent outside combat during the window. Still received and normalized, but excluded from activity scoring since v2.1.',
+    why: 'Excluded from activity scoring: accumulates passively for any player not in combat — including combat-intent players waiting for enemies on sparse maps. Also the arithmetic complement of timeInCombat (both sum to session time), making them redundant for scoring purposes.',
+    computed: 'Window duration minus timeInCombat. Normalized to [0–1] for pipeline completeness.',
+    reading: 'Value is normalized but NOT used in pct_explore computation. Presence in telemetry is still required by the API.',
   },
 
   // --- ADAPTATION PARAMETERS ---

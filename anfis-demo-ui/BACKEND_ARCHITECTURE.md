@@ -1244,5 +1244,5 @@ Memory Usage: ~15MB per pipeline instance
 
 ---
 
-*Last Updated: February 2026*
+*Last Updated: March 2026 — v2.2.1 (Activity Scoring fix: averages + timeOutOfCombat excluded from exploration)*
 *For questions, see inline code comments or reach out to the development team.*

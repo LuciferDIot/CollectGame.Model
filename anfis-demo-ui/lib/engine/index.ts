@@ -79,10 +79,10 @@ export class ANFISPipeline {
     // Step 5: Defuzzification & Temporal Dynamics
     // Eq 4.2: Delta Calculation (Velocity)
     // Parse timestamp if available (handles ISO strings)
-    const timestamp = telemetry.timestamp 
-        ? new Date(telemetry.timestamp).getTime() 
-        : Date.now();
-        
+    const timestamp = telemetry.timestamp
+      ? new Date(telemetry.timestamp).getTime()
+      : Date.now();
+
     const deltas = this.step5_ComputeDeltas(telemetry.userId, softMembership, timestamp);
 
     // Step 6: Inference Engine (Rules Layer)
@@ -96,7 +96,7 @@ export class ANFISPipeline {
     // Step 8: Result Aggregation
     // Final packaging for Client-Server contract
     perfTimings.total = performance.now() - t0;
-    
+
     return {
       filtering: { passed: true, duration_seconds: telemetry.duration ?? 30 },
       normalized_features: normalized,
@@ -109,7 +109,7 @@ export class ANFISPipeline {
         rulesFired: mlpResult.activations.map((val, idx) => ({
           ruleName: `Hidden Neuron #${idx + 1}`,
           strength: val
-        })).sort((a,b) => b.strength - a.strength)
+        })).sort((a, b) => b.strength - a.strength)
       },
       target_multiplier: targetMultiplier,
       adapted_parameters: adaptedParameters,
@@ -125,7 +125,7 @@ export class ANFISPipeline {
    * Ensures data integrity before processing.
    */
   private step1_AcquireAndValidate(telemetry: TelemetryWindow): void {
-     validateDuration(telemetry.duration ?? 30);
+    validateDuration(telemetry.duration ?? 30);
   }
 
   /**
@@ -134,13 +134,30 @@ export class ANFISPipeline {
    * CONCEPT: "Comparing Apples to Apples"
    * The game sends us data in different units (e.g., Distance in meters, Damage in points).
    * The AI can't understand these raw numbers.
-   * 
+   *
    * WHAT WE DO:
-   * We squash all numbers into a range between 0 and 1.
-   * Example: 50 Health (0-100 scale) becomes 0.5.
+   * We first compute two derived features from raw telemetry, then squash all numbers
+   * into a range between 0 and 1 using the trained MinMax scaler.
+   *
+   * DERIVED FEATURES (v2.2):
+   * - damagePerHit       = damageDone / max(enemiesHit, 1)
+   *     Captures weapon-class-agnostic combat intensity. Sniper players land
+   *     few hits but high damage-per-hit; spray players show the inverse.
+   *     Without this, snipers are underrepresented in the combat score.
+   *
+   * - pickupAttemptRate  = pickupAttempts / max(timeNearInteractables, 1)
+   *     Distinguishes deliberate collectors (high rate) from explorers who
+   *     pass near items incidentally (low rate). Reduces cross-archetype
+   *     contamination between Collection and Exploration clusters.
    */
   private step2_NormalizeFeatures(features: any) {
-    return this.normalizer.normalize(features);
+    // Pre-compute derived features from raw values before normalization
+    const damagePerHit = (features.damageDone ?? 0) / Math.max(features.enemiesHit ?? 0, 1);
+    const pickupAttemptRate = (features.pickupAttempts ?? 0) / Math.max(features.timeNearInteractables ?? 0, 1);
+
+    // Merge derived features with raw telemetry — scaler picks them up by name
+    const enrichedFeatures = { ...features, damagePerHit, pickupAttemptRate };
+    return this.normalizer.normalize(enrichedFeatures);
   }
 
   /**

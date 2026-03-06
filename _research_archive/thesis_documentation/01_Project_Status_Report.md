@@ -46,3 +46,43 @@ The system evolved through two major iterations:
 
 ## 6. Conclusion
 The system implementation is internally consistent, scientifically validated, and ready for integration into the thesis dissertation. The architecture strikes an optimal balance between computational efficiency and behavioral modeling accuracy.
+
+## 7. Post-Production Revision (v2.1) — March 2026
+
+### 7.1 Issue Identified
+Following live gameplay observation after v2.0 production deployment, a systematic classification error was identified through user feedback: players with clear Combat intent were being classified as Explorers during the early portion of sessions when enemy spawns were sparse.
+
+### 7.2 Root Cause
+Two structural problems were identified in the v2.0 activity scoring formula:
+
+**Problem 1 — Passive Signal Inclusion**: `timeOutOfCombat` was included in the Exploration score. This feature accumulates for any player not in active combat, including players searching for enemies on a low-density map. The v2.0 formula was:
+```
+score_explore = distanceTraveled + timeSprinting + timeOutOfCombat  (sum-based)
+```
+
+**Problem 2 — Feature Count Asymmetry**: Using raw sums gave Combat (4 features, max=4) a structural ceiling advantage over Collection (3 features, max=3) and Exploration (3 features, max=3). This created subtle but consistent over-classification toward Combat during high-activity sessions.
+
+### 7.3 Fix Applied (v2.1)
+```
+score_combat  = avg(enemiesHit, damageDone, timeInCombat, kills)          → [0, 1]
+score_collect = avg(itemsCollected, pickupAttempts, timeNearInteractables) → [0, 1]
+score_explore = avg(distanceTraveled, timeSprinting)                       → [0, 1]
+```
+
+Key changes:
+1. Per-archetype **averages** (÷ feature count) — equal ceiling of 1.0 for all archetypes
+2. `timeOutOfCombat` **removed** from Exploration — only active movement signals used
+
+No new telemetry data was collected. The fix operates entirely within the existing 10-feature dataset.
+
+### 7.4 Pipeline Regeneration
+Notebooks 04 → 05 → 06 → 07 were rerun on 2026-03-06. All model artifacts updated:
+- `cluster_centroids.json` — regenerated with v2.1 activity scores
+- `anfis_mlp_weights.json` — retrained on new soft membership values
+- Post-rerun metrics: test_mae = 0.0107, train_mae = 0.0125
+
+### 7.5 Revised System Status
+The system is **fully production-ready** under v2.1. The issue, its root cause, the fix applied, and the pipeline regeneration are fully documented for thesis purposes. This revision demonstrates:
+1. The importance of real-world testing for identifying structural biases not apparent from training metrics alone
+2. The ability to correct classification errors within an existing dataset without collecting new telemetry
+3. The value of principled feature selection (active vs passive signals)

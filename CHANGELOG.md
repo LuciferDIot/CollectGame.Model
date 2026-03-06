@@ -37,8 +37,8 @@ ceiling advantage over Collection (3) and Exploration (previously 3, now 2 after
 - **`05_Clustering.ipynb`**: New cell added to export `cluster_centroids.json` directly
   to both `data/processed/` and `anfis-demo-ui/models/` after clustering.
 
-### Action Required
-Rerun notebooks 04 → 05 → 06 → 07 to regenerate:
+### Action Completed
+Notebooks 04 → 05 → 06 → 07 have been rerun and all artifacts regenerated:
 - `data/processed/4_activity_contributions.csv`
 - `data/processed/5_clustered_telemetry.csv`
 - `anfis-demo-ui/models/cluster_centroids.json`
@@ -124,8 +124,8 @@ Complete system with delta integration. All experimental validation finished, ar
 
 ## Status
 
-**Version**: 2.0.0 (PRODUCTION)  
-**Status**: ✅ FROZEN - No further tuning  
+**Version**: 2.1.0 (PRODUCTION)
+**Status**: ✅ FROZEN - Activity scoring revised (v2.1), pipeline regenerated 2026-03-06
 **Next Phase**: Thesis write-up and deployment
 
 ---
