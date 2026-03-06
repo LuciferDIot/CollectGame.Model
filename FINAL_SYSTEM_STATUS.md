@@ -1,8 +1,8 @@
 # ANFIS Adaptive Difficulty System - Final System Summary
 
 **Project**: CollectGame.Model
-**Version**: 2.1 (ACTIVITY SCORING REVISION)
-**Status**: ✅ PRODUCTION (v2.1)
+**Version**: 2.2 (DERIVED FEATURES & SENSITIVITY)
+**Status**: ✅ PRODUCTION (v2.2)
 **Date**: March 6, 2026
 
 ---
@@ -14,17 +14,20 @@
 2. Uniform MinMaxScaler normalization
 3. K-Means clustering (K=3) → Soft membership
 4. Delta computation → Temporal signals
-5. ANFIS input: **6 features** (3 soft + 3 deltas)
-6. MLP surrogate training
-7. Adaptation parameters output
+5.- **ANFIS input**: **6 features** (3 soft + 3 deltas)
+- **MLP surrogate architecture**: 6-16-8-1
+- **Adaptation**: Per-parameter sensitivity tuning (0.20 - 0.35)
+- **Target**: 0.9 + 0.55×Δcombat + 0.40×Δcollect + 0.35×Δexplore (Delta-Weighted Canonical)
 
-### Final Configuration (v2.1)
+### Final Configuration (v2.2)
 - **Preprocessing**: Uniform MinMaxScaler (no feature-specific)
-- **Features**: 9 active telemetry features (`timeOutOfCombat` excluded from scoring — see v2.1 change log)
-- **Activity Scoring**: Per-archetype average (not sum) — equal ceiling per archetype
+- **Features**: 12 total features (10 raw telemetry + 2 derived)
+- **Derived Features**: `damagePerHit` (Combat) and `pickupAttemptRate` (Collection)
+- **Activity Scoring**: Per-archetype average (÷5 Combat, ÷4 Collect, ÷2 Explore) — equal ceiling per archetype
 - **Clustering**: K=3, soft membership via inverse distance
 - **ANFIS Inputs**: [soft_combat, soft_collect, soft_explore, Δcombat, Δcollect, Δexplore]
 - **Target**: 1.0 - 0.1×deaths + 0.05×activity, clipped [0.5, 1.5]
+- **Session Timeout**: 90s (Increased to handle loading/network latency)
 
 ### v2.1 Activity Scoring Change — Rationale
 

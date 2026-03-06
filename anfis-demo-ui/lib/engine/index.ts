@@ -152,11 +152,11 @@ export class ANFISPipeline {
    */
   private step2_NormalizeFeatures(features: any) {
     // Pre-compute derived features from raw values before normalization
-    const damagePerHit = (features.damageDone ?? 0) / Math.max(features.enemiesHit ?? 0, 1);
-    const pickupAttemptRate = (features.pickupAttempts ?? 0) / Math.max(features.timeNearInteractables ?? 0, 1);
+    const damage_per_hit = (features.damageDone ?? 0) / Math.max(features.enemiesHit ?? 0, 1);
+    const pickup_attempt_rate = (features.pickupAttempts ?? 0) / Math.max(features.timeNearInteractables ?? 0, 1);
 
     // Merge derived features with raw telemetry — scaler picks them up by name
-    const enrichedFeatures = { ...features, damagePerHit, pickupAttemptRate };
+    const enrichedFeatures = { ...features, damage_per_hit, pickup_attempt_rate };
     return this.normalizer.normalize(enrichedFeatures);
   }
 

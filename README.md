@@ -1,8 +1,8 @@
 # ANFIS Adaptive Difficulty System - PRODUCTION
 
-**Status**: ✅ COMPLETE (Architecture Finalized)  
-**Version**: 2.0 (With Delta Integration)  
-**Last Updated**: January 27, 2026, 2:20 PM IST
+**Status**: ✅ PRODUCTION (v2.2 — Derived Features & Sensitivity Update)  
+**Version**: 2.2  
+**Last Updated**: March 6, 2026
 
 ---
 
@@ -12,11 +12,12 @@ This is the **final, frozen production architecture** for the ANFIS-based adapti
 
 ---
 
-## 📊 Final Configuration (LOCKED 🔒)
+## 📊 Final Configuration (v2.2)
 
 ### Preprocessing
 - **Scaler**: Uniform MinMaxScaler [0, 1]
-- **Features**: All 10 telemetry features (no selection, no weighting)
+- **Features**: 12 features (10 raw telemetry + 2 derived: `damage_per_hit`, `pickup_attempt_rate`)
+- **Derived Features**: Computed before normalization from raw values
 - **Outlier Handling**: None
 
 ### Clustering
@@ -55,7 +56,7 @@ This is the **final, frozen production architecture** for the ANFIS-based adapti
 - **Conclusion**: Baseline already near-optimal
 
 ### Signal Interpretation Refinement
-- **Δexplore ↔ Δtarget**: r = **0.808** (very strong correlation)
+- **Δexplore ↔ Δtarget**: r = **0.839** (very strong correlation — v2.2)
 - **Δcombat ↔ Δtarget**: r = -0.471
 - **Feature Weighting**: No improvement (rejected)
 - **Decision**: Add deltas to ANFIS inputs ✅
@@ -124,18 +125,18 @@ jupyter notebook
 
 ---
 
-## 🔒 Frozen Decisions (DO NOT CHANGE)
+## 📌 Architecture Principles
 
-❌ **No further changes to**:
-- Preprocessing methods
-- Feature selection/weighting
-- Clustering algorithm or K value
-- Archetype mapping
-- Target generation formula
+**Stable** (evidence-based decisions, retain unless new data suggests otherwise):
+- Preprocessing: Uniform MinMaxScaler
+- Clustering: K=3 (Combat, Collection, Exploration)
+- ANFIS input: 6D soft+delta space
+- Target formula structure
 
-✅ **Only delta integration**:
-- Approved refinement based on evidence (r=0.808)
-- Adds temporal context without changing core architecture
+**Open to tuning**:
+- Derived feature formulas (empirically validated in v2.2)
+- Per-parameter sensitivity weights (0.20–0.35 range)
+- Session timeout (currently 90s)
 
 ---
 
@@ -161,8 +162,9 @@ jupyter notebook
 ## ✅ System Status
 
 **Experimentation Phase**: ✅ COMPLETE  
-**Architecture**: ✅ FROZEN  
-**Delta Integration**: ✅ SPECIFIED  
+**Architecture**: ✅ Production (v2.2)  
+**Derived Features**: ✅ Integrated (damage_per_hit, pickup_attempt_rate)  
+**Sensitivity Registry**: ✅ Non-uniform (0.20–0.35)  
 **Documentation**: ✅ COMPLETE  
 **Production Ready**: ✅ YES
 

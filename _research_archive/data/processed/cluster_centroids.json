@@ -10,7 +10,7 @@
   "1": {
     "archetype": "Exploration",
     "centroid": {
-      "pct_combat": 0.009980181516020814,
+      "pct_combat": 0.009980181516020759,
       "pct_collect": 0.14233362069180275,
       "pct_explore": 0.8476861977921765
     }
