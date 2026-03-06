@@ -31,8 +31,14 @@ describe('KMeansSoftMembership', () => {
          * TEST CASE: Direct Match
          * If a player's activity EXACTLY matches the Combat archetype centroid,
          * their soft_combat membership should be near 1.0.
+         *
+         * NOTE: Look up by archetype name, not numeric key — cluster indices
+         * can shift when the pipeline is regenerated (e.g., v2.2 rerun).
          */
-        const combatCentroid = (clusterCentroids as any)["2"].centroid;
+        const combatEntry = Object.values(clusterCentroids as any).find(
+            (c: any) => c.archetype === 'Combat'
+        ) as any;
+        const combatCentroid = combatEntry.centroid;
         const results = clustering.calculateMembership(combatCentroid);
 
         expect(results.soft_combat).toBeGreaterThan(0.99);

@@ -11,9 +11,9 @@ We have upgraded the dashboard to a **5-Section Academic Layout**. This board an
 ### 🔷 Section 1: Offline Model Evaluation (The "Trust Anchor")
 *   **Purpose**: Prove the static model quality.
 *   **Components**:
-    *   **Model Evaluation Card**: Locked, validated metrics (R²=0.956, MAE=0.013).
+    *   **Model Evaluation Card**: Locked, validated metrics (R²=0.9391, MAE=0.0112) — v2.2 final.
     *   **Comparative Evidence**: "Original vs. Option B" table showing the 18x Span gain and 450% Std gain.
-*   **Thesis Argument**: *"The model is statistically proven accurate (R²=0.96) on held-out data."*
+*   **Thesis Argument**: *"The model is statistically proven accurate (R²=0.94) on held-out data."*
 
 ### 🔷 Section 2: Runtime Consistency Checks (Online Validity)
 *   **Purpose**: Prove the runtime behavior matches training assumptions.
