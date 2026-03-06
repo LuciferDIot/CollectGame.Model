@@ -28,6 +28,7 @@
 18. [Independent Analyses](#18-independent-analyses)
 19. [Final Metrics & Production Configuration](#19-final-metrics--production-configuration)
 20. [Frozen Decisions Summary](#20-frozen-decisions-summary)
+21. [Activity Scoring Revision (v2.1) — March 2026](#21-activity-scoring-revision-v21--march-2026)
 
 ---
 
@@ -992,3 +993,24 @@ Rerun: 04 → 05 → 06 → 07
 
 Notebook 05 now includes an automatic export cell that writes `cluster_centroids.json`
 directly to `anfis-demo-ui/models/` upon completion.
+
+### Pipeline Regeneration Status — Completed 2026-03-06
+
+Notebooks 04 → 05 → 06 → 07 were rerun with the v2.1 formula.
+
+**New cluster centroids (post-rerun):**
+
+| Cluster | Archetype | pct_combat | pct_collect | pct_explore |
+|---------|-----------|------------|-------------|-------------|
+| 0 | Collection | 0.1303 | 0.3474 | 0.5223 |
+| 1 | Exploration | 0.0467 | 0.1042 | 0.8491 |
+| 2 | Combat | 0.5110 | 0.0581 | 0.4309 |
+
+**Key shift from v2.0 → v2.1 centroids**: The Exploration centroid now requires `pct_explore = 0.849` to reach (up from 0.879 in v2.0 using inflated old formula), but the Combat centroid's `pct_explore` dropped from 0.430 to 0.431 (minor), confirming that passive `timeOutOfCombat` inflation was the dominant driver of the old formula's biases. The Collection centroid's `pct_explore` component dropped from 0.630 to 0.522, correctly de-coupling collection behavior from exploration scoring.
+
+**New model metrics (post-rerun):**
+- train_mae: 0.0125
+- test_mae: 0.0107
+- Architecture: 6-16-8-1
+
+The pipeline is now correctly aligned with the v2.1 activity scoring formula. All deployed artifacts (`cluster_centroids.json`, `anfis_mlp_weights.json`) reflect the new formula.

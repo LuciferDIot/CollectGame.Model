@@ -1,7 +1,7 @@
 {
-  "version": "2.0",
-  "status": "FROZEN",
-  "export_date": "2026-01-28T19:46:28.468998",
+  "version": "2.2",
+  "status": "PRODUCTION",
+  "export_date": "2026-03-06T15:35:00.000000",
   "pipeline": {
     "features": [
       "enemiesHit",
@@ -13,9 +13,11 @@
       "timeNearInteractables",
       "distanceTraveled",
       "timeSprinting",
-      "timeOutOfCombat"
+      "timeOutOfCombat",
+      "damagePerHit",
+      "pickupAttemptRate"
     ],
-    "num_features": 10,
+    "num_features": 12,
     "k_clusters": 3,
     "anfis_architecture": "6-16-8-1",
     "training_samples": 3164
@@ -39,15 +41,19 @@
     ]
   },
   "feature_calculations": {
-    "pct_combat": "avg(enemiesHit, damageDone, timeInCombat, kills)  — 4 features",
-    "pct_collect": "avg(itemsCollected, pickupAttempts, timeNearInteractables)  — 3 features",
-    "pct_explore": "avg(distanceTraveled, timeSprinting)  — 2 active features; timeOutOfCombat excluded (passive accumulation, inverse of timeInCombat)"
+    "pct_combat": "avg(enemiesHit, damageDone, timeInCombat, kills, damagePerHit) — 5 features (v2.2)",
+    "pct_collect": "avg(itemsCollected, pickupAttempts, timeNearInteractables, pickupAttemptRate) — 4 features (v2.2)",
+    "pct_explore": "avg(distanceTraveled, timeSprinting) — 2 active features; timeOutOfCombat excluded (v2.1)"
   },
   "scoring_notes": {
-    "method": "per-archetype average (not sum) so each archetype has equal ceiling of 1.0 regardless of feature count",
+    "method": "per-archetype average so each archetype has equal ceiling of 1.0 regardless of feature count",
     "timeOutOfCombat_excluded": true,
-    "timeOutOfCombat_reason": "Passive signal: accumulates for combat-intent players when no enemies are available. Redundant with timeInCombat (their sum = session time). Replaced by active exploration signals only.",
-    "centroids_require_regeneration": true,
-    "regeneration_steps": "Rerun notebooks 04 → 05 → 06 → 07 after this change to update cluster_centroids.json and anfis_mlp_weights.json"
+    "timeOutOfCombat_reason": "Passive signal: accumulates when no enemies are available, regardless of player intent. Arithmetic complement of timeInCombat — including both is redundant. Exploration measured by active signals only.",
+    "damagePerHit_added": true,
+    "damagePerHit_formula": "damageDone_raw / max(enemiesHit_raw, 1) — weapon-class-agnostic combat intensity, captures sniper/heavy archetypes",
+    "pickupAttemptRate_added": true,
+    "pickupAttemptRate_formula": "pickupAttempts_raw / max(timeNearInteractables_raw, 1) — deliberateness of collection intent, reduces Collect/Explore cluster contamination",
+    "centroids_regenerated": true,
+    "regeneration_steps": "Notebooks 03 → 04 → 05 → 06 → 07 rerun with v2.2 formula"
   }
 }

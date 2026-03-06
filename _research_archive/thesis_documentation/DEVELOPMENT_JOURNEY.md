@@ -421,6 +421,71 @@ Even correct implementations need:
 
 ---
 
-**Document Version**: 1.0  
-**Date**: 2026-01-28  
+**Document Version**: 1.0
+**Date**: 2026-01-28
 **Status**: Thesis Documentation - Final
+
+---
+
+## Phase 7: Post-Production Activity Scoring Revision (v2.1) — March 2026
+
+### Issue Identification
+
+**Method**: Live gameplay observation with real users on sparse-enemy maps.
+
+**Observation**: Players who expressed intent to fight (searching for enemies at map start) were being classified as Explorers by the system. This triggered exploration-oriented difficulty settings (stamina buffs, movement cooldown reduction) instead of combat settings (more enemies, enemy cap increase).
+
+**Impact**: The system was actively working against the player's intent during the critical first minutes of a session.
+
+### Root Cause (Technical)
+
+The v2.0 `score_explore` formula included `timeOutOfCombat`:
+```
+score_explore_v2 = sum(distanceTraveled, timeSprinting, timeOutOfCombat)
+```
+
+`timeOutOfCombat` is a **passive signal** — it increases automatically whenever the player is not in combat, regardless of intent or action. On a map with 3–5 enemies at spawn time:
+- Player walks toward spawn area: `timeOutOfCombat` accumulates continuously
+- Player reaches area, no enemies yet: `timeOutOfCombat` still accumulates
+- Player begins searching adjacent zone: `timeOutOfCombat` still accumulates
+- All this time: `score_explore` grows, despite the player's intent being Combat
+
+Additionally, `timeOutOfCombat` is the arithmetic complement of `timeInCombat` (they sum to 30 seconds, the window duration). Including both creates an inverse dependency that structurally suppresses Combat scores during low-enemy phases.
+
+A second issue was identified simultaneously: sum-based scoring gave Combat (4 features) a raw ceiling of 4 vs Collection/Exploration at 3 each. While this cancelled in percentage normalisation, it created bias in mixed sessions.
+
+### Design Decision: Averages Over Sums
+
+**Option considered**: Keep sums but remove `timeOutOfCombat`.
+**Problem**: Still leaves feature count asymmetry (Combat 4, others 3 and 2).
+
+**Decision taken**: Switch to per-archetype **averages** (sum ÷ feature count).
+**Rationale**: Each archetype ceiling becomes 1.0 regardless of feature count. A player maximising all features in any archetype gets score = 1.0, making comparisons truly fair.
+
+**Accepted limitation**: Feature count still affects confidence — an archetype with 4 well-designed features is more robustly measured than one with 2. This is documented rather than hidden.
+
+### Solution
+
+```python
+# v2.1 (changed)
+score_combat  = df[['enemiesHit','damageDone','timeInCombat','kills']].mean(axis=1)
+score_collect = df[['itemsCollected','pickupAttempts','timeNearInteractables']].mean(axis=1)
+score_explore = df[['distanceTraveled','timeSprinting']].mean(axis=1)
+# timeOutOfCombat: still normalized and stored, not used in scoring
+```
+
+### Why No New Telemetry Was Needed
+
+The fix works within the existing 10-feature dataset because:
+1. The bias came from formula design, not data quality
+2. The passive signal was always wrong to include — removing it requires no new data
+3. Averages replace sums algebraically — same features, different aggregation
+
+This demonstrates a key research principle: **structural bias from feature engineering can be corrected without new data collection**, provided the root cause is properly diagnosed.
+
+### Outcome
+
+Notebooks 04 → 05 → 06 → 07 rerun on 2026-03-06:
+- New centroids: Combat pct_combat=0.511, Collection pct_collect=0.347, Exploration pct_explore=0.849
+- New model metrics: test_mae=0.0107, train_mae=0.0125
+- System correctly classifies combat-seeking players during low-spawn phases

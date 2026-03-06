@@ -183,32 +183,42 @@ export function calculateActivityScores(normalized: NormalizedFeatures): Activit
   // with more features.
 
   /**
-   * === COMBAT SCORE (4 features, avg range [0, 1]) ===
+   * === COMBAT SCORE (5 features, avg range [0, 1]) ===
    *
    * 1. enemiesHit       - Accuracy/engagement (did they land shots?)
    * 2. damageDone       - Effectiveness (how much hurt did they inflict?)
    * 3. timeInCombat     - Commitment (how long were they fighting?)
    * 4. kills            - Success (did they actually defeat enemies?)
+   * 5. damagePerHit     - Weapon-class intensity (sniper vs spray archetype).
+   *    Snipers land few hits but deal heavy damage per hit. Without this feature,
+   *    purely hit-count-based scoring underrepresents heavy-weapon combat players.
+   *    Formula: damageDone_raw / max(enemiesHit_raw, 1) — pre-computed in step2.
    */
   const score_combat = calculateComponentSum([
     normalized.enemiesHit as number,
     normalized.damageDone as number,
     normalized.timeInCombat as number,
-    normalized.kills as number
-  ]) / 4;
+    normalized.kills as number,
+    (normalized.damagePerHit as number) ?? 0,  // derived feature (v2.2)
+  ]) / 5;
 
   /**
-   * === COLLECTION SCORE (3 features, avg range [0, 1]) ===
+   * === COLLECTION SCORE (4 features, avg range [0, 1]) ===
    *
    * 1. itemsCollected        - Success (did they actually get items?)
    * 2. pickupAttempts        - Intent (were they trying to collect?)
    * 3. timeNearInteractables - Seeking (did they hang around loot?)
+   * 4. pickupAttemptRate     - Deliberateness of collection intent.
+   *    Explorers who pass near items incidentally have low pickupAttemptRate;
+   *    true collectors who actively attempt pickups have high rate.
+   *    Formula: pickupAttempts_raw / max(timeNearInteractables_raw, 1) — pre-computed in step2.
    */
   const score_collect = calculateComponentSum([
     normalized.itemsCollected as number,
     normalized.pickupAttempts as number,
-    normalized.timeNearInteractables as number
-  ]) / 3;
+    normalized.timeNearInteractables as number,
+    (normalized.pickupAttemptRate as number) ?? 0,  // derived feature (v2.2)
+  ]) / 4;
 
   /**
    * === EXPLORATION SCORE (2 active features, avg range [0, 1]) ===
