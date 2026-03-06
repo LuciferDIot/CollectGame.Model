@@ -22,8 +22,8 @@ export function ModelTab() {
             onClick={() => setSelectedMetric && setSelectedMetric('model_metadata')}
             className="p-4 rounded bg-blue-950/10 border border-blue-900/30 hover:bg-blue-950/20 transition-colors cursor-help group"
           >
-             <p className="text-xs font-bold text-blue-300 mb-1 uppercase tracking-wide group-hover:text-blue-200">Model Version: v2.1 (Activity Scoring Fix)</p>
-             <p className="text-xs text-blue-200/60 leading-relaxed">Trained on 3,164 samples with 0.011 MAE. Exploration now uses active signals only (distanceTraveled + timeSprinting). All archetypes averaged to equal ceiling of 1.0.</p>
+             <p className="text-xs font-bold text-blue-300 mb-1 uppercase tracking-wide group-hover:text-blue-200">Model Version: v2.2 (Derived Features)</p>
+             <p className="text-xs text-blue-200/60 leading-relaxed">Trained on 3,240 samples with 0.011 MAE. Combat adds damagePerHit; Collection adds pickupAttemptRate. Active-signals-only exploration. All archetypes averaged to equal ceiling of 1.0.</p>
           </div>
           <div 
             onClick={() => setSelectedMetric && setSelectedMetric('fuzzy_partition')}

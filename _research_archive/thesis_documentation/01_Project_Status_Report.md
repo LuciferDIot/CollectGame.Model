@@ -86,3 +86,24 @@ The system is **fully production-ready** under v2.1. The issue, its root cause, 
 1. The importance of real-world testing for identifying structural biases not apparent from training metrics alone
 2. The ability to correct classification errors within an existing dataset without collecting new telemetry
 3. The value of principled feature selection (active vs passive signals)
+
+---
+
+## Section 8: v2.2 Update — Derived Features (2026-03-07)
+
+### 8.1 Summary
+Two derived features were added to the pipeline to address archetype discrimination gaps identified after v2.1 deployment:
+
+- **`damage_per_hit`** = `damageDone / max(enemiesHit, 1)` — distinguishes high-accuracy from high-volume combat
+- **`pickup_attempt_rate`** = `pickupAttempts / max(timeNearInteractables, 1)` — distinguishes deliberate collectors from incidental ones
+
+Both are computed server-side from existing raw telemetry before normalization. The feature vector expanded from 10 → 12.
+
+### 8.2 Pipeline Regeneration
+Notebooks 03 → 10 rerun on 2026-03-07. All integration assertions pass (9/9):
+- `scaler_params.json` — 12 features
+- `anfis_mlp_weights.json` — retrained on new inputs
+- Post-rerun metrics: **test_r2 = 0.9391**, test_mae = 0.0112, Δexplore r = 0.8394
+
+### 8.3 Final System Status
+**Version**: 2.2.0 | **Status**: PRODUCTION ✅

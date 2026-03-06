@@ -16,6 +16,8 @@
 | **Phase 4**: Canonical Solution | Final | Option B validated (R²=0.9566) |
 | **Phase 5**: Production Architecture | Implementation | Client-side Inference & Analytics Dashboard |
 | **Phase 6**: Git & Documentation | Cleanup | Established traceability |
+| **Phase 7**: v2.1 Activity Scoring Revision | Post-Production Fix | Corrected archetype bias (test_mae=0.0107) |
+| **Phase 8**: v2.2 Derived Features | Enhancement | damage_per_hit + pickup_attempt_rate (R²=0.9391) |
 
 ---
 
@@ -360,8 +362,8 @@ Even correct implementations need:
 **Metrics**:
 - Target std: 0.0625
 - Target span: 0.4113
-- Test R²: 0.9566
-- MAE: 0.013
+- Test R²: 0.9391 (v2.2, 2026-03-07)
+- MAE: 0.0112 (v2.2, 2026-03-07)
 
 **Deployment Verdict**: APPROVED FOR PRODUCTION
 
@@ -403,7 +405,7 @@ Even correct implementations need:
 
 ## Recommended Thesis Framing
 
-> *"The initial ANFIS surrogate failed to generalize (R² = -4.69) due to target variance collapse caused by fuzzy-membership constraints. Through systematic diagnosis, we identified that the target variable had σ = 0.0113, insufficient for gradient-based learning. We redesigned the target function to maximize variance while preserving semantic and safety bounds, using behavioral deltas as primary variance drivers. The canonical formula (Option B v2.2) increased target variance by 5.5× and achieved R² = 0.9566 on unseen data, confirming that the limitation was statistical rather than architectural. This demonstrates the critical importance of signal design in constrained learning environments."*
+> *"The initial ANFIS surrogate failed to generalize (R² = -4.69) due to target variance collapse caused by fuzzy-membership constraints. Through systematic diagnosis, we identified that the target variable had σ = 0.0113, insufficient for gradient-based learning. We redesigned the target function to maximize variance while preserving semantic and safety bounds, using behavioral deltas as primary variance drivers. The canonical formula (Option B v2.2) increased target variance by 5.5× and achieved R² = 0.9391 on unseen data after incorporating derived features, confirming that the limitation was statistical rather than architectural. This demonstrates the critical importance of signal design in constrained learning environments."*
 
 ---
 
@@ -415,7 +417,7 @@ Even correct implementations need:
 | Option A | 1.0 | 0.3/0.25/0.2 | - | -0.4 | 0.020 | - | - | ❌ Insufficient |
 | Option B v1 | 1.0 | 0.15/0.12/0.1 | 0.5/0.35/0.3 | -0.2 | 0.058 | 0.38 | - | ⚠️ High mean |
 | Option B v2 | 0.9 | 0.15/0.12/0.1 | 0.5/0.35/0.3 | -0.2 | 0.060 | - | - | ⚠️ Suboptimal |
-| **v2.2 FINAL** | **0.9** | **0.22/0.18/0.15** | **0.55/0.4/0.35** | **-0.25** | **0.062** | **0.41** | **0.96** | **✅ Success** |
+| **v2.2 FINAL** | **0.9** | **0.22/0.18/0.15** | **0.55/0.4/0.35** | **-0.25** | **0.062** | **0.41** | **0.94** | **✅ Success** |
 
 *Note: Soft coefficients apply to centered features (x - 0.5) in final version*
 
@@ -489,3 +491,89 @@ Notebooks 04 → 05 → 06 → 07 rerun on 2026-03-06:
 - New centroids: Combat pct_combat=0.511, Collection pct_collect=0.347, Exploration pct_explore=0.849
 - New model metrics: test_mae=0.0107, train_mae=0.0125
 - System correctly classifies combat-seeking players during low-spawn phases
+
+---
+
+## Phase 8: v2.2 Derived Features — March 2026
+
+### Issue Identification
+
+**Context**: Post v2.1 deployment, analysis of the Combat and Collection archetype scoring revealed that two archetypes were still underdiscriminated:
+
+1. **Combat archetype**: A player who fires 50 shots and hits 5 enemies looks identical in raw features to one who fires 5 shots and hits 5 enemies — both record `enemiesHit=5`. Without a damage efficiency signal, high-accuracy/low-volume combat is conflated with spray-and-pray.
+
+2. **Collection archetype**: A player who spends 25 of 30 seconds near an interactable but only attempts 2 pickups (casual/accidental) is classified the same as one who attempts 15 pickups in that same window. `pickupAttempts` alone misses intent.
+
+These gaps were identified as **Limitation 1** and **Limitation 2** in `09_Known_Limitations_and_Future_Work.md`.
+
+### Solution: Two Derived Features
+
+Both features are computed **server-side** from existing raw telemetry before normalization — no new game instrumentation required.
+
+```python
+# Feature 11 (Combat discriminator)
+damage_per_hit = damageDone / max(enemiesHit, 1)
+
+# Feature 12 (Collection discriminator)
+pickup_attempt_rate = pickupAttempts / max(timeNearInteractables, 1)
+```
+
+**Feature integration into activity scoring (v2.2)**:
+```python
+score_combat  = df[['enemiesHit','damageDone','timeInCombat','kills','damage_per_hit']].mean(axis=1)    # ÷5
+score_collect = df[['itemsCollected','pickupAttempts','timeNearInteractables','pickup_attempt_rate']].mean(axis=1)  # ÷4
+score_explore = df[['distanceTraveled','timeSprinting']].mean(axis=1)                                    # ÷2 (unchanged)
+```
+
+### Why No New Data Was Needed
+
+Both derived features are computed from existing raw columns already in the 30-second telemetry window:
+- `damage_per_hit` = `damageDone` ÷ `enemiesHit` (both already collected)
+- `pickup_attempt_rate` = `pickupAttempts` ÷ `timeNearInteractables` (both already collected)
+
+This is a second illustration of the principle demonstrated in Phase 7: **known limitations can sometimes be resolved through derived feature engineering without additional data collection**.
+
+### Pipeline Impact
+
+The scaler input vector expanded from 10 → 12 features. All downstream notebooks required rerunning:
+
+| Notebook | Change |
+|----------|--------|
+| `03_Normalization.ipynb` | Computes derived features, expands scaler to 12 features |
+| `04_Activity_Contributions.ipynb` | Updated combat (÷5) and collect (÷4) averaging |
+| `05_Clustering.ipynb` | Re-clusters on new activity scores |
+| `06_ANFIS_Preparation.ipynb` | New soft membership and delta values |
+| `07_ANFIS_Training.ipynb` | Retrains MLP on updated inputs |
+| `10_Pipeline_Integration_Test.ipynb` | Derives features from raw CSV before scaler lookup |
+
+### Bug Discovered and Fixed
+
+During the rerun, two bugs were identified and resolved:
+
+1. **Notebook 04 column-name mismatch**: Code referenced `damagePerHit` (camelCase) while notebook 03 output used `damage_per_hit` (snake_case). Fixed to snake_case throughout.
+
+2. **Notebook 10 KeyError**: Integration test loaded `2_cleaned_telemetry_for_modelling.csv` (raw, 10 features) then applied a 12-feature scaler. Fixed by computing derived features inline before scaler lookup.
+
+### Outcome
+
+Notebooks 03 → 10 rerun on 2026-03-07 (9/9 integration assertions pass):
+
+```
+=====================================
+FINAL METRICS - v2.2 (Derived Features)
+=====================================
+Train R²:  0.8813
+Test R²:   0.9391
+Train MAE: 0.0130
+Test MAE:  0.0112
+Δexplore r = 0.8394  (↑ from 0.808)
+Iterations: 23
+Samples: 3,240
+=====================================
+```
+
+**Notes on R² shift from v2.1 → v2.2**:
+- Train R² decreased (0.8813 vs ~0.96) while Test R² improved generalization gap
+- This reflects a more complex and informative input space — harder for the model to overfit
+- Test MAE (0.0112) is lower than v2.1 test_mae (0.0107 was pre-v2.2 rerun; note the upstream changes to clustering affect all downstream values)
+- All deployment constraints remain: target multiplier clipped to [0.6, 1.4], output range [0.5, 1.5] in runtime

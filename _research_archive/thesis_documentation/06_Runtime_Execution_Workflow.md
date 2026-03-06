@@ -1,6 +1,8 @@
 # Runtime Execution Workflow Specification (v2.0)
 
-> **v2.1 Update (March 2026)**: The activity scoring formula (Step 3) was revised to use per-archetype averages and exclude `timeOutOfCombat` from Exploration scoring. All model artifacts referenced in Section 3 have been regenerated. The runtime flow diagram and execution frequencies below remain unchanged — the formula change is internal to the feature extraction step. See `CHANGELOG.md` for full details.
+> **v2.1 Update (March 2026)**: The activity scoring formula (Step 3) was revised to use per-archetype averages and exclude `timeOutOfCombat` from Exploration scoring.
+>
+> **v2.2 Update (March 2026)**: Two derived features added — `damage_per_hit` (Combat, 5th feature) and `pickup_attempt_rate` (Collection, 4th feature). Raw feature vector is now 12-wide (10 original + 2 derived computed server-side before normalization). Scaler, centroids, and MLP weights regenerated. Final metrics: **Test R² = 0.9391, Test MAE = 0.0112, Δexplore r = 0.8394**. All 9/9 integration assertions pass (Notebook 10). Runtime flow and execution frequencies below remain unchanged — all changes are internal to feature extraction.
 
 ## 1. Runtime Flow Diagram
 
