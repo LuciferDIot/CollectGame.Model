@@ -55,9 +55,11 @@ Build an **ANFIS (Adaptive Neuro-Fuzzy Inference System)–based adaptive diffic
 |----------|----------|
 | **Combat** | `enemiesHit`, `damageDone`, `timeInCombat`, `kills` |
 | **Collection** | `itemsCollected`, `pickupAttempts`, `timeNearInteractables` |
-| **Exploration** | `distanceTraveled`, `timeSprinting`, `timeOutOfCombat` |
+| **Exploration** | `distanceTraveled`, `timeSprinting` _(`timeOutOfCombat` removed — see v2.1)_ |
 
 **Why these 10?** They map directly to the three gameplay pillars designed into CollectGame. Each category represents a fundamentally different play style that the difficulty system must adapt to differently.
+
+> **v2.1 Note**: `timeOutOfCombat` is collected but intentionally excluded from the activity scoring formula. See Section 21 for rationale.
 
 ---
 
@@ -900,3 +902,93 @@ CollectGame.Model/
 │
 └── anfis-demo-ui/                     ← Web demo (Next.js)
 ```
+
+---
+
+## 21. Activity Scoring Revision (v2.1) — March 2026
+
+### Background
+
+Following live gameplay observation with real users, a systematic classification error was
+identified: players who clearly intended to play as Attackers (Combat archetype) were being
+classified as Explorers during the early portion of game sessions when enemy density was low.
+The game spawns a small number of enemies at start; new enemies take time to appear. During
+this window, an attacker-intent player walks around searching for enemies but cannot engage.
+
+### Root Cause Analysis
+
+The v2.0 Exploration score included `timeOutOfCombat`:
+
+```
+score_explore_v2 = distanceTraveled + timeSprinting + timeOutOfCombat   (sums)
+pct_explore      = score_explore / (score_combat + score_collect + score_explore)
+```
+
+Two structural problems were identified:
+
+**Problem 1 — Passive Accumulation**
+`timeOutOfCombat` measures the absence of combat, not the presence of exploration. A player
+standing still in an empty area accumulates this signal identically to a player deliberately
+mapping terrain. On a sparse-enemy map, every second of searching for enemies that do not
+yet exist becomes an Exploration vote. The player's true intent — combat — is invisible to
+the system until enemies arrive.
+
+**Problem 2 — Redundancy with `timeInCombat`**
+`timeInCombat` + `timeOutOfCombat` = total session window duration (30 seconds).
+Including both features introduces a hard linear dependency: as combat time rises, out-of-
+combat time falls by exactly the same amount. This creates inverse coupling that structurally
+suppresses Combat classification whenever `timeInCombat` is low, even if that is purely
+because no enemies were available.
+
+**Problem 3 — Feature Count Asymmetry (also fixed)**
+The sum-based formula gave Combat (4 features, raw range [0, 4]) a higher raw ceiling than
+Collection (3 features, [0, 3]) or Exploration ([0, 3] in v2, [0, 2] in v2.1). While this
+partially cancelled in the percentage calculation, it created subtle imbalances in mixed
+sessions. Switching to averages gives every archetype an equal ceiling of 1.0.
+
+### Solution (v2.1)
+
+```
+# v2.1 formula
+score_combat  = avg(enemiesHit, damageDone, timeInCombat, kills)          → [0, 1]
+score_collect = avg(itemsCollected, pickupAttempts, timeNearInteractables) → [0, 1]
+score_explore = avg(distanceTraveled, timeSprinting)                       → [0, 1]
+
+pct_X = score_X / (score_combat + score_collect + score_explore)
+```
+
+Exploration now measures only **deliberate movement**: covering distance and sprinting.
+A player who stands still searching for enemies contributes 0 to Exploration score —
+which accurately reflects their intent.
+
+### Expected Behavioural Impact
+
+| Scenario | v2.0 Classification | v2.1 Classification |
+|----------|--------------------|--------------------|
+| Attacker waiting for enemies to spawn (stationary) | Explorer (passive `timeOutOfCombat`) | Neutral (33/33/33 — no activity) |
+| Attacker moving to search for enemies | Explorer (movement + `timeOutOfCombat`) | Mixed Combat/Explorer (movement only, corrected) |
+| Attacker killing enemies | Combat ✅ | Combat ✅ |
+| Pure Explorer traversing map | Explorer ✅ | Explorer ✅ (now requires actual movement) |
+
+### Limitations of This Fix
+
+The remaining ambiguity: a player moving around a map while searching for enemies still
+accumulates Exploration score from `distanceTraveled` and `timeSprinting`, because these
+are the same physical actions as exploration. Without a new telemetry signal (e.g.,
+`enemiesInSightline`, `movementTowardEnemyDirection`), movement-as-searching is
+indistinguishable from movement-as-exploration using the current 10-feature dataset.
+
+The fix addresses the worst case (passive accumulation) within existing data constraints.
+The residual ambiguity is documented for thesis transparency.
+
+### Pipeline Regeneration Required
+
+The centroids in `cluster_centroids.json` and model weights in `anfis_mlp_weights.json`
+were computed with the v2.0 formula and must be regenerated:
+
+```
+Rerun: 04 → 05 → 06 → 07
+```
+
+Notebook 05 now includes an automatic export cell that writes `cluster_centroids.json`
+directly to `anfis-demo-ui/models/` upon completion.

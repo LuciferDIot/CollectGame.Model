@@ -5,6 +5,54 @@
 
 ---
 
+## [2.1.0] - 2026-03-06 - ACTIVITY SCORING REVISION
+
+### Summary
+Corrected structural bias in the activity scoring formula that caused combat-intent players
+to be misclassified as Explorers when enemy spawns were sparse. No new telemetry required;
+fix works entirely within the existing 10-feature dataset.
+
+### Problem
+The v2.0 Exploration score included `timeOutOfCombat`:
+```
+score_explore = distanceTraveled + timeSprinting + timeOutOfCombat   (v2.0)
+```
+This feature accumulated **passively** for any player not in combat — including players
+actively seeking enemies on a large map with low initial spawn density. `timeOutOfCombat`
+is also the arithmetic inverse of `timeInCombat` (they sum to session time), making them
+redundant and inversely correlated. The result was systematic overcounting of the Exploration
+archetype, suppressing Combat classification for attacker-intent players.
+
+Additionally, scores were computed as raw sums, giving Combat (4 features) a structural
+ceiling advantage over Collection (3) and Exploration (previously 3, now 2 after fix).
+
+### Changed
+- **`activity.ts`**: Activity scores now use per-archetype averages (÷ feature count)
+  so each archetype has an equal ceiling of 1.0. `timeOutOfCombat` removed from
+  Exploration score; Exploration now uses only `distanceTraveled` and `timeSprinting`.
+- **`deployment_manifest.json`**: `feature_calculations` updated to reflect new formula.
+  `scoring_notes` section added documenting the rationale.
+- **`04_Activity_Contributions.ipynb`**: Score cell updated to use `mean(axis=1)` with
+  correct feature lists. Old `sum(axis=1)` approach replaced.
+- **`05_Clustering.ipynb`**: New cell added to export `cluster_centroids.json` directly
+  to both `data/processed/` and `anfis-demo-ui/models/` after clustering.
+
+### Action Required
+Rerun notebooks 04 → 05 → 06 → 07 to regenerate:
+- `data/processed/4_activity_contributions.csv`
+- `data/processed/5_clustered_telemetry.csv`
+- `anfis-demo-ui/models/cluster_centroids.json`
+- `data/processed/6_anfis_dataset.csv`
+- `anfis-demo-ui/models/anfis_mlp_weights.json`
+
+### Expected Improvements After Rerun
+- Combat archetype centroid `pct_explore` will decrease (was inflated by `timeOutOfCombat`)
+- Exploration centroid will require more deliberate movement to achieve (more accurate)
+- Players on sparse-enemy maps who are actively seeking combat will score closer to Combat
+- All three archetype ceilings become equal (prevents structural bias)
+
+---
+
 ## [2.0.0] - 2026-01-27 - FINAL PRODUCTION RELEASE ✅
 
 ### Summary

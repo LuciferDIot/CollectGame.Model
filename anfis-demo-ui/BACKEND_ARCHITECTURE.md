@@ -700,17 +700,27 @@ AFTER:  Distance = 0.75 (normalized to typical range)
 - "Rule of Thumb" guessing
 - Uses simple logic to estimate what the player is doing
 
-**Example Logic:**
+**Formula (v2.1):**
 ```
-IF lots of kills AND lots of damage
-  THEN player is probably in Combat mode
+score_combat  = avg(enemiesHit, damageDone, timeInCombat, kills)           → [0, 1]
+score_collect = avg(itemsCollected, pickupAttempts, timeNearInteractables)  → [0, 1]
+score_explore = avg(distanceTraveled, timeSprinting)                        → [0, 1]
 
-IF lots of items collected AND low damage
-  THEN player is probably in Collection mode
-
-IF lots of distance traveled AND few kills
-  THEN player is probably in Exploration mode
+pct_combat  = score_combat  / (score_combat + score_collect + score_explore)
+pct_collect = score_collect / (score_combat + score_collect + score_explore)
+pct_explore = score_explore / (score_combat + score_collect + score_explore)
 ```
+
+**Design Decisions:**
+- **Averages, not sums**: Each archetype has a max score of 1.0 regardless of feature count.
+  Using sums gave Combat (4 features) a structural raw-score advantage over Collection (3)
+  and Exploration (2). Averaging removes this bias.
+- **`timeOutOfCombat` excluded from Exploration**: This signal is passive — it increases
+  whenever the player is not in combat, regardless of intent. On maps with sparse enemy
+  spawns, a combat-seeking player accumulates high Exploration score purely from waiting.
+  `timeOutOfCombat` is also the complement of `timeInCombat` (both max at 30.5s; they sum
+  to session duration), making them redundant. Exploration is now measured by active
+  movement signals only: `distanceTraveled` and `timeSprinting`.
 
 **Why We Need This:**
 - Quick first guess before asking the AI

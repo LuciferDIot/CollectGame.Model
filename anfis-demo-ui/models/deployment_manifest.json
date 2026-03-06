@@ -39,8 +39,15 @@
     ]
   },
   "feature_calculations": {
-    "pct_combat": "(enemiesHit + damageDone + timeInCombat + kills) / 4",
-    "pct_collect": "(itemsCollected + pickupAttempts + timeNearInteractables) / 3",
-    "pct_explore": "(distanceTraveled + timeSprinting + timeOutOfCombat) / 3"
+    "pct_combat": "avg(enemiesHit, damageDone, timeInCombat, kills)  — 4 features",
+    "pct_collect": "avg(itemsCollected, pickupAttempts, timeNearInteractables)  — 3 features",
+    "pct_explore": "avg(distanceTraveled, timeSprinting)  — 2 active features; timeOutOfCombat excluded (passive accumulation, inverse of timeInCombat)"
+  },
+  "scoring_notes": {
+    "method": "per-archetype average (not sum) so each archetype has equal ceiling of 1.0 regardless of feature count",
+    "timeOutOfCombat_excluded": true,
+    "timeOutOfCombat_reason": "Passive signal: accumulates for combat-intent players when no enemies are available. Redundant with timeInCombat (their sum = session time). Replaced by active exploration signals only.",
+    "centroids_require_regeneration": true,
+    "regeneration_steps": "Rerun notebooks 04 → 05 → 06 → 07 after this change to update cluster_centroids.json and anfis_mlp_weights.json"
   }
 }
