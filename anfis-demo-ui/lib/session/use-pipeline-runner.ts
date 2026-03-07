@@ -79,21 +79,31 @@ export function usePipelineRunner({
     const runSimulation = async (stepByStep: boolean = false) => {
         const inputs = validateInputs();
         if (!inputs) return;
-        
+
         const { userId, telemetry } = inputs;
+
+        // Capture previous run's output before starting new simulation
+        const prevOutput = pipelineState.output ?? null;
+        const prevCategories = pipelineState.behaviorCategories.length > 0
+            ? [...pipelineState.behaviorCategories]
+            : undefined;
+
         initSimulationState(stepByStep);
-    
+
         try {
             const startTime = performance.now();
             // Pass empty array for deathEvents because it's now inside telemetry
             const result = await executePipelineLogic(
                 userId, telemetry, [], lastRoundRef.current || undefined
             );
-            
+
             const executionTime = performance.now() - startTime;
             lastRoundRef.current = result.roundAnalytics;
-    
+
             const finalState = constructFinalState(pipelineState, result, executionTime);
+            // Attach previous run data for comparison
+            finalState.previousOutput = prevOutput;
+            finalState.previousCategories = prevCategories;
             setSimulationResult(finalState);
     
             await handleSimulationPlayback(stepByStep, result, finalState, executionTime);

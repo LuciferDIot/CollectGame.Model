@@ -359,4 +359,38 @@ export const METRIC_EXPLANATIONS: Record<string, EducationalContent> = {
     computed: 'Telemetry → Fuzzification → Soft Clustering → Neural Inference → Adaptation.',
     reading: 'Visualizes real-time decision flow.',
   },
+
+  // ─── BEGINNER EXPLAINERS ────────────────────────────────────────────────────
+
+  'how_normalization_works': {
+    title: 'How Normalization Works',
+    what: 'Normalization converts raw game measurements (kills, meters, damage) into values between 0 and 1. This is called Min-Max scaling.',
+    why: 'The AI cannot directly compare a kill count of 10 with a damage total of 850 — they live on completely different scales. Normalization puts all inputs on the same 0–1 playing field so the AI can weight them fairly.',
+    computed: 'Formula: normalized = (raw_value − training_minimum) ÷ (training_maximum − training_minimum).\n\nExample: 10 kills, range 0–50 → (10 − 0) ÷ 50 = 0.200\nExample: 800 damage, range 0–2000 → (800 − 0) ÷ 2000 = 0.400\n\nValues are then clamped to [0, 1] to handle extreme outliers.',
+    reading: '0.0 = minimum ever seen in training data (low activity).\n0.5 = about average.\n1.0 = maximum ever seen (exceptional).\nAmber-highlighted rows (> 0.80) indicate high activity in that category.',
+  },
+
+  'how_deltas_work': {
+    title: 'How Behavioral Deltas Work',
+    what: 'A delta (Δ) is the change in a player\'s archetype membership between two consecutive windows. It tells the AI whether behaviour is trending up or down.',
+    why: 'Without deltas, a player always at 70% Combat looks identical to one who just jumped from 50% to 70%. The delta reveals velocity — the AI can spot trends and adapt ahead of time, not just react to the current snapshot.',
+    computed: 'delta_combat = soft_combat_NOW − soft_combat_PREVIOUS\n\nExample:\n  Previous window: Combat 50%\n  Current window:  Combat 70%\n  Δ Combat = +20% → player is getting more aggressive!\n\nDeltas reset to 0 after a 90-second gap (session timeout).',
+    reading: 'Positive delta (+) → behaviour increasing this window.\nNegative delta (−) → behaviour decreasing.\nZero → consistent play style, no trend.\n\nLarger deltas trigger stronger parameter adjustments.',
+  },
+
+  'how_archetypes_differ': {
+    title: 'How the Three Archetypes Differ',
+    what: 'Players are classified as a blend of Combat Specialist, Resource Gatherer (Collection), and Explorer. Each archetype uses different signals and drives different parameter changes.',
+    why: 'A single difficulty scale fails all player types. Fighters need harder enemies; collectors need sparser items; explorers need fluid movement. Soft membership lets all three archetypes co-exist in one session.',
+    computed: 'K-Means clustering finds three centroids during training. At runtime, inverse-distance weighting from the current activity vector to each centroid produces three memberships that sum to 1.0.',
+    reading: 'All memberships sum to 100%. A player can be 60% Combat + 30% Explorer + 10% Collector simultaneously. The dominant archetype drives the largest parameter shift. Even 0%-archetype players receive 50% of the global adaptation as a baseline.',
+  },
+
+  'how_surrogate_model_works': {
+    title: 'What is the Surrogate Model?',
+    what: 'A small neural network (MLP) trained to replicate the ANFIS output. It takes archetype memberships and deltas as inputs and outputs a single difficulty multiplier.',
+    why: 'A full ANFIS is expensive to run in real time. The MLP surrogate was trained on synthetic data to mimic ANFIS with R²=0.94 accuracy, running in under 1ms instead of potentially hundreds.',
+    computed: 'Input: [soft_combat, soft_collect, soft_explore, Δcombat, Δcollect, Δexplore]\nHidden layers with ReLU activation → Linear output → clamp to [0.6, 1.4]',
+    reading: '> 1.0 = harder (enemies stronger, items fewer).\n< 1.0 = easier (enemies weaker, more items, better movement).\n= 1.0 = balanced, no change.',
+  },
 };

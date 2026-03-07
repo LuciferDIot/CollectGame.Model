@@ -10,6 +10,18 @@ export function ModelTab() {
 
   return (
     <div className="m-0 p-6 space-y-8 max-w-[1600px] mx-auto">
+      {/* Beginner Intro Banner */}
+      <div className="p-3 rounded-lg border border-violet-800/30 bg-violet-950/20 flex items-start gap-2.5">
+        <Info size={16} className="text-violet-400 shrink-0 mt-0.5" />
+        <div>
+          <p className="text-xs font-semibold text-violet-300 mb-0.5">What is this tab?</p>
+          <p className="text-[11px] text-slate-400 leading-relaxed">
+            This shows <span className="text-slate-300">how accurate the AI model is</span> and the technical details of how it was trained.
+            R² close to 1.0 means very accurate predictions. MAE (Mean Absolute Error) shows the average prediction mistake in multiplier units.
+          </p>
+        </div>
+      </div>
+
       <ExecutiveHealthPanel />
 
       <div className="border-t border-slate-700/50 pt-4 opacity-75 hover:opacity-100 transition-opacity">

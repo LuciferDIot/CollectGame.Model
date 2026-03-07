@@ -87,6 +87,13 @@ export interface PipelineState {
   };
   session?: SessionAnalytics;
   error?: string | null;
+  // Previous run data for window-to-window comparison
+  previousOutput?: {
+    adjustedMultiplier: number;
+    ruleActivations: any[];
+    confidence: number;
+  } | null;
+  previousCategories?: BehaviorCategory[];
 }
 
 export type Delta = {

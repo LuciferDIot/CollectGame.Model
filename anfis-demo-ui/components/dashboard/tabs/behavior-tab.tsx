@@ -31,6 +31,18 @@ export function BehaviorTab() {
 
   return (
     <div className="h-full flex flex-col p-6 space-y-2 max-w-[1800px] mx-auto">
+      {/* Beginner Intro Banner */}
+      <div className="p-3 rounded-lg border border-blue-800/30 bg-blue-950/20 flex items-start gap-2.5">
+        <Activity className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
+        <div>
+          <p className="text-xs font-semibold text-blue-300 mb-0.5">What is this tab?</p>
+          <p className="text-[11px] text-slate-400 leading-relaxed">
+            This shows <span className="text-slate-300">what the AI detected about how this player plays</span> —
+            which raw stats were measured, how they were turned into scores, and which fuzzy rules fired to classify the play style.
+          </p>
+        </div>
+      </div>
+
       {/* Header Section */}
       <div className="flex items-center justify-between pb-4 border-b border-slate-800">
         <div>

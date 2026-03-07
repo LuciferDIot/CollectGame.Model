@@ -28,6 +28,18 @@ export function ArchetypesTab() {
 
   return (
     <div className="m-0 p-6 space-y-8 max-w-[1600px] mx-auto">
+      {/* Beginner Intro Banner */}
+      <div className="p-3 rounded-lg border border-cyan-800/30 bg-cyan-950/20 flex items-start gap-2.5">
+        <GlobeLock className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
+        <div>
+          <p className="text-xs font-semibold text-cyan-300 mb-0.5">What is this tab?</p>
+          <p className="text-[11px] text-slate-400 leading-relaxed">
+            This shows <span className="text-slate-300">which player archetype the AI matched most</span> — Combat, Collection, or Exploration.
+            The radar chart visualises all three scores at once. A higher percentage means the player more closely fits that archetype.
+          </p>
+        </div>
+      </div>
+
       {/* Header Section */}
       <div className="flex items-center justify-between pb-4 border-b border-slate-800">
         <div>
@@ -115,13 +127,107 @@ export function ArchetypesTab() {
         </div>
       </div>
 
-      <MetricDetailModal 
+      {/* Archetype Comparison — always-visible reference table */}
+      <ArchetypeComparisonTable />
+
+      <MetricDetailModal
         isOpen={!!selectedMetric}
         onClose={() => setSelectedMetric(null)}
         metricKey={selectedMetric || ''}
-        currentValue="Definition" 
+        currentValue="Definition"
         status="neutral"
       />
+    </div>
+  );
+}
+
+// ─── Archetype Comparison Reference ──────────────────────────────────────────
+
+const ARCHETYPE_DATA = [
+  {
+    name: 'Combat',
+    color: 'border-rose-500/30 bg-rose-950/10',
+    titleColor: 'text-rose-400',
+    barColor: 'bg-rose-500',
+    emoji: '⚔️',
+    description: 'Fights enemies. High kills, hits, and damage.',
+    signals: ['enemiesHit', 'damageDone', 'timeInCombat', 'kills', 'damagePerHit (derived)'],
+    paramEffect: 'More enemies, tougher enemies, lower player HP/damage',
+    surrogateNote: 'Closest K-Means centroid: high combat scores, near-zero exploration.',
+  },
+  {
+    name: 'Collection',
+    color: 'border-amber-500/30 bg-amber-950/10',
+    titleColor: 'text-amber-400',
+    barColor: 'bg-amber-500',
+    emoji: '🎒',
+    description: 'Gathers items. High pickups and time near loot.',
+    signals: ['itemsCollected', 'pickupAttempts', 'timeNearInteractables', 'pickupAttemptRate (derived)'],
+    paramEffect: 'More collectibles, faster respawns, longer loot lifetime',
+    surrogateNote: 'Closest K-Means centroid: high collection scores, low combat.',
+  },
+  {
+    name: 'Exploration',
+    color: 'border-sky-500/30 bg-sky-950/10',
+    titleColor: 'text-sky-400',
+    barColor: 'bg-sky-500',
+    emoji: '🗺️',
+    description: 'Covers the map. High distance and sprint time.',
+    signals: ['distanceTraveled', 'timeSprinting'],
+    paramEffect: 'Better stamina regen, shorter dash cooldown',
+    surrogateNote: 'Closest K-Means centroid: high movement scores, low combat/collection.',
+  },
+];
+
+function ArchetypeComparisonTable() {
+  return (
+    <div className="rounded-xl border border-slate-700/40 bg-slate-900/20 overflow-hidden">
+      <div className="px-4 py-3 border-b border-slate-700/30 flex items-start justify-between gap-4">
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Archetype reference — how the AI tells them apart</p>
+          <p className="text-[11px] text-slate-500 mt-1">
+            Memberships are <span className="text-slate-400">not exclusive</span> — a player can be 60% Combat + 30% Explorer + 10% Collector at the same time.
+            All three always sum to 100%. The AI uses <span className="text-slate-400">K-Means soft clustering</span>: distance to each pre-trained centroid
+            determines how strongly you match each archetype.
+          </p>
+        </div>
+        <EducationalDrawer
+          contentKey="how_archetypes_differ"
+          trigger={<span className="text-[10px] text-cyan-600 hover:text-cyan-400 cursor-pointer underline underline-offset-2 decoration-dotted whitespace-nowrap shrink-0 mt-1">deep dive</span>}
+        />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-slate-700/30">
+        {ARCHETYPE_DATA.map((a) => (
+          <div key={a.name} className={`p-4 space-y-3 ${a.color}`}>
+            <div className="flex items-center gap-2">
+              <span className="text-lg">{a.emoji}</span>
+              <span className={`text-sm font-bold ${a.titleColor}`}>{a.name}</span>
+            </div>
+            <p className="text-[11px] text-slate-300">{a.description}</p>
+
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Signals the AI watches</p>
+              <ul className="space-y-0.5">
+                {a.signals.map((s) => (
+                  <li key={s} className="text-[11px] text-slate-400 flex items-center gap-1.5">
+                    <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${a.barColor}`} />
+                    {s}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Game effect when high</p>
+              <p className="text-[11px] text-slate-400">{a.paramEffect}</p>
+            </div>
+
+            <div className="pt-1 border-t border-slate-700/30">
+              <p className="text-[10px] text-slate-600 italic">{a.surrogateNote}</p>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
