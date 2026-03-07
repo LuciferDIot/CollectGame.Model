@@ -12,19 +12,19 @@ export function AdaptationTab() {
   const { pipelineState } = usePipeline();
   const { behaviorCategories, output } = pipelineState;
   const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
-  
+
   // Helper to get category specific multiplier
   const getCategoryFactor = (catName: string): number => {
     const cat = behaviorCategories.find(c => c.category === catName);
     const membership = cat?.softMembership ?? 0;
     const globalMult = output?.adjustedMultiplier ?? 1.0;
-    
+
     // REFINED LOGIC:
     // Always apply at least 50% of the global adaptation (Global Baseline).
     // Add membership influence on top (Archetype Specificity).
-    const weight = 0.5 + (membership * 1.5); 
+    const weight = 0.5 + (membership * 1.5);
     const delta = globalMult - 1.0;
-    
+
     return 1.0 + (delta * weight);
   };
 
@@ -35,7 +35,7 @@ export function AdaptationTab() {
   const openMetric = (key: string) => setSelectedMetric(key);
 
   return (
-    <div className="m-0 p-6 space-y-8 max-w-[1600px] mx-auto">
+    <div className="m-0 p-4 sm:p-5 space-y-6 w-full">
       {/* Beginner Intro Banner */}
       <div className="p-3 rounded-lg border border-amber-800/30 bg-amber-950/20 flex items-start gap-2.5">
         <History className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
@@ -61,7 +61,7 @@ export function AdaptationTab() {
           <h2 className="text-lg font-bold text-slate-100 uppercase tracking-tight flex items-center gap-2">
             <History className="w-5 h-5 text-blue-400" />
             Adaptation calculation
-            <EducationalDrawer 
+            <EducationalDrawer
               contentKey="anfis_pipeline_overview"
               trigger={<span className="ml-2 px-1.5 py-0.5 rounded border border-blue-500/30 bg-blue-500/10 text-[10px] text-blue-300 cursor-help hover:bg-blue-500/20 transition-colors uppercase tracking-widest font-mono">Info</span>}
             />
@@ -73,134 +73,134 @@ export function AdaptationTab() {
       </div>
       <div className="flex flex-col gap-6">
         <div className="flex items-center gap-2 text-slate-400 mb-1">
-        <SeparatorVertical className="w-3.5 h-3.5" />
-        <EducationalDrawer
-          contentKey="input_normalization"
-          trigger={
-            <span className="text-xs font-bold uppercase tracking-wider font-mono cursor-help hover:text-blue-400 transition-colors border-b border-dotted border-slate-600">
-              Parameter Adaptation
-            </span>
-          }
-        />
+          <SeparatorVertical className="w-3.5 h-3.5" />
+          <EducationalDrawer
+            contentKey="input_normalization"
+            trigger={
+              <span className="text-xs font-bold uppercase tracking-wider font-mono cursor-help hover:text-blue-400 transition-colors border-b border-dotted border-slate-600">
+                Parameter Adaptation
+              </span>
+            }
+          />
         </div>
 
         {/* COLLECTION PARAMETERS */}
-        <ParameterCard 
+        <ParameterCard
           title="Collection Parameters"
           color="collection"
         >
-            <ParameterRow 
-             name="collectible count" 
-             base={120.0} 
-             final={120.0 * collectionFactor} 
-             format="0.00"
-             onClick={() => openMetric('resource_density')}
-             dark
-           />
-           <ParameterRow 
-             name="collectible spawn interval" 
-             base={40.0} 
-             final={40.0 * (2 - collectionFactor)} 
-             format="0.00"
-             onClick={() => openMetric('resource_respawn_rate')}
-             dark
-           />
-            <ParameterRow 
-             name="collectible lifetime" 
-             base={30.0} 
-             final={30.0 * collectionFactor} 
-             format="0.00"
-             onClick={() => openMetric('resource_availability_window')}
-             dark
-           />
+          <ParameterRow
+            name="collectible count"
+            base={120.0}
+            final={120.0 * collectionFactor}
+            format="0.00"
+            onClick={() => openMetric('resource_density')}
+            dark
+          />
+          <ParameterRow
+            name="collectible spawn interval"
+            base={40.0}
+            final={40.0 * (2 - collectionFactor)}
+            format="0.00"
+            onClick={() => openMetric('resource_respawn_rate')}
+            dark
+          />
+          <ParameterRow
+            name="collectible lifetime"
+            base={30.0}
+            final={30.0 * collectionFactor}
+            format="0.00"
+            onClick={() => openMetric('resource_availability_window')}
+            dark
+          />
         </ParameterCard>
-    
+
         {/* EXPLORATION PARAMETERS */}
-        <ParameterCard 
+        <ParameterCard
           title="Exploration Parameters"
           color="exploration"
         >
-            <ParameterRow 
-             name="stamina regen" 
-             base={12.0} 
-             final={12.0 * (1/explorationFactor)} 
-             format="0.00"
-             onClick={() => openMetric('stamina_recovery_dynamics')}
-             dark
-           />
-             <ParameterRow 
-             name="dash cooldown" 
-             base={3.0} 
-             final={3.0 * (2 - explorationFactor)} 
-             format="0.00"
-             onClick={() => openMetric('movement_fluidity')}
-             dark
-           />
+          <ParameterRow
+            name="stamina regen"
+            base={12.0}
+            final={12.0 * (1 / explorationFactor)}
+            format="0.00"
+            onClick={() => openMetric('stamina_recovery_dynamics')}
+            dark
+          />
+          <ParameterRow
+            name="dash cooldown"
+            base={3.0}
+            final={3.0 * (2 - explorationFactor)}
+            format="0.00"
+            onClick={() => openMetric('movement_fluidity')}
+            dark
+          />
         </ParameterCard>
 
-        
+
 
         {/* COMBAT PARAMETERS */}
-        <ParameterCard 
+        <ParameterCard
           title="Combat Parameters"
           color="combat"
         >
-           <ParameterRow 
-             name="enemy spawn interval" 
-             base={40.0} 
-             final={40.0 * (2 - combatFactor)} 
-             format="0.00"
-             onClick={() => openMetric('combat_parameter_adaptation')}
-             dark
-           />
-           <ParameterRow 
-             name="global enemy cap" 
-             base={35.0} 
-             final={35.0 * combatFactor} 
-             format="0.00"
-             onClick={() => openMetric('global_cap_adaptation')}
-             dark
-           />
-           <ParameterRow 
-             name="enemy damage intensity" 
-             base={10.0} 
-             final={10.0 * combatFactor} 
-             format="0.00"
-             onClick={() => openMetric('combat_intensity')}
-             dark
-           />
-            <ParameterRow 
-             name="enemy max health" 
-             base={100.0} 
-             final={100.0 * combatFactor} 
-             format="0.00"
-             onClick={() => openMetric('combat_health_scaling')}
-             dark
-           />
-           <ParameterRow 
-             name="stamina damage" 
-             base={5.0} 
-             final={5.0 * combatFactor} 
-             format="0.00"
-             onClick={() => openMetric('stamina_penalty')}
-             dark
-           />
-            <ParameterRow 
-             name="player damage intensity" 
-             base={16.0} 
-             final={16.0 * (1/combatFactor)} 
-             format="0.00"
-             onClick={() => openMetric('player_power_scaling')}
-             dark
-           />
-             <ParameterRow 
-             name="player max health" 
-             base={180.0} 
-             final={180.0 * (1/combatFactor)} 
-             format="0.00"
-             onClick={() => openMetric('player_resilience')}
-             dark
-           />
+          <ParameterRow
+            name="enemy spawn interval"
+            base={40.0}
+            final={40.0 * (2 - combatFactor)}
+            format="0.00"
+            onClick={() => openMetric('combat_parameter_adaptation')}
+            dark
+          />
+          <ParameterRow
+            name="global enemy cap"
+            base={35.0}
+            final={35.0 * combatFactor}
+            format="0.00"
+            onClick={() => openMetric('global_cap_adaptation')}
+            dark
+          />
+          <ParameterRow
+            name="enemy damage intensity"
+            base={10.0}
+            final={10.0 * combatFactor}
+            format="0.00"
+            onClick={() => openMetric('combat_intensity')}
+            dark
+          />
+          <ParameterRow
+            name="enemy max health"
+            base={100.0}
+            final={100.0 * combatFactor}
+            format="0.00"
+            onClick={() => openMetric('combat_health_scaling')}
+            dark
+          />
+          <ParameterRow
+            name="stamina damage"
+            base={5.0}
+            final={5.0 * combatFactor}
+            format="0.00"
+            onClick={() => openMetric('stamina_penalty')}
+            dark
+          />
+          <ParameterRow
+            name="player damage intensity"
+            base={16.0}
+            final={16.0 * (1 / combatFactor)}
+            format="0.00"
+            onClick={() => openMetric('player_power_scaling')}
+            dark
+          />
+          <ParameterRow
+            name="player max health"
+            base={180.0}
+            final={180.0 * (1 / combatFactor)}
+            format="0.00"
+            onClick={() => openMetric('player_resilience')}
+            dark
+          />
         </ParameterCard>
 
       </div>
@@ -235,16 +235,16 @@ export function AdaptationTab() {
         </div>
       </div>
 
-       <div className="flex justify-center pt-4 opacity-20">
-          <SlidersHorizontal className="w-5 h-5 text-slate-600" />
-       </div>
+      <div className="flex justify-center pt-4 opacity-20">
+        <SlidersHorizontal className="w-5 h-5 text-slate-600" />
+      </div>
 
       {/* Shared Metric Modal for Deep Dives */}
-      <MetricDetailModal 
+      <MetricDetailModal
         isOpen={!!selectedMetric}
         onClose={() => setSelectedMetric(null)}
-        metricKey={selectedMetric || 'adaptive_parameter_tuning'} 
-        currentValue="Dynamic" 
+        metricKey={selectedMetric || 'adaptive_parameter_tuning'}
+        currentValue="Dynamic"
         status="neutral"
       />
     </div>
@@ -252,71 +252,71 @@ export function AdaptationTab() {
 }
 
 function ParameterCard({ title, children, color }: { title: string, children: React.ReactNode, color: 'combat' | 'collection' | 'exploration' }) {
-    const borderColor = color === 'combat' ? 'border-rose-500/20' : color === 'collection' ? 'border-amber-500/20' : 'border-sky-500/20';
-    const bgGradient = 'bg-gradient-to-b from-[#161b2c] to-[#0f111a]'; // Subtle gradient for depth
-    const titleColor = color === 'combat' ? 'text-rose-400' : color === 'collection' ? 'text-amber-400' : 'text-sky-400';
-    const glowColor = color === 'combat' ? 'shadow-rose-900/10' : color === 'collection' ? 'shadow-amber-900/10' : 'shadow-sky-900/10';
-    const bulletColor = color === 'combat' ? 'text-rose-500' : color === 'collection' ? 'text-amber-500' : 'text-sky-500';
+  const borderColor = color === 'combat' ? 'border-rose-500/20' : color === 'collection' ? 'border-amber-500/20' : 'border-sky-500/20';
+  const bgGradient = 'bg-gradient-to-b from-[#161b2c] to-[#0f111a]'; // Subtle gradient for depth
+  const titleColor = color === 'combat' ? 'text-rose-400' : color === 'collection' ? 'text-amber-400' : 'text-sky-400';
+  const glowColor = color === 'combat' ? 'shadow-rose-900/10' : color === 'collection' ? 'shadow-amber-900/10' : 'shadow-sky-900/10';
+  const bulletColor = color === 'combat' ? 'text-rose-500' : color === 'collection' ? 'text-amber-500' : 'text-sky-500';
 
-    return (
-        <div className={cn("rounded-xl border p-6 shadow-xl backdrop-blur-sm", bgGradient, borderColor, glowColor)}>
-            <h4 className={cn("text-base font-bold mb-6 tracking-tight flex items-center gap-2", titleColor)}>
-               <span className={cn("text-xl leading-none", bulletColor)}>•</span>
-               {title}
-            </h4>
-            <div className="space-y-5">
-                {children}
-            </div>
-        </div>
-    )
+  return (
+    <div className={cn("rounded-xl border p-6 shadow-xl backdrop-blur-sm", bgGradient, borderColor, glowColor)}>
+      <h4 className={cn("text-base font-bold mb-6 tracking-tight flex items-center gap-2", titleColor)}>
+        <span className={cn("text-xl leading-none", bulletColor)}>•</span>
+        {title}
+      </h4>
+      <div className="space-y-5">
+        {children}
+      </div>
+    </div>
+  )
 }
 
-function ParameterRow({ name, base, final, format="0.00", dark, onClick }: any) {
-    const percentChange = ((final - base) / base) * 100;
-    const isGain = percentChange > 0;
-    const isNeutral = Math.abs(percentChange) < 0.01;
+function ParameterRow({ name, base, final, format = "0.00", dark, onClick }: any) {
+  const percentChange = ((final - base) / base) * 100;
+  const isGain = percentChange > 0;
+  const isNeutral = Math.abs(percentChange) < 0.01;
 
-    return (
-        <div 
-            onClick={onClick}
-            className="flex items-center justify-between group py-1 cursor-pointer hover:bg-white/5 rounded pl-2 pr-1 transition-colors -ml-2"
-        >
-            <div className="space-y-1.5 point-events-none">
-                <div className="text-[13px] font-medium text-slate-300 group-hover:text-blue-200 transition-colors tracking-wide underline-offset-2 group-hover:underline decoration-dotted decoration-slate-600">
-                    {name}
-                </div>
-                <div className="font-mono text-[11px] text-slate-500 flex items-center gap-2">
-                    <span className="opacity-60">Base:</span> 
-                    <span className="text-slate-400">{base.toFixed(2)}</span> 
-                    <span className="text-slate-600">→</span> 
-                    <span className="opacity-60">Final:</span>
-                    <span className="text-slate-200 font-bold bg-white/5 px-1.5 rounded">{final.toFixed(2)}</span>
-                </div>
-            </div>
-            
-            {!isNeutral && (
-                <div className={cn(
-                    "px-2.5 py-1 rounded-md text-[11px] font-bold font-mono min-w-[3.5rem] text-center shadow-sm border border-transparent",
-                    isGain ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-rose-500/10 text-rose-400 border-rose-500/20"
-                )}>
-                    {isGain ? '+' : ''}{percentChange.toFixed(1)}%
-                </div>
-            )}
-            {isNeutral && (
-                <div className="px-2.5 py-1 rounded-md text-[11px] font-bold font-mono min-w-[3.5rem] text-center shadow-sm border border-slate-700/50 bg-slate-800/40 text-slate-500">
-                    0.0%
-                </div>
-            )}
+  return (
+    <div
+      onClick={onClick}
+      className="flex items-center justify-between group py-1 cursor-pointer hover:bg-white/5 rounded pl-2 pr-1 transition-colors -ml-2"
+    >
+      <div className="space-y-1.5 point-events-none">
+        <div className="text-[13px] font-medium text-slate-300 group-hover:text-blue-200 transition-colors tracking-wide underline-offset-2 group-hover:underline decoration-dotted decoration-slate-600">
+          {name}
         </div>
-    )
+        <div className="font-mono text-[11px] text-slate-500 flex items-center gap-2">
+          <span className="opacity-60">Base:</span>
+          <span className="text-slate-400">{base.toFixed(2)}</span>
+          <span className="text-slate-600">→</span>
+          <span className="opacity-60">Final:</span>
+          <span className="text-slate-200 font-bold bg-white/5 px-1.5 rounded">{final.toFixed(2)}</span>
+        </div>
+      </div>
+
+      {!isNeutral && (
+        <div className={cn(
+          "px-2.5 py-1 rounded-md text-[11px] font-bold font-mono min-w-14 text-center shadow-sm border border-transparent",
+          isGain ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-rose-500/10 text-rose-400 border-rose-500/20"
+        )}>
+          {isGain ? '+' : ''}{percentChange.toFixed(1)}%
+        </div>
+      )}
+      {isNeutral && (
+        <div className="px-2.5 py-1 rounded-md text-[11px] font-bold font-mono min-w-14 text-center shadow-sm border border-slate-700/50 bg-slate-800/40 text-slate-500">
+          0.0%
+        </div>
+      )}
+    </div>
+  )
 }
 
 // ─── Window-to-Window Comparison Panel ───────────────────────────────────────
 
 const CATEGORY_REASONS: Record<string, { up: string; down: string }> = {
-  Combat:      { up: 'More fighting detected → combat difficulty increased.',     down: 'Less fighting detected → combat difficulty eased.' },
-  Collection:  { up: 'More collecting detected → item availability increased.',   down: 'Less collecting detected → item spawns reduced.' },
-  Exploration: { up: 'More exploration detected → movement rewards boosted.',     down: 'Less exploration detected → movement bonuses reduced.' },
+  Combat: { up: 'More fighting detected → combat difficulty increased.', down: 'Less fighting detected → combat difficulty eased.' },
+  Collection: { up: 'More collecting detected → item availability increased.', down: 'Less collecting detected → item spawns reduced.' },
+  Exploration: { up: 'More exploration detected → movement rewards boosted.', down: 'Less exploration detected → movement bonuses reduced.' },
 };
 
 function WindowComparison({
@@ -363,8 +363,8 @@ function WindowComparison({
             {Math.abs(multDelta) < 0.001
               ? 'No change from last window — play style was consistent.'
               : multDelta > 0
-              ? `Increased by ${multDeltaPct}% — the AI is making the game harder this window.`
-              : `Decreased by ${multDeltaPct}% — the AI is easing difficulty this window.`}
+                ? `Increased by ${multDeltaPct}% — the AI is making the game harder this window.`
+                : `Decreased by ${multDeltaPct}% — the AI is easing difficulty this window.`}
           </p>
         </div>
         <MultiplierDeltaBadge prev={multPrev} curr={multNow} />
@@ -385,7 +385,7 @@ function WindowComparison({
                 <div className="flex items-center gap-2 mb-0.5">
                   <span className={cn('text-xs font-bold',
                     cat.category === 'Combat' ? 'text-rose-400' :
-                    cat.category === 'Collection' ? 'text-amber-400' : 'text-sky-400'
+                      cat.category === 'Collection' ? 'text-amber-400' : 'text-sky-400'
                   )}>{cat.category}</span>
                   <DeltaChip delta={delta} />
                 </div>

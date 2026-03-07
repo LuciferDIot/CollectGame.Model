@@ -23,31 +23,31 @@ function StepStatusIcon({ status, stepId }: { status: string, stepId: string }) 
 
     return (
         <div className={`${baseClasses} ${colorClasses}`}>
-            {isRunning ? <Cpu className="w-4 h-4 animate-spin" /> : 
-             isCompleted ? <CheckCircle2 className="w-4 h-4" /> :
-             hasError ? <AlertCircle className="w-4 h-4" /> :
-             STEP_ICONS[stepId]}
+            {isRunning ? <Cpu className="w-4 h-4 animate-spin" /> :
+                isCompleted ? <CheckCircle2 className="w-4 h-4" /> :
+                    hasError ? <AlertCircle className="w-4 h-4" /> :
+                        STEP_ICONS[stepId]}
         </div>
     );
 }
 
-function StepHeader({ 
-    name, 
-    status, 
-    isExpanded, 
-    hasOutput, 
-    contentKey, 
-    onToggle 
-}: { 
-    name: string, 
-    status: string, 
-    isExpanded: boolean, 
-    hasOutput: boolean, 
-    contentKey?: string, 
-    onToggle: () => void 
+function StepHeader({
+    name,
+    status,
+    isExpanded,
+    hasOutput,
+    contentKey,
+    onToggle
+}: {
+    name: string,
+    status: string,
+    isExpanded: boolean,
+    hasOutput: boolean,
+    contentKey?: string,
+    onToggle: () => void
 }) {
     const isRunning = status === 'running';
-    
+
     return (
         <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -55,7 +55,7 @@ function StepHeader({
                     {name}
                 </h3>
                 <div onClick={(e) => e.stopPropagation()}>
-                    <EducationalDrawer 
+                    <EducationalDrawer
                         contentKey={contentKey || ''}
                         trigger={
                             <div className="opacity-0 group-hover/card:opacity-100 transition-opacity p-1 hover:bg-accent/20 rounded text-muted-foreground hover:text-primary cursor-help">
@@ -65,14 +65,14 @@ function StepHeader({
                     />
                 </div>
             </div>
-            
-            <div className="flex items-center gap-2">
+
+            <div className="flex items-center gap-1.5 sm:gap-2">
                 {hasOutput && (
-                    <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">
-                        Data Ready
+                    <span className="text-[9px] sm:text-[10px] font-mono text-muted-foreground uppercase tracking-wider whitespace-nowrap overflow-hidden text-ellipsis max-w-[50px] xs:max-w-none">
+                        Ready
                     </span>
                 )}
-                {isExpanded ? <ChevronDown className="w-3 h-3 text-muted-foreground" /> : <ChevronRight className="w-3 h-3 text-muted-foreground" />}
+                {isExpanded ? <ChevronDown className="w-3 h-3 text-muted-foreground shrink-0" /> : <ChevronRight className="w-3 h-3 text-muted-foreground shrink-0" />}
             </div>
         </div>
     );
@@ -84,42 +84,42 @@ export function PipelineStepItem({ step, index, isLast }: { step: any, index: nu
     const [isExpanded, setIsExpanded] = useState(false);
     const isCompleted = step.status === 'completed';
     const isRunning = step.status === 'running';
-    
+
     // Auto-expand interesting steps when completed
     useEffect(() => {
         if (isCompleted && ['3', '5', '6', '7'].includes(step.id)) {
-             setIsExpanded(true);
+            setIsExpanded(true);
         }
     }, [isCompleted, step.id]);
 
     const contentKey = STEP_CONTENT_KEYS[step.id];
 
     return (
-        <motion.div 
-            initial={{ opacity: 0, x: -20 }}
+        <motion.div
+            initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.3 }}
-            className="relative pl-8"
+            className="relative pl-7 sm:pl-8"
         >
-            {!isLast && <div className="absolute left-[15px] top-8 bottom-[-16px] w-px bg-border/30" />}
+            {!isLast && <div className="absolute left-[14px] sm:left-[15px] top-8 bottom-[-16px] w-px bg-border/30" />}
 
             <StepStatusIcon status={step.status} stepId={step.id} />
 
-            <div 
+            <div
                 onClick={() => setIsExpanded(!isExpanded)}
                 className={`rounded-lg border p-3 cursor-pointer transition-all duration-200 group/card ${getCardBackgroundClasses(isRunning)}`}>
-                <StepHeader 
-                    name={step.name} 
-                    status={step.status} 
-                    isExpanded={isExpanded} 
-                    hasOutput={!!step.output} 
+                <StepHeader
+                    name={step.name}
+                    status={step.status}
+                    isExpanded={isExpanded}
+                    hasOutput={!!step.output}
                     contentKey={contentKey}
                     onToggle={() => setIsExpanded(!isExpanded)}
                 />
-                
+
                 <AnimatePresence>
                     {isExpanded && (
-                        <motion.div 
+                        <motion.div
                             initial={{ height: 0, opacity: 0 }}
                             animate={{ height: 'auto', opacity: 1 }}
                             exit={{ height: 0, opacity: 0 }}
@@ -127,14 +127,14 @@ export function PipelineStepItem({ step, index, isLast }: { step: any, index: nu
                         >
                             <div className="mt-3 pt-3 border-t border-border/30 space-y-3">
                                 <p className="text-xs text-muted-foreground italic mb-2">{step.description}</p>
-                                
+
                                 {step.input && (
                                     <div className="mb-4">
                                         <div className="text-[11px] font-bold text-muted-foreground/80 uppercase tracking-wider mb-2.5 flex items-center gap-2">
                                             <ArrowDown className="w-3.5 h-3.5" /> Input Data
                                         </div>
                                         <div className="bg-card/30 rounded-md border border-border/30 p-3">
-                                           <PipelineStepDetails step={step} details={step.input} isInput={true} />
+                                            <PipelineStepDetails step={step} details={step.input} isInput={true} />
                                         </div>
                                     </div>
                                 )}

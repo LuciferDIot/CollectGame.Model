@@ -35,6 +35,7 @@ export class ANFISPipeline {
   private mlp: MLPInference;
   private sessionManager: PipelineSessionManager;
   private manifest: DeploymentManifest;
+  private mlpNeutral: number;
 
   constructor(
     scalerParams: ScalerParams,
@@ -47,6 +48,9 @@ export class ANFISPipeline {
     this.mlp = new MLPInference(mlpWeights);
     this.sessionManager = new PipelineSessionManager();
     this.manifest = manifest;
+    // Neutral baseline: MLP output for balanced (⅓,⅓,⅓) no-delta input.
+    // Stored in anfis_mlp_weights.json; auto-updated by notebook 07 after each retrain.
+    this.mlpNeutral = mlpWeights.mlp_neutral ?? 0.932;
   }
 
   /**
@@ -247,15 +251,39 @@ export class ANFISPipeline {
   }
 
   /**
-   * Helper: Safety Clamping
-   * Ensures the Multiplier adheres to the deployment manifest constraints.
+   * Helper: Safety Clamping + Output Rescaling
+   *
+   * WHY RESCALING IS NEEDED:
+   * The MLP surrogate was trained on ANFIS outputs that fell in the range
+   * [0.535, 0.976] — the training dataset only contained sessions where the
+   * AI recommended "easier" adjustments. Without rescaling the MLP always
+   * produces values below 1.0 (always "easier"), and the full [0.6, 1.4]
+   * deployment range is never reached.
+   *
+   * The rescaling linearly maps the empirical MLP output range → deployment
+   * range so that:
+   *   MLP min (0.535) → deployment min (0.6)   — maximum easier
+   * Neutral-centred mapping:
+   *   raw == mlp_neutral  → 1.0  (no change)
+   *   raw >  mlp_neutral  → harder  (amplified by AMPLIFICATION)
+   *   raw <  mlp_neutral  → easier  (amplified by AMPLIFICATION)
+   *
+   * mlp_neutral is stored in anfis_mlp_weights.json and auto-updated by
+   * notebook 07 after each retrain — no code changes needed.
+   * AMPLIFICATION is a fixed design constant (±0.4 raw → ±0.8 display).
    */
   private computeTargetMultiplier(rawOutput: number): { targetMultiplier: number; multiplierClamped: boolean } {
     const [minM, maxM] = this.manifest.hard_constraints.target_multiplier_range;
-    const targetMultiplier = Math.max(minM, Math.min(maxM, rawOutput));
+
+    // Amplification: how much a 1-unit deviation from neutral shifts the display.
+    // 2.0 means raw±0.4 from neutral → display±0.8 (reaching the 0.6–1.4 extremes).
+    const AMPLIFICATION = 2.0;
+    const rescaled = 1.0 + (rawOutput - this.mlpNeutral) * AMPLIFICATION;
+
+    const targetMultiplier = Math.max(minM, Math.min(maxM, rescaled));
     return {
       targetMultiplier,
-      multiplierClamped: rawOutput !== targetMultiplier
+      multiplierClamped: rescaled !== targetMultiplier
     };
   }
 

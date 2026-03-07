@@ -14,130 +14,132 @@ export function CenterPanel() {
   const scrollRef = useAutoScroll([pipelineState.steps.length, pipelineState.executionTime]);
 
   return (
-    <div className="h-full flex flex-col bg-background/60 backdrop-blur-lg border-r border-border relative overflow-hidden">
-      {/* Background Grid Pattern */}
-      <div className="absolute inset-0 bg-size-[50px_50px] opacity-[0.03] pointer-events-none"
-           style={{ backgroundImage: 'linear-gradient(to right, var(--primary) 1px, transparent 1px), linear-gradient(to bottom, var(--primary) 1px, transparent 1px)' }} 
+    <div className="h-full flex flex-col glass-panel border-r border-border/30 relative overflow-hidden">
+      {/* Dynamic Background Grid */}
+      <div className="absolute inset-0 bg-size-[60px_60px] opacity-[0.05] pointer-events-none"
+        style={{ backgroundImage: 'linear-gradient(to right, oklch(0.72 0.14 210) 1px, transparent 1px), linear-gradient(to bottom, oklch(0.72 0.14 210) 1px, transparent 1px)' }}
       />
-      
-      {/* Header */}
-      <div className="h-12 border-b border-border bg-background/40 backdrop-blur-md flex items-center px-4 justify-between shrink-0 z-10">
-        <div className="flex items-center gap-2">
-            <Cpu className="w-4 h-4 text-primary" />
-            <span className="text-sm font-semibold text-foreground/90 tracking-tight">Pipeline Execution</span>
+
+      {/* Premium Header */}
+      <div className="h-14 border-b border-white/5 bg-background/20 backdrop-blur-xl flex items-center px-6 justify-between shrink-0 z-10">
+        <div className="flex items-center gap-3">
+          <div className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-20"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+          </div>
+          <span className="text-[10px] font-black text-foreground uppercase tracking-[0.25em]">
+            Pipeline Sequence
+          </span>
         </div>
-        <div className="text-xs font-mono text-muted-foreground/60">
-             {pipelineState.isRunning ? (
-                 <span className="text-emerald-400 flex items-center gap-1.5">
-                    <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                    </span>
-                    RUNNING
-                 </span>
-             ) : (
-                 <span className="text-slate-600">IDLE</span>
-             )}
-             {pipelineState.executionTime > 0 && (
-                 <span className="ml-3 text-cyan-600 border-l border-slate-800 pl-3">
-                     {pipelineState.executionTime.toFixed(1)}ms
-                 </span>
-             )}
+        <div className="flex items-center gap-4">
+          <div className="text-[10px] font-mono font-bold text-muted-foreground/40 uppercase tracking-widest flex items-center gap-2">
+            {pipelineState.isRunning ? (
+              <span className="text-primary flex items-center gap-2 animate-pulse">
+                ACTIVE_STREAM
+              </span>
+            ) : (
+              <span className="opacity-50">STDBY_MODE</span>
+            )}
+            {pipelineState.executionTime > 0 && (
+              <span className="text-accent border-l border-white/10 pl-4">
+                {pipelineState.executionTime.toFixed(2)}ms
+              </span>
+            )}
+          </div>
         </div>
       </div>
 
       {/* Steps List */}
-      <ScrollArea className="flex-1 basis-0 min-h-0 w-full relative" ref={scrollRef} type="always">
-          <div className="p-6 space-y-4 min-h-full pb-20 relative z-10">
-            {/* Decorative Connection Line */}
-            <div className="absolute left-[29px] top-6 bottom-20 w-px bg-border/30 -z-10 shadow-[0_0_10px_rgba(var(--primary-rgb),0.05)]" />
+      <ScrollArea className="flex-1 basis-0 min-h-0 w-full relative custom-scrollbar" ref={scrollRef} type="always">
+        <div className="p-8 space-y-6 min-h-full pb-24 relative z-10 max-w-4xl mx-auto">
+          {/* Decorative Connection Line */}
+          <div className="absolute left-[39px] top-8 bottom-24 w-px bg-linear-to-b from-primary/30 via-accent/20 to-transparent -z-10" />
 
-            <AnimatePresence mode='popLayout'>
-                {pipelineState.steps.map((step, index) => (
-                    <PipelineStepItem 
-                        key={step.id} 
-                        step={step} 
-                        index={index} 
-                        isLast={index === pipelineState.steps.length - 1} 
-                    />
-                ))}
-            </AnimatePresence>
-            
-            {pipelineState.steps.length === 0 && (
-                <div className="flex flex-col gap-6 mt-6 px-2 select-none">
-                    {/* Branding Header */}
-                    <div className="flex flex-col items-center gap-3 py-4 opacity-60">
-                        <div className="w-16 h-16 rounded-full border border-slate-800 flex items-center justify-center relative">
-                            <div className="absolute inset-0 border border-slate-800 rounded-full animate-[spin_10s_linear_infinite]" />
-                            <BrainCircuit className="w-8 h-8 text-slate-700" />
-                        </div>
-                        <p className="text-xs text-slate-600 uppercase tracking-[0.2em] font-bold">How to Use</p>
-                    </div>
+          <AnimatePresence mode='popLayout'>
+            {pipelineState.steps.map((step, index) => (
+              <PipelineStepItem
+                key={step.id}
+                step={step}
+                index={index}
+                isLast={index === pipelineState.steps.length - 1}
+              />
+            ))}
+          </AnimatePresence>
 
-                    {/* Step-by-Step Tutorial Cards */}
-                    <div className="flex flex-col gap-3">
-                        <TutorialStep
-                            number={1}
-                            icon={<FileJson className="w-4 h-4 text-cyan-400" />}
-                            title="Paste game telemetry data"
-                            description='In the left panel, paste a JSON object with stats from one play session — kills, damage, distance, items collected, etc.'
-                            color="cyan"
-                        />
-                        <TutorialStep
-                            number={2}
-                            icon={<PlayCircle className="w-4 h-4 text-emerald-400" />}
-                            title="Click Run Simulation"
-                            description="Press the Run button to send the data through the AI pipeline. You will see each processing step appear here in real time."
-                            color="emerald"
-                        />
-                        <TutorialStep
-                            number={3}
-                            icon={<BrainCircuit className="w-4 h-4 text-violet-400" />}
-                            title="Watch the AI think"
-                            description="The pipeline normalizes the data, classifies the play style (Combat / Collection / Exploration), and calculates a difficulty adjustment."
-                            color="violet"
-                        />
-                        <TutorialStep
-                            number={4}
-                            icon={<BarChart3 className="w-4 h-4 text-amber-400" />}
-                            title="Open Analytics to see results"
-                            description='Click the "Analytics" button (top-right) to see a plain-English summary, charts, and exactly which game settings the AI changed.'
-                            color="amber"
-                        />
-                        <TutorialStep
-                            number={5}
-                            icon={<Zap className="w-4 h-4 text-rose-400" />}
-                            title="Run again to see comparisons"
-                            description="Submit a second round to see how the AI adapts. The Adaptation tab will show what changed versus the previous window and why."
-                            color="rose"
-                        />
-                    </div>
-
-                    {/* What is this system? */}
-                    <div className="border border-slate-800/60 rounded-lg p-4 bg-slate-900/20 mt-2">
-                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">What is this?</p>
-                        <p className="text-xs text-slate-500 leading-relaxed">
-                            This is an <span className="text-slate-400 font-medium">ANFIS-based Adaptive Difficulty System</span>.
-                            It watches how a player behaves in the game and automatically adjusts parameters —
-                            like enemy count, item spawns, and stamina — to keep the experience fun and challenging for that specific player.
-                        </p>
-                    </div>
+          {pipelineState.steps.length === 0 && (
+            <div className="flex flex-col gap-8 mt-4 px-2 select-none animate-fade-in">
+              {/* Branding Header */}
+              <div className="flex flex-col items-center gap-4 py-6">
+                <div className="w-20 h-20 rounded-2xl tech-border flex items-center justify-center relative bg-primary/5">
+                  <div className="absolute inset-0 border border-primary/20 rounded-2xl animate-[spin_12s_linear_infinite] opacity-30" />
+                  <BrainCircuit className="w-10 h-10 text-primary drop-shadow-[0_0_15px_rgba(var(--primary-rgb),0.4)]" />
                 </div>
-            )}
-          </div>
+                <div className="text-center">
+                  <p className="text-[10px] text-primary font-black uppercase tracking-[0.4em] mb-1">Deployment Guide</p>
+                  <p className="text-[11px] text-muted-foreground/60 italic font-serif">Follow the sequence to initialize AURA</p>
+                </div>
+              </div>
+
+              {/* Step-by-Step Tutorial cards with enhanced glass effect */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <TutorialStep
+                  number={1}
+                  icon={<FileJson className="w-5 h-5 text-chart-1" />}
+                  title="Ingest Telemetry"
+                  description='Paste JSON-formatted player behavioral data into the source console.'
+                  color="cyan"
+                />
+                <TutorialStep
+                  number={2}
+                  icon={<PlayCircle className="w-5 h-5 text-chart-3" />}
+                  title="Start Simulation"
+                  description="Execute the pipeline to begin the multi-stage fuzzy inference process."
+                  color="emerald"
+                />
+                <TutorialStep
+                  number={3}
+                  icon={<BrainCircuit className="w-5 h-5 text-chart-2" />}
+                  title="Analyze Logic"
+                  description="Observe real-time clustering, rule activations, and parameter adaptation."
+                  color="violet"
+                />
+                <TutorialStep
+                  number={4}
+                  icon={<BarChart3 className="w-5 h-5 text-chart-4" />}
+                  title="Review Console"
+                  description='Examine performance deltas and system transparency in the Analytics view.'
+                  color="amber"
+                />
+              </div>
+
+              {/* System Summary */}
+              <div className="border border-white/5 rounded-2xl p-6 bg-secondary/20 backdrop-blur-sm relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-3xl" />
+                <p className="text-[10px] font-black text-muted-foreground/40 uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
+                  <Zap size={12} className="text-primary" />
+                  System Architecture
+                </p>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  AURA utilizes an <span className="text-foreground font-bold">ANFIS-based Inference Engine</span> to bridge high-resolution gameplay telemetry with low-latency parameter adaptation. By mapping behavioral archetypes through soft-clustering, the system facilitates dynamic, personalized challenge scaling without sacrificing gameplay cohesion.
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
       </ScrollArea>
-      
-      {/* Decorative HUD Corners */}
-      <div className="absolute top-12 left-0 w-4 h-4 border-l border-t border-primary/20" />
-      <div className="absolute top-12 right-0 w-4 h-4 border-r border-t border-primary/20" />
-      <div className="absolute bottom-0 left-0 w-4 h-4 border-l border-b border-primary/20" />
-      <div className="absolute bottom-0 right-0 w-4 h-4 border-r border-b border-primary/20" />
 
-      {/* Scanning Line Animation (Overlay) */}
-      <div className="absolute inset-0 bg-linear-to-b from-transparent via-primary/5 to-transparent pointer-events-none -translate-y-full animate-[scan_8s_ease-in-out_infinite]" />
+      {/* Premium HUD Decor */}
+      <div className="absolute top-14 left-0 w-8 h-8 border-l-2 border-t-2 border-primary/20 rounded-tl-sm pointer-events-none" />
+      <div className="absolute top-14 right-0 w-8 h-8 border-r-2 border-t-2 border-primary/20 rounded-tr-sm pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-8 h-8 border-l-2 border-b-2 border-primary/20 rounded-bl-sm pointer-events-none" />
+      <div className="absolute bottom-0 right-0 w-8 h-8 border-r-2 border-b-2 border-primary/20 rounded-br-sm pointer-events-none" />
 
-      {/* Bottom Gradient Overlay */}
-      <div className="absolute bottom-0 left-0 right-0 h-16 bg-linear-to-t from-background via-background/80 to-transparent pointer-events-none" />
+      {/* Advanced Scanning Overlay */}
+      <div className="absolute inset-0 bg-linear-to-b from-transparent via-primary/5 to-transparent pointer-events-none -translate-y-full animate-[scan_10s_ease-in-out_infinite] opacity-30" />
+
+      {/* Elegant Edge Fades */}
+      <div className="absolute top-14 left-0 right-0 h-12 bg-linear-to-b from-background to-transparent z-20 pointer-events-none" />
+      <div className="absolute bottom-0 left-0 right-0 h-24 bg-linear-to-t from-background via-background/80 to-transparent z-20 pointer-events-none" />
     </div>
   );
 }

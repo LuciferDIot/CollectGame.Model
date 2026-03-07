@@ -19,46 +19,57 @@ export function LeftPanel() {
   }, [setTelemetryJson, setDeathEventsJson]);
 
   return (
-    <div className="flex flex-col h-full bg-linear-to-b from-slate-900 to-slate-950 overflow-hidden">
-      <div className="flex-1 overflow-y-auto">
-        <div className="p-4 space-y-4">
+    <div className="flex flex-col h-full bg-background/20 backdrop-blur-md overflow-hidden border-r border-border/30">
+      <div className="flex-1 overflow-y-auto custom-scrollbar">
+        <div className="p-5 space-y-6">
           {/* Telemetry Data Section */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wide">
-                Telemetry Input
+          <div className="space-y-3">
+            <div className="flex items-center justify-between pb-1">
+              <div className="flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                <label className="block text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">
+                  Source Telemetry
                 </label>
-                <JsonEditorDialog 
-                    title="Telemetry JSON Editor" 
-                    value={inputState.telemetryJson} 
-                    onChange={setTelemetryJson}
-                    description="Paste your Mongo-style telemetry document here."
-                />
+              </div>
+              <JsonEditorDialog
+                title="Telemetry JSON Editor"
+                value={inputState.telemetryJson}
+                onChange={setTelemetryJson}
+                description="Paste your Mongo-style telemetry document here."
+              />
             </div>
-            <textarea
-              value={inputState.telemetryJson}
-              onChange={(e) => setTelemetryJson(e.target.value)}
-              placeholder="Paste telemetry JSON here..."
-              className="w-full h-32 p-3 bg-slate-800/50 border border-slate-700 rounded-lg text-slate-100 text-xs font-mono placeholder:text-slate-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 focus:bg-slate-800 transition-all resize-none"
-              spellCheck="false"
-            />
-            {inputState.telemetryError && (
-              <div className="flex items-center gap-2 text-xs text-red-400 bg-red-950/20 border border-red-900/30 rounded px-3 py-2">
-                <AlertCircle size={14} className="shrink-0" />
-                <span>{inputState.telemetryError}</span>
-              </div>
-            )}
-            {!inputState.telemetryError && inputState.telemetryJson && (
-              <div className="flex items-center gap-2 text-xs text-green-400 bg-green-950/20 border border-green-900/30 rounded px-3 py-2">
-                <CheckCircle size={14} className="shrink-0" />
-                <span>Valid JSON</span>
-              </div>
-            )}
+            <div className="relative group">
+              <div className="absolute -inset-[1px] bg-linear-to-br from-primary/20 via-transparent to-accent/20 rounded-xl opacity-0 group-focus-within:opacity-100 transition-opacity blur-[2px]" />
+              <textarea
+                value={inputState.telemetryJson}
+                onChange={(e) => setTelemetryJson(e.target.value)}
+                placeholder="Paste telemetry JSON here..."
+                className="relative w-full h-40 p-4 bg-secondary/30 backdrop-blur-sm border border-border/60 rounded-xl text-foreground text-xs font-mono placeholder:text-muted-foreground/40 focus:border-primary/50 focus:ring-0 focus:bg-secondary/40 transition-all resize-none shadow-inner"
+                spellCheck="false"
+              />
+            </div>
+
+            <div className="animate-in fade-in slide-in-from-top-1 duration-300">
+              {inputState.telemetryError && (
+                <div className="flex items-center gap-2.5 text-[10px] font-bold text-destructive bg-destructive/5 border border-destructive/20 rounded-lg px-3 py-2.5 uppercase tracking-wider">
+                  <AlertCircle size={14} className="shrink-0" />
+                  <span>{inputState.telemetryError}</span>
+                </div>
+              )}
+              {!inputState.telemetryError && inputState.telemetryJson && (
+                <div className="flex items-center gap-2.5 text-[10px] font-bold text-emerald-400 bg-emerald-500/5 border border-emerald-500/20 rounded-lg px-3 py-2.5 uppercase tracking-wider">
+                  <CheckCircle size={14} className="shrink-0" />
+                  <span>Stream Validated</span>
+                </div>
+              )}
+            </div>
           </div>
 
-          <SchemaViewer />
+          <div className="pt-2">
+            <SchemaViewer />
+          </div>
 
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 gap-4">
             <InputStatus json={inputState.telemetryJson} />
           </div>
         </div>

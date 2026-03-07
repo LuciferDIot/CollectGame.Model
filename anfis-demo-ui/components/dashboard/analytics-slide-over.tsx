@@ -76,7 +76,7 @@ function PlainEnglishSummary({
   })();
 
   return (
-    <div className="mx-4 mt-4 mb-1 rounded-xl border border-slate-700/60 bg-slate-800/30 overflow-hidden">
+    <div className="mx-2 sm:mx-4 mt-4 mb-1 rounded-xl border border-slate-700/60 bg-slate-800/30 overflow-hidden">
       {/* ── Main summary row ── */}
       <div className="p-4">
         <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">What just happened?</p>
@@ -184,7 +184,7 @@ function PlainEnglishSummary({
                 Δ {categories.map(c => {
                   const p = previousCategories!.find(x => x.category === c.category);
                   const d = p ? (c.softMembership - p.softMembership) : 0;
-                  return `${c.category.substring(0,3)}=${d >= 0 ? '+' : ''}${d.toFixed(3)}`;
+                  return `${c.category.substring(0, 3)}=${d >= 0 ? '+' : ''}${d.toFixed(3)}`;
                 }).join('  ')}
               </span>
             </CalcSection>
@@ -272,7 +272,7 @@ export function AnalyticsSlideOver({ open, onOpenChange }: AnalyticsSlideOverPro
       <Dialog.Root open={open} onOpenChange={onOpenChange}>
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 z-40" />
-          <Dialog.Content className="fixed right-0 top-0 h-screen w-[600px] bg-gradient-to-b from-slate-900 to-slate-950 border-l border-slate-700 shadow-2xl data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right z-50 overflow-hidden flex flex-col">
+          <Dialog.Content className="fixed right-0 top-0 h-screen w-[600px] bg-linear-to-b from-slate-900 to-slate-950 border-l border-slate-700 shadow-2xl data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right z-50 overflow-hidden flex flex-col">
             <div className="flex items-center justify-between p-6 border-b border-slate-700">
               <div className="flex items-center gap-3">
                 <BarChart3 className="w-5 h-5 text-blue-400" />
@@ -299,7 +299,7 @@ export function AnalyticsSlideOver({ open, onOpenChange }: AnalyticsSlideOverPro
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 z-40" />
-        <Dialog.Content className="fixed inset-y-0 right-0 h-full w-full sm:max-w-xl md:max-w-2xl bg-gradient-to-b from-slate-900 to-slate-950 border-l border-slate-700 shadow-2xl data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right z-50 overflow-hidden flex flex-col">
+        <Dialog.Content className="fixed inset-y-0 right-0 h-full w-full sm:max-w-xl md:max-w-2xl bg-linear-to-b from-slate-900 to-slate-950 border-l border-slate-700 shadow-2xl data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right z-50 overflow-hidden flex flex-col">
           {/* Header */}
           <div className="flex items-center justify-between p-4 sm:p-6 border-b border-slate-700/50 bg-slate-900/30 shrink-0">
             <div className="flex items-center gap-3">
@@ -308,11 +308,11 @@ export function AnalyticsSlideOver({ open, onOpenChange }: AnalyticsSlideOverPro
               </div>
               <div>
                 <Dialog.Title className="text-base sm:text-lg font-semibold text-slate-100 tracking-tight flex items-center gap-2">
-                   System Analytics
-                   <EducationalDrawer 
-                      contentKey="anfis_pipeline_overview"
-                      trigger={<Info className="w-4 h-4 text-slate-500 hover:text-cyan-400 cursor-pointer transition-colors" />}
-                   />
+                  System Analytics
+                  <EducationalDrawer
+                    contentKey="anfis_pipeline_overview"
+                    trigger={<Info className="w-4 h-4 text-slate-500 hover:text-cyan-400 cursor-pointer transition-colors" />}
+                  />
                 </Dialog.Title>
                 <p className="text-xs text-slate-500 font-mono">Real-time behavioral telemetry</p>
               </div>
@@ -322,35 +322,39 @@ export function AnalyticsSlideOver({ open, onOpenChange }: AnalyticsSlideOverPro
             </Dialog.Close>
           </div>
 
-          {/* Plain-English Summary */}
-          <PlainEnglishSummary
-            categories={pipelineState.behaviorCategories}
-            multiplier={pipelineState.output?.adjustedMultiplier}
-            previousCategories={pipelineState.previousCategories}
-            previousMultiplier={pipelineState.previousOutput?.adjustedMultiplier}
-          />
+          {/* Main Scrollable Content Area */}
+          <Tabs defaultValue="behavior" className="flex-1 flex flex-col overflow-hidden">
+            <div className="flex-1 overflow-y-auto scrollbar-thin scroll-smooth pb-8">
+              {/* Plain-English Summary (Inside scrollable) */}
+              <PlainEnglishSummary
+                categories={pipelineState.behaviorCategories}
+                multiplier={pipelineState.output?.adjustedMultiplier}
+                previousCategories={pipelineState.previousCategories}
+                previousMultiplier={pipelineState.previousOutput?.adjustedMultiplier}
+              />
 
-          {/* Technical Metric Cards */}
-          <AnalyticsMetricsCards />
+              {/* Technical Metric Cards (Inside scrollable) */}
+              <AnalyticsMetricsCards />
 
-          {/* Tabs Content */}
-          <Tabs defaultValue="behavior" className="flex flex-col flex-1 overflow-hidden">
-            <AnalyticsTabsList />
+              {/* Sticky Tabs List */}
+              <div className="sticky top-0 z-30 bg-slate-900/95 backdrop-blur-md border-b border-slate-800/40">
+                <AnalyticsTabsList />
+              </div>
 
-            <div className="flex-1 overflow-y-auto">
-              <TabsContent value="behavior">
+              {/* Tab Contents */}
+              <TabsContent value="behavior" className="m-0 border-0 focus-visible:outline-none">
                 <BehaviorTab />
               </TabsContent>
 
-              <TabsContent value="adaptation">
+              <TabsContent value="adaptation" className="m-0 border-0 focus-visible:outline-none">
                 <AdaptationTab />
               </TabsContent>
 
-              <TabsContent value="archetypes">
+              <TabsContent value="archetypes" className="m-0 border-0 focus-visible:outline-none">
                 <ArchetypesTab />
               </TabsContent>
 
-              <TabsContent value="model">
+              <TabsContent value="model" className="m-0 border-0 focus-visible:outline-none">
                 <ModelTab />
               </TabsContent>
             </div>

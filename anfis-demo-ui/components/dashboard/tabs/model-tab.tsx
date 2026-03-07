@@ -9,7 +9,7 @@ export function ModelTab() {
   const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
 
   return (
-    <div className="m-0 p-6 space-y-8 max-w-[1600px] mx-auto">
+    <div className="m-0 p-4 sm:p-5 space-y-6 w-full">
       {/* Beginner Intro Banner */}
       <div className="p-3 rounded-lg border border-violet-800/30 bg-violet-950/20 flex items-start gap-2.5">
         <Info size={16} className="text-violet-400 shrink-0 mt-0.5" />
@@ -30,14 +30,14 @@ export function ModelTab() {
           Model Notes
         </h4>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div 
+          <div
             onClick={() => setSelectedMetric && setSelectedMetric('model_metadata')}
             className="p-4 rounded bg-blue-950/10 border border-blue-900/30 hover:bg-blue-950/20 transition-colors cursor-help group"
           >
-             <p className="text-xs font-bold text-blue-300 mb-1 uppercase tracking-wide group-hover:text-blue-200">Model Version: v2.2 (Derived Features)</p>
-             <p className="text-xs text-blue-200/60 leading-relaxed">Trained on 3,240 samples with 0.011 MAE. Combat adds damagePerHit; Collection adds pickupAttemptRate. Active-signals-only exploration. All archetypes averaged to equal ceiling of 1.0.</p>
+            <p className="text-xs font-bold text-blue-300 mb-1 uppercase tracking-wide group-hover:text-blue-200">Model Version: v2.2 (Derived Features)</p>
+            <p className="text-xs text-blue-200/60 leading-relaxed">Trained on 3,240 samples with 0.011 MAE. Combat adds damagePerHit; Collection adds pickupAttemptRate. Active-signals-only exploration. All archetypes averaged to equal ceiling of 1.0.</p>
           </div>
-          <div 
+          <div
             onClick={() => setSelectedMetric && setSelectedMetric('fuzzy_partition')}
             className="p-4 rounded bg-blue-950/10 border border-blue-900/30 hover:bg-blue-950/20 transition-colors cursor-help group"
           >
@@ -46,12 +46,12 @@ export function ModelTab() {
           </div>
         </div>
       </div>
-      
-      <MetricDetailModal 
+
+      <MetricDetailModal
         isOpen={!!selectedMetric}
         onClose={() => setSelectedMetric(null)}
         metricKey={selectedMetric || ''}
-        currentValue="Info" 
+        currentValue="Info"
         status="neutral"
       />
     </div>

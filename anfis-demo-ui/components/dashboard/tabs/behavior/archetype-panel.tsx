@@ -13,102 +13,111 @@ interface ArchetypePanelProps {
 }
 
 export function ArchetypePanel({ categories, onMetricSelect }: ArchetypePanelProps) {
-  
+
 
   return (
-    <div className="xl:col-span-5 flex flex-col gap-3">
-      <div className="flex items-center gap-2 text-slate-400 mb-1">
-        <GitBranch className="w-3.5 h-3.5" />
-        <span className="text-xs font-bold uppercase tracking-wider font-mono">
-          02. Archetype Decomposition
+    <div className="xl:col-span-12 flex flex-col gap-4">
+      <div className="flex items-center gap-3 text-muted-foreground pb-2">
+        <div className="w-8 h-px bg-primary/30" />
+        <span className="text-[10px] font-black uppercase tracking-[0.3em] font-mono text-primary/80">
+          Archetype Decomposition Logic
         </span>
+        <div className="flex-1 h-px bg-linear-to-r from-primary/30 to-transparent" />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 flex-1 content-start">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 flex-1 content-start">
         {categories.map((cat) => (
           <Card
             key={cat.category}
-            className="bg-slate-900/40 border-slate-800 hover:border-slate-700 transition-all p-0 overflow-hidden relative group"
+            className="glass-card bg-secondary/20 border-white/5 hover:bg-secondary/30 transition-all p-0 overflow-hidden relative group rounded-2xl"
           >
-             <div className="absolute top-2 right-2 z-10">
-                <EducationalDrawer 
-                   contentKey={`archetype_${cat.category.toLowerCase()}`} 
-                   trigger={<span className="sr-only">Info</span>} 
-                />
-             </div>
-             
-             {/* Clickable Area */}
-             <div 
-                onClick={() => onMetricSelect?.(`archetype_${cat.category.toLowerCase()}`)}
-                className="absolute inset-0 z-0 cursor-pointer hover:bg-white/[0.02] transition-colors" 
-             />
+            <div className="absolute top-4 right-4 z-20">
+              <EducationalDrawer
+                contentKey={`archetype_${cat.category.toLowerCase()}`}
+                trigger={<span className="sr-only">Info</span>}
+              />
+            </div>
 
-            <div className="flex items-stretch pointer-events-none relative z-10">
-              {/* Left Color strip */}
+            {/* Interaction Overlay */}
+            <div
+              onClick={() => onMetricSelect?.(`archetype_${cat.category.toLowerCase()}`)}
+              className="absolute inset-0 z-10 cursor-pointer hover:bg-white/[0.03] transition-colors"
+            />
+
+            <div className="flex items-stretch pointer-events-none relative z-10 h-full min-h-[160px]">
+              {/* Vertical Identity Bar */}
               <div
                 className={cn(
-                  "w-1.5",
-                  cat.category === 'Combat' ? "bg-red-500" :
-                  cat.category === 'Collection' ? "bg-emerald-500" :
-                  "bg-amber-500"
+                  "w-1.5 shadow-[0_0_15px_-2px_rgba(var(--primary-rgb),0.3)]",
+                  cat.category === 'Combat' ? "bg-chart-5" :
+                    cat.category === 'Collection' ? "bg-chart-3" :
+                      "bg-chart-4"
                 )}
               />
 
-              <div className="flex-1 p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <span
-                      className={cn(
-                        "text-xs font-bold uppercase tracking-wider",
-                        getTextColor(cat.category)
-                      )}
-                    >
-                      {cat.category}
-                    </span>
-                    <span className="text-[10px] text-slate-500 font-mono bg-slate-950 px-1.5 py-0.5 rounded border border-slate-800">
-                      ID: {cat.category.substring(0, 3).toUpperCase()}
-                    </span>
+              <div className="flex-1 p-6 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex flex-col gap-1">
+                      <span
+                        className={cn(
+                          "text-[10px] font-black uppercase tracking-[0.2em]",
+                          cat.category === 'Combat' ? "text-chart-5" :
+                            cat.category === 'Collection' ? "text-chart-3" :
+                              "text-chart-4"
+                        )}
+                      >
+                        {cat.category} Archetype
+                      </span>
+                      <span className="text-[9px] text-muted-foreground opacity-40 font-mono tracking-tighter">
+                        REF_ID: 0x{cat.category.substring(0, 3).toUpperCase()}_VECTOR
+                      </span>
+                    </div>
+                    <div className="text-right">
+                      <span className="font-black text-3xl text-foreground tracking-tighter tabular-nums drop-shadow-sm">
+                        {(cat.softMembership * 100).toFixed(1)}
+                        <span className="text-xs text-muted-foreground/40 ml-1 font-bold">%</span>
+                      </span>
+                    </div>
                   </div>
-                  <span className="font-mono text-xl font-bold text-slate-100 tracking-tighter">
-                    {(cat.softMembership * 100).toFixed(1)}
-                    <span className="text-xs text-slate-500 ml-0.5">%</span>
-                  </span>
+
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-[10px] uppercase text-muted-foreground font-black tracking-[0.1em]">
+                        <span>Soft Membership Strength</span>
+                        <span className="font-mono">{cat.softMembership.toFixed(4)}</span>
+                      </div>
+                      <div className="h-2 bg-background/50 rounded-full overflow-hidden border border-white/5">
+                        <div
+                          className={cn(
+                            "h-full rounded-full transition-all duration-1000 ease-out shadow-[0_0_10px_-2px_rgba(var(--primary-rgb),0.5)]",
+                            cat.category === 'Combat' ? "bg-chart-5" :
+                              cat.category === 'Collection' ? "bg-chart-3" :
+                                "bg-chart-4"
+                          )}
+                          style={{ width: `${cat.softMembership * 100}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="space-y-4">
-                  <div className="space-y-1.5">
-                    <div className="flex justify-between text-[10px] uppercase text-slate-400 font-semibold tracking-wider">
-                      <span>Membership Vector</span>
-                      <span>{cat.softMembership.toFixed(4)}</span>
-                    </div>
-                    <Progress
-                      value={cat.softMembership * 100}
-                      className="h-1.5 bg-slate-800"
-                      indicatorClassName={cn(
-                         cat.category === 'Combat' ? "bg-red-500" :
-                         cat.category === 'Collection' ? "bg-emerald-500" :
-                         "bg-amber-500"
-                      )}
-                    />
+                <div className="grid grid-cols-2 gap-4 pt-4 mt-4 border-t border-white/5">
+                  <div className="flex flex-col">
+                    <span className="text-[9px] text-muted-foreground/50 uppercase font-black tracking-widest mb-1 leading-none">
+                      Activity Index
+                    </span>
+                    <span className="text-sm font-black text-foreground/80 tracking-tight leading-none group-hover:text-primary transition-colors">
+                      {cat.activityPercentage}%
+                    </span>
                   </div>
-
-                  <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800/50">
-                    <div>
-                      <span className="text-[10px] text-slate-500 uppercase block mb-0.5">
-                        Activity %
-                      </span>
-                      <span className="text-sm font-mono text-slate-300">
-                        {cat.activityPercentage}%
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-[10px] text-slate-500 uppercase block mb-0.5">
-                        Confidence
-                      </span>
-                      <span className="text-sm font-mono text-slate-300">
-                        {(cat.confidence * 100).toFixed(0)}%
-                      </span>
-                    </div>
+                  <div className="flex flex-col">
+                    <span className="text-[9px] text-muted-foreground/50 uppercase font-black tracking-widest mb-1 leading-none">
+                      Confidence
+                    </span>
+                    <span className="text-sm font-black text-foreground/80 tracking-tight leading-none group-hover:text-accent transition-colors">
+                      {(cat.confidence * 100).toFixed(0)}%
+                    </span>
                   </div>
                 </div>
               </div>
