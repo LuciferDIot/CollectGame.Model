@@ -5,7 +5,7 @@ import { MetricDetailModal } from '@/components/analytics/shared/metric-detail-m
 import { usePipeline } from '@/lib/session/pipeline-context';
 import { BehaviorCategory } from '@/lib/types';
 import { cn } from '@/lib/utils';
-import { ArrowDown, ArrowRight, ArrowUp, History, SeparatorVertical, SlidersHorizontal } from 'lucide-react';
+import { ArrowDown, ArrowRight, ArrowUp, History, SlidersHorizontal } from 'lucide-react';
 import { useState } from 'react';
 
 export function AdaptationTab() {
@@ -71,19 +71,7 @@ export function AdaptationTab() {
           </p>
         </div>
       </div>
-      <div className="flex flex-col gap-6">
-        <div className="flex items-center gap-2 text-slate-400 mb-1">
-          <SeparatorVertical className="w-3.5 h-3.5" />
-          <EducationalDrawer
-            contentKey="input_normalization"
-            trigger={
-              <span className="text-xs font-bold uppercase tracking-wider font-mono cursor-help hover:text-blue-400 transition-colors border-b border-dotted border-slate-600">
-                Parameter Adaptation
-              </span>
-            }
-          />
-        </div>
-
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* COLLECTION PARAMETERS */}
         <ParameterCard
           title="Collection Parameters"
@@ -138,71 +126,76 @@ export function AdaptationTab() {
           />
         </ParameterCard>
 
-
-
-        {/* COMBAT PARAMETERS */}
-        <ParameterCard
-          title="Combat Parameters"
-          color="combat"
-        >
-          <ParameterRow
-            name="enemy spawn interval"
-            base={40.0}
-            final={40.0 * (2 - combatFactor)}
-            format="0.00"
-            onClick={() => openMetric('combat_parameter_adaptation')}
-            dark
-          />
-          <ParameterRow
-            name="global enemy cap"
-            base={35.0}
-            final={35.0 * combatFactor}
-            format="0.00"
-            onClick={() => openMetric('global_cap_adaptation')}
-            dark
-          />
-          <ParameterRow
-            name="enemy damage intensity"
-            base={10.0}
-            final={10.0 * combatFactor}
-            format="0.00"
-            onClick={() => openMetric('combat_intensity')}
-            dark
-          />
-          <ParameterRow
-            name="enemy max health"
-            base={100.0}
-            final={100.0 * combatFactor}
-            format="0.00"
-            onClick={() => openMetric('combat_health_scaling')}
-            dark
-          />
-          <ParameterRow
-            name="stamina damage"
-            base={5.0}
-            final={5.0 * combatFactor}
-            format="0.00"
-            onClick={() => openMetric('stamina_penalty')}
-            dark
-          />
-          <ParameterRow
-            name="player damage intensity"
-            base={16.0}
-            final={16.0 * (1 / combatFactor)}
-            format="0.00"
-            onClick={() => openMetric('player_power_scaling')}
-            dark
-          />
-          <ParameterRow
-            name="player max health"
-            base={180.0}
-            final={180.0 * (1 / combatFactor)}
-            format="0.00"
-            onClick={() => openMetric('player_resilience')}
-            dark
-          />
-        </ParameterCard>
-
+        {/* COMBAT PARAMETERS - spans 2 cols on large to give it more room */}
+        <div className="lg:col-span-2">
+          <ParameterCard
+            title="Combat Parameters"
+            color="combat"
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
+              <div className="space-y-5">
+                <ParameterRow
+                  name="enemy spawn interval"
+                  base={40.0}
+                  final={40.0 * (2 - combatFactor)}
+                  format="0.00"
+                  onClick={() => openMetric('combat_parameter_adaptation')}
+                  dark
+                />
+                <ParameterRow
+                  name="global enemy cap"
+                  base={35.0}
+                  final={35.0 * combatFactor}
+                  format="0.00"
+                  onClick={() => openMetric('global_cap_adaptation')}
+                  dark
+                />
+                <ParameterRow
+                  name="enemy damage intensity"
+                  base={10.0}
+                  final={10.0 * combatFactor}
+                  format="0.00"
+                  onClick={() => openMetric('combat_intensity')}
+                  dark
+                />
+                <ParameterRow
+                  name="enemy max health"
+                  base={100.0}
+                  final={100.0 * combatFactor}
+                  format="0.00"
+                  onClick={() => openMetric('combat_health_scaling')}
+                  dark
+                />
+              </div>
+              <div className="space-y-5">
+                <ParameterRow
+                  name="stamina damage"
+                  base={5.0}
+                  final={5.0 * combatFactor}
+                  format="0.00"
+                  onClick={() => openMetric('stamina_penalty')}
+                  dark
+                />
+                <ParameterRow
+                  name="player damage intensity"
+                  base={16.0}
+                  final={16.0 * (1 / combatFactor)}
+                  format="0.00"
+                  onClick={() => openMetric('player_power_scaling')}
+                  dark
+                />
+                <ParameterRow
+                  name="player max health"
+                  base={180.0}
+                  final={180.0 * (1 / combatFactor)}
+                  format="0.00"
+                  onClick={() => openMetric('player_resilience')}
+                  dark
+                />
+              </div>
+            </div>
+          </ParameterCard>
+        </div>
       </div>
       {/* How Adaptation Works — Permanent Explainer */}
       <div className="rounded-xl border border-slate-700/40 bg-slate-900/20 overflow-hidden">

@@ -78,8 +78,8 @@ export function TelemetryPanel({ features, onMetricSelect }: TelemetryPanelProps
                 </TableRow>
               ) : (
                 features.map((f, i) => f.value > 0.001 && (
-                  <TableRow 
-                    key={i} 
+                  <TableRow
+                    key={i}
                     onClick={() => onMetricSelect?.(`feature_${f.name}`)}
                     className="hover:bg-slate-900/40 border-slate-800/50 cursor-pointer group transition-colors"
                   >
@@ -97,7 +97,7 @@ export function TelemetryPanel({ features, onMetricSelect }: TelemetryPanelProps
                         <span className={cn(
                           "text-xs",
                           f.value > 0.8 ? "text-amber-400" :
-                          f.value < 0.2 ? "text-slate-500" : "text-blue-300"
+                            f.value < 0.2 ? "text-slate-500" : "text-blue-300"
                         )}>
                           {f.value.toFixed(3)}
                         </span>

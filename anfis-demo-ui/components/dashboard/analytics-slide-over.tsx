@@ -114,9 +114,9 @@ function PlainEnglishSummary({
       </div>
 
       {/* ── Archetype breakdown bar ── */}
-      <div className="px-4 pb-3 flex gap-2 items-center">
+      <div className="px-4 pb-3 flex max-sm:flex-col sm:gap-5 md:gap-10 items-center">
         {categories.map(cat => (
-          <div key={cat.category} className="flex-1 flex flex-col gap-0.5">
+          <div key={cat.category} className="w-full sm:flex-1 flex flex-col gap-0.5">
             <div className="flex items-center justify-between">
               <span className={`text-[10px] font-bold ${ARCHETYPE_COLOR[cat.category]}`}>{cat.category}</span>
               <span className="text-[10px] font-mono text-slate-500">{Math.round(cat.softMembership * 100)}%</span>
@@ -299,7 +299,7 @@ export function AnalyticsSlideOver({ open, onOpenChange }: AnalyticsSlideOverPro
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 z-40" />
-        <Dialog.Content className="fixed inset-y-0 right-0 h-full w-full sm:max-w-xl md:max-w-2xl bg-linear-to-b from-slate-900 to-slate-950 border-l border-slate-700 shadow-2xl data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right z-50 overflow-hidden flex flex-col">
+        <Dialog.Content className="fixed inset-y-0 right-0 h-full w-full sm:max-w-2xl lg:max-w-3xl xl:max-w-4xl 2xl:max-w-3xl bg-linear-to-b from-slate-900 to-slate-950 border-l border-slate-700 shadow-2xl data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right z-50 overflow-hidden flex flex-col">
           {/* Header */}
           <div className="flex items-center justify-between p-4 sm:p-6 border-b border-slate-700/50 bg-slate-900/30 shrink-0">
             <div className="flex items-center gap-3">

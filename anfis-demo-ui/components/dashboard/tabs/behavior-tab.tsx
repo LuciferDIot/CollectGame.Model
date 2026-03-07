@@ -32,7 +32,7 @@ export function BehaviorTab() {
   return (
     <div className="h-full flex flex-col p-4 sm:p-5 space-y-4 w-full animate-fade-in">
       {/* Premium Intro Banner */}
-      <div className="p-4 rounded-xl border border-primary/20 bg-primary/5 backdrop-blur-sm flex items-start gap-4 shadow-2xl relative overflow-hidden">
+      <div className="p-4 mb-6 rounded-xl border border-primary/20 bg-primary/5 backdrop-blur-sm flex items-start gap-4 shadow-2xl relative overflow-hidden">
         <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-16 -mt-16" />
         <Activity className="w-5 h-5 text-primary shrink-0 mt-0.5 animate-pulse" />
         <div>
@@ -69,23 +69,24 @@ export function BehaviorTab() {
       </div>
 
       {/* Main Grid Layout */}
-      <div className="grid grid-cols-1 gap-6 h-full min-h-0 pt-4">
+      <div className="space-y-6 pt-4">
+        {/* Top Row: Telemetry + Rules side by side on larger screens */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* 1. Feature Inputs */}
+          <TelemetryPanel
+            features={featuresList}
+            onMetricSelect={setSelectedMetric}
+          />
 
-        {/* 1. Feature Inputs */}
-        <TelemetryPanel
-          features={featuresList}
-          onMetricSelect={setSelectedMetric}
-        />
+          {/* 3. Rule Trace */}
+          <RulesPanel rules={activeRules} />
+        </div>
 
-        {/* 2. Archetype Decomposition */}
+        {/* Bottom Row: Archetype Decomposition full width */}
         <ArchetypePanel
           categories={behaviorCategories}
           onMetricSelect={setSelectedMetric}
         />
-
-        {/* 3. Rule Trace */}
-        <RulesPanel rules={activeRules} />
-
       </div>
 
       <MetricDetailModal

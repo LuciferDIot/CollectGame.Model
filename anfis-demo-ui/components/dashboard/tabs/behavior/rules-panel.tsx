@@ -16,17 +16,17 @@ interface RulesPanelProps {
 export function RulesPanel({ rules }: RulesPanelProps) {
   // Logic already passed in sorted, but nice to be safe or re-sort if needed.
   // Assuming 'rules' passed here are the ones we want to show.
-  
+
   return (
     <div className="xl:col-span-4 flex flex-col gap-3 min-h-[300px]">
       <div className="flex items-center gap-2 text-slate-400 mb-1">
         <Zap className="w-3.5 h-3.5" />
-        <EducationalDrawer 
+        <EducationalDrawer
           contentKey="rule_firing_strength"
           trigger={
-             <span className="text-xs font-bold uppercase tracking-wider font-mono cursor-help hover:text-blue-400 transition-colors border-b border-dotted border-slate-600">
-                03. Inference Rules Trace
-             </span>
+            <span className="text-xs font-bold uppercase tracking-wider font-mono cursor-help hover:text-blue-400 transition-colors border-b border-dotted border-slate-600">
+              03. Inference Rules Trace
+            </span>
           }
         />
       </div>
