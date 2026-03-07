@@ -1,69 +1,65 @@
-# ANFIS Adaptive Difficulty System - PRODUCTION
+# ANFIS Adaptive Difficulty System
 
-**Status**: ✅ PRODUCTION (v2.2 — Derived Features & Sensitivity Update)  
-**Version**: 2.2  
-**Last Updated**: March 6, 2026
-
----
-
-## 🎯 System Overview
-
-This is the **final, frozen production architecture** for the ANFIS-based adaptive difficulty system. All experimental validation complete, all decisions locked.
+**Version**: 2.2.1
+**Status**: Production
+**Last Updated**: March 7, 2026
 
 ---
 
-## 📊 Final Configuration (v2.2)
+## System Overview
+
+ANFIS-based adaptive difficulty system using K-Means clustering, fuzzy soft membership, and an MLP surrogate model. Classifies player behavior into three archetypes (Combat, Collection, Exploration) and adjusts game difficulty in real time based on behavioral telemetry and temporal trends.
+
+---
+
+## Final Configuration (v2.2.1)
 
 ### Preprocessing
 - **Scaler**: Uniform MinMaxScaler [0, 1]
-- **Features**: 12 features (10 raw telemetry + 2 derived: `damage_per_hit`, `pickup_attempt_rate`)
-- **Derived Features**: Computed before normalization from raw values
-- **Outlier Handling**: None
+- **Features**: 12 (10 raw telemetry + 2 derived: `damage_per_hit`, `pickup_attempt_rate`)
+- **Derived features**: Computed from raw values before normalization
+- **Outlier handling**: None
 
 ### Clustering
-- **Algorithm**: K-Means
-- **K**: 3 (Combat, Collection, Exploration archetypes)
-- **Random State**: 42
-- **Soft Membership**: Inverse distance to centroids
+- **Algorithm**: K-Means, K=3 (Combat, Collection, Exploration)
+- **Soft Membership**: Inverse-distance weighting to centroids
 
-### ANFIS Inputs (6 Features)
-1. `soft_combat` - Fuzzy membership to combat archetype
-2. `soft_collect` - Fuzzy membership to collection archetype
-3. `soft_explore` - Fuzzy membership to exploration archetype
-4. `delta_combat` - Δ soft_combat (window-to-window change)
-5. `delta_collect` - Δ soft_collect
-6. `delta_explore` - Δ soft_explore
+### ANFIS Inputs (6 features)
+1. `soft_combat` — fuzzy membership to combat archetype
+2. `soft_collect` — fuzzy membership to collection archetype
+3. `soft_explore` — fuzzy membership to exploration archetype
+4. `delta_combat` — Δ soft_combat (window-to-window change)
+5. `delta_collect` — Δ soft_collect
+6. `delta_explore` — Δ soft_explore
 
-### Target Generation
-- **Formula**: `1.0 - (0.1 × deaths) + (0.05 × normalized_activity)`
-- **Range**: Clipped to [0.5, 1.5]
+### Target Generation (Option B, v2.2.1)
+- **Formula**: `T = 1.0 + 0.22×(soft_combat−0.5) + 0.18×(soft_collect−0.5) + 0.15×(soft_explore−0.5) + 0.55×Δcombat + 0.40×Δcollect + 0.35×Δexplore − 0.25×death_rate`
+- **Clipped to**: [0.6, 1.4]
+- **Display calibration**: `display = clamp(1.0 + (raw − mlp_neutral) × 2.0, 0.6, 1.4)` where `mlp_neutral = 0.932006`
 
 ---
 
-## 🔬 Experimental Validation Summary
+## Experimental Validation
 
 ### A/B Testing
-- **Experiment A** (Baseline - Uniform MinMax): **WINNER** ✅
+- **Experiment A** (Uniform MinMax): Selected — won 5/8 metrics (Silhouette, DB Index, CH Score, Target CV, Collection %)
 - **Experiment B** (Feature-aware preprocessing): Rejected
-- **Decision Basis**: A won 5/8 metrics (Silhouette, DB Index, CH Score, Target CV, Collection %)
 
 ### Grid Search Optimization
+- **Configurations tested**: 108 (4 K values × 3 outlier levels × 3 normalizations × 3 feature sets)
+- **Best overall**: K=2, Silhouette=0.4166 — rejected (incompatible with 3-archetype design)
+- **Best K=3**: Silhouette=0.3764 — not significant improvement over baseline
+- **Conclusion**: Baseline already near-optimal; no configuration change warranted
 
-
-- **Configurations Tested**: 108 (4 K values × 3 outlier levels × 3 normalizations × 3 feature sets)
-- **Best Overall**: K=2, Silhouette=0.4166 (+11%) - **REJECTED** (incompatible with 3-archetype system)
-- **Best K=3**: Silhouette=0.3764 (+0.4%) - **NOT SIGNIFICANT**
-- **Conclusion**: Baseline already near-optimal
-
-### Signal Interpretation Refinement
-- **Δexplore ↔ Δtarget**: r = **0.839** (very strong correlation — v2.2)
-- **Δcombat ↔ Δtarget**: r = -0.471
-- **Feature Weighting**: No improvement (rejected)
-- **Decision**: Add deltas to ANFIS inputs ✅
+### Delta Signal Analysis
+- **Δexplore ↔ Δtarget**: r = 0.839
+- **Δcombat ↔ Δtarget**: r = −0.471
+- **Feature weighting**: No improvement (rejected)
+- **Decision**: Add delta signals as ANFIS inputs
 
 ---
 
-## 📁 Production Pipeline Structure
+## Pipeline Structure
 
 ```
 core/
@@ -72,115 +68,76 @@ core/
 │   ├── 02_Gameplay_Summary.ipynb
 │   ├── 03_Normalization.ipynb
 │   ├── 04_Activity_Contributions.ipynb
-│   ├── 05_Clustering.ipynb              ← Includes soft membership + deltas
-│   ├── 06_ANFIS_Preparation.ipynb       ← 6-feature input
+│   ├── 05_Clustering.ipynb
+│   ├── 06_ANFIS_Preparation.ipynb
 │   ├── 07_ANFIS_Training.ipynb
 │   └── 08_Evaluation_Visualizations.ipynb
 ├── utils.py
-├── pipeline_config.yaml                  ← All settings locked
-├── README.md
-└── DELTA_IMPLEMENTATION_GUIDE.md
+├── pipeline_config.yaml
+└── README.md
 ```
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
-### Run Production Pipeline
 ```bash
 cd core/notebooks
 jupyter notebook
-# Execute notebooks 01-08 sequentially
+# Run notebooks 01-08 in order
 ```
 
-### Expected Outputs
-- `data/processed/5_clustered_telemetry.csv` - With soft membership + deltas
-- `data/processed/6_anfis_dataset.csv` - 6-feature input vectors
-- `data/models/anfis_params.json` - Trained model parameters
-- `data/processed/viz_*.png` - Evaluation visualizations
+Expected outputs:
+- `data/processed/5_clustered_telemetry.csv` — soft membership + deltas
+- `data/processed/6_anfis_dataset.csv` — 6-feature input vectors
+- `anfis-demo-ui/models/anfis_mlp_weights.json` — trained weights + mlp_neutral
 
 ---
 
-## 📈 Final Metrics (Baseline with Deltas)
+## Final Metrics
 
 ### Clustering Quality
-- **Silhouette Score**: 0.3752 (acceptable, >0.3 threshold)
-- **Davies-Bouldin Index**: 0.9768 (good, <1.5 threshold)
-- **Calinski-Harabasz Score**: 2109.3 (strong separation)
+- Silhouette: 0.3752 (threshold >0.3)
+- Davies-Bouldin Index: 0.9768 (threshold <1.5)
+- Calinski-Harabasz Score: 2109.3
 
 ### Behavioral Modeling
-- **Soft Membership Distribution**:
-  - Combat: 29.5%
-  - Collection: 38.8%
-  - Exploration: 31.7%
-- **Mean Entropy**: 1.4053 (high diversity, near-max 1.585)
+- Soft membership distribution: Combat 29.5% / Collection 38.8% / Exploration 31.7%
+- Mean Entropy: 1.4053
 
-### ANFIS Stability
-- **Target CV**: 0.022 (very low variance)
-- **Target Range**: [1.01, 1.19] (safe adaptation zone)
+### MLP Surrogate (v2.2.1)
+- Architecture: 6→16→8→1 (ReLU hidden, Linear output)
+- Test R²: 0.9264 | Test MAE: 0.0127
+- Convergence: 21 iterations (LBFGS, max_iter=500)
+- mlp_neutral: 0.932006 | AMPLIFICATION: 2.0
 
-### Responsiveness (NEW with Deltas)
-- **Δexplore → Δtarget**: r = 0.808 ✅
-- **Reaction Latency**: Improved (temporal context added)
+### Target Distribution (post-retrain)
+- Range: [0.60, 1.107] | Mean: 0.902 | Std: 0.074
 
----
-
-## 📌 Architecture Principles
-
-**Stable** (evidence-based decisions, retain unless new data suggests otherwise):
-- Preprocessing: Uniform MinMaxScaler
-- Clustering: K=3 (Combat, Collection, Exploration)
-- ANFIS input: 6D soft+delta space
-- Target formula structure
-
-**Open to tuning**:
-- Derived feature formulas (empirically validated in v2.2)
-- Per-parameter sensitivity weights (0.20–0.35 range)
-- Session timeout (currently 90s)
+### Responsiveness
+- Δexplore → Δtarget: r = 0.808
 
 ---
 
-## 📚 Documentation
+## Architecture Decisions (Frozen)
 
-### For Development
-- `core/pipeline_config.yaml` - Technical configuration
-- `core/DELTA_IMPLEMENTATION_GUIDE.md` - Implementation steps
-- `CHANGELOG.md` - Version history
+| Component | Choice | Reason |
+|-----------|--------|--------|
+| Preprocessing | Uniform MinMaxScaler | A/B test: wins 5/8 metrics |
+| Clustering | K=3, K-Means, soft IDW | Grid search: near-optimal; K=4 collapses |
+| ANFIS input | 6D (3 soft + 3 delta) | Delta r=0.808 correlation with target |
+| MLP architecture | 6→16→8→1 | 5-fold CV: smallest with R²>0.90 |
+| Output calibration | Neutral-centred | Balanced player guaranteed → display=1.0 |
+| Safety clamp | [0.6, 1.4] | Calibration study: M=1.5 felt unfair |
+| Session timeout | 90s | Tolerates loading screens (3× window cadence) |
 
-### For Thesis
-- `thesis_documentation/01_COMPLETE_WALKTHROUGH.md` - Full development timeline
-- `thesis_documentation/02-03_AB_TEST_*.md` - Experimental methodology
-- `thesis_documentation/04_GRID_SEARCH_OPTIMIZATION.md` - 108-config analysis
-- `thesis_documentation/05_SIGNAL_INTERPRETATION_REFINEMENT.md` - Delta validation
-- `thesis_documentation/06_FINAL_STATUS.md` - System summary
-
-### Archived Experiments
-- `experiments/` - Read-only, preserved for reference
+**Open to tuning**: derived feature formulas, per-parameter sensitivity weights (0.20–0.35), session timeout.
 
 ---
 
-## ✅ System Status
+## Documentation
 
-**Experimentation Phase**: ✅ COMPLETE  
-**Architecture**: ✅ Production (v2.2)  
-**Derived Features**: ✅ Integrated (damage_per_hit, pickup_attempt_rate)  
-**Sensitivity Registry**: ✅ Non-uniform (0.20–0.35)  
-**Documentation**: ✅ COMPLETE  
-**Production Ready**: ✅ YES
-
----
-
-## 🎓 Thesis-Ready Summary
-
-**What was built**: ANFIS-based adaptive difficulty system using K-Means clustering and soft membership
-
-**How it was validated**:
-1. A/B testing (2 approaches)
-2. Grid search (108 configurations)
-3. Signal interpretation analysis (deltas)
-
-**What was learned**: Simple baseline preprocessing + temporal deltas = optimal
-
-**Final innovation**: Temporal context via deltas (r=0.808 correlation) improves responsiveness without destabilizing clustering
-
-**Status**: Production-ready, experimentally validated, thesis-defensible ✅
+- `CHANGELOG.md` — version history with rationale per change
+- `thesis_documentation/11_Complete_Development_Journey.md` — full decisions and challenges log
+- `thesis_documentation/10_Training_Bias_Fix_and_Calibration.md` — calibration design decision
+- `thesis_documentation/FINAL_EVALUATION_REPORT.md` — model evaluation with addenda

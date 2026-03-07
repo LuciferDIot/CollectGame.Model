@@ -2,14 +2,16 @@
 
 > **v2.1 Update (March 2026)**: The activity scoring formula (Step 3) was revised to use per-archetype averages and exclude `timeOutOfCombat` from Exploration scoring.
 >
-> **v2.2 Update (March 2026)**: Two derived features added — `damage_per_hit` (Combat, 5th feature) and `pickup_attempt_rate` (Collection, 4th feature). Raw feature vector is now 12-wide (10 original + 2 derived computed server-side before normalization). Scaler, centroids, and MLP weights regenerated. Final metrics: **Test R² = 0.9391, Test MAE = 0.0112, Δexplore r = 0.8394**. All 9/9 integration assertions pass (Notebook 10). Runtime flow and execution frequencies below remain unchanged — all changes are internal to feature extraction.
+> **v2.2 Update (March 2026)**: Two derived features added — `damage_per_hit` (Combat, 5th feature) and `pickup_attempt_rate` (Collection, 4th feature). Raw feature vector is now 12-wide (10 original + 2 derived computed server-side before normalization). Scaler, centroids, and MLP weights regenerated.
+>
+> **v2.2.1 Update (March 2026)**: Training bias fixed (base=0.9→1.0 in target formula). MLP output calibration changed from min-max rescaling to **neutral-centred**: `display = clamp(1.0 + (raw − 0.932006) × 2.0, 0.6, 1.4)`. Final metrics: **Test R² = 0.9264, Test MAE = 0.0127**. `mlp_neutral = 0.932006` stored in `anfis_mlp_weights.json` and auto-updated by notebook 07 after each retrain.
 
 ## 1. Runtime Flow Diagram
 
 ```mermaid
 graph TD
-    A[Continuous Gameplay Telemetry] -->|Aggregate 30s Window| B(Raw Feature Vector [10])
-    B -->|Apply Saved scaler.json| C(Normalized Vector [10])
+    A[Continuous Gameplay Telemetry] -->|Aggregate 30s Window| B(Raw Feature Vector [10] + 2 derived = [12])
+    B -->|Apply Saved scaler.json| C(Normalized Vector [12])
     C -->|Distance to Saved centroids.json| D{K-Means Centroids}
     D -->|Inverse Distance Weighting| E(Soft Membership [3])
     E -->|Retrieve Previous State| F(Delta Computation)
@@ -34,12 +36,14 @@ graph TD
 
 The game engine requires the following frozen artifacts (JSON/Binary) exported from the training pipeline:
 
-1.  **`scaler_params.json`**: Contains `min` and `scale` values for the 10 core features.
+1.  **`scaler_params.json`**: Contains `min` and `scale` values for all **12 features** (10 raw + 2 derived).
     *   *Source*: Notebook `03_Normalization.ipynb`
-2.  **`cluster_centroids.json`**: Contains the (3, 10) coordinate matrix of the K-Means centroids and their archetype labels.
+2.  **`cluster_centroids.json`**: Contains the (3, 3) centroid matrix in pct_combat/collect/explore space.
     *   *Source*: Notebook `05_Clustering.ipynb`
-3.  **`mlp_model_weights.json`**: Contains the weights and biases for the 6-input MLP regressor.
-    *   *Source*: Notebook `07_ANFIS_Training.ipynb`
+3.  **`anfis_mlp_weights.json`**: Contains weights/biases for the 6-input MLP + `mlp_neutral` (0.932006) for neutral-centred calibration.
+    *   *Source*: Notebook `07_ANFIS_Training.ipynb` (auto-exports `mlp_neutral` after every retrain)
+4.  **`deployment_manifest.json`**: Hard constraints — `target_multiplier_range: [0.6, 1.4]`, feature order, version.
+    *   *Source*: Manually maintained; version-bumped per release
 
 ## 4. State Variables to Persist
 
@@ -63,8 +67,13 @@ For each active player session, the runtime system must maintain a minimal state
 | **First Window (t=0)** | Set `Deltas = [0, 0, 0]`. Use static soft membership. | No history exists for change detection. |
 | **Missing Telemetry** | Zero-fill features. Output `Target = 1.0` (Neutral). | Defaults to baseline difficulty to prevent spikes. |
 | **Corrupt Artifacts** | Fallback to `Target = 1.0`. Log Critical Error. | Game stability > Adaptation. |
-| **Extreme Outliers** | Clip Input to Scaler Min/Max. Clip Output to [0.5, 1.5]. | Prevent mathematical instability from affecting gameplay. |
+| **Extreme Outliers** | Clip Input to Scaler Min/Max. Neutral-centred output + clamp to [0.6, 1.4]. | Prevent mathematical instability from affecting gameplay. |
 
 ## 6. Verification
 
-This workflow uses the v2.1 models regenerated on 2026-03-06. The activity scoring formula was corrected (averages, timeOutOfCombat excluded from Exploration). All other pipeline steps, execution frequencies, and failure-safe behaviors remain as specified above.
+This workflow uses the v2.2.1 models (2026-03-07). Changes from v2.0:
+- **v2.1**: Activity scoring corrected — averages instead of sums, `timeOutOfCombat` excluded from Exploration
+- **v2.2**: Derived features added (`damage_per_hit`, `pickup_attempt_rate`); scaler expanded to 12 features
+- **v2.2.1**: Training target base corrected (0.9→1.0); output calibration changed to neutral-centred mapping
+
+All execution frequencies and failure-safe behaviors remain as specified above.
