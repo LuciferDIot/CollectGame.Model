@@ -1,3 +1,5 @@
+'use client';
+
 import {
     Dialog,
     DialogContent,
@@ -6,6 +8,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
+import { useTutorial } from '@/lib/analytics/tutorial-context';
 import { BookOpen, Calculator, HelpCircle } from 'lucide-react';
 import { ReactNode } from 'react';
 
@@ -13,10 +16,10 @@ interface HelpfulTooltipProps {
   trigger?: ReactNode;
   title: string;
   description: string;
-  formula?: string; // Legacy prop, can be mapped to calculation
-  calculation?: string; // New prop for technical details
+  formula?: string;
+  calculation?: string;
   interpretation?: string;
-  side?: 'top' | 'right' | 'bottom' | 'left'; // Kept for compatibility but unused in Dialog
+  side?: 'top' | 'right' | 'bottom' | 'left';
 }
 
 export function HelpfulTooltip({
@@ -27,16 +30,19 @@ export function HelpfulTooltip({
   calculation,
   interpretation,
 }: HelpfulTooltipProps) {
-  // Map legacy formula to calculation if calculation is missing
+  const { tutorialMode } = useTutorial();
   const technicalDetail = calculation || formula;
+
+  // When tutorial mode is off, render the trigger passively (no dialog wrapper)
+  if (!tutorialMode) {
+    return trigger ? <>{trigger}</> : null;
+  }
 
   return (
     <Dialog>
       <DialogTrigger asChild>
         {trigger ? (
-          // IMPORTANT: The trigger element must be able to accept a ref.
-          // Most HTML elements (span, div, button) work fine.
-          trigger 
+          trigger
         ) : (
           <button className="cursor-pointer inline-flex items-center gap-1.5 opacity-80 hover:opacity-100 transition-opacity decoration-dotted underline-offset-2 hover:underline outline-none focus:ring-2 focus:ring-slate-400 rounded-sm">
             <HelpCircle className="h-4 w-4 text-muted-foreground" />
@@ -69,7 +75,7 @@ export function HelpfulTooltip({
 
           {interpretation && (
              <div className="space-y-2">
-               <h4 className="font-semibold text-slate-200 text-sm uppercase tracking-wider text-xs">
+               <h4 className="font-semibold text-slate-200 text-xs uppercase tracking-wider">
                  Interpretation
                </h4>
                <p className="text-sm text-emerald-400/90 italic border-l-2 border-emerald-500/50 pl-3">

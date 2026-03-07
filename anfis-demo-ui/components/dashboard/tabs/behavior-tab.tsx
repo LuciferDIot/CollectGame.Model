@@ -9,12 +9,14 @@ import { TelemetryPanel } from './behavior/telemetry-panel';
 
 import { EducationalDrawer } from '@/components/analytics/shared/educational-drawer';
 import { MetricDetailModal } from '@/components/analytics/shared/metric-detail-modal';
+import { useTutorial } from '@/lib/analytics/tutorial-context';
 import { useState } from 'react';
 
 export function BehaviorTab() {
   const { pipelineState } = usePipeline();
   const { normalizedFeatures, rulesFired, behaviorCategories } = pipelineState;
   const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
+  const { tutorialMode } = useTutorial();
 
   // Logic: Sort rules and filter
   const activeRules = [...(rulesFired || [])]
@@ -31,17 +33,19 @@ export function BehaviorTab() {
 
   return (
     <div className="h-full flex flex-col p-4 sm:p-5 space-y-4 w-full animate-fade-in">
-      {/* Premium Intro Banner */}
-      <div className="p-4 mb-6 rounded-xl border border-primary/20 bg-primary/5 backdrop-blur-sm flex items-start gap-4 shadow-2xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-16 -mt-16" />
-        <Activity className="w-5 h-5 text-primary shrink-0 mt-0.5 animate-pulse" />
-        <div>
-          <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-1">System Context</p>
-          <p className="text-xs text-muted-foreground leading-relaxed max-w-2xl">
-            This module visualizes the <span className="text-foreground font-bold italic">Behavioral Inference Sequence</span>. It decodes raw gameplay telemetry into fuzzy archetypes, utilizing soft-clustering to determine playstyle alignment and drive downstream adaptation logic.
-          </p>
+      {/* System Context Banner — tutorial mode only */}
+      {tutorialMode && (
+        <div className="p-4 mb-6 rounded-xl border border-primary/20 bg-primary/5 backdrop-blur-sm flex items-start gap-4 shadow-2xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-16 -mt-16" />
+          <Activity className="w-5 h-5 text-primary shrink-0 mt-0.5 animate-pulse" />
+          <div>
+            <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-1">System Context</p>
+            <p className="text-xs text-muted-foreground leading-relaxed max-w-2xl">
+              This module visualizes the <span className="text-foreground font-bold italic">Behavioral Inference Sequence</span>. It decodes raw gameplay telemetry into fuzzy archetypes, utilizing soft-clustering to determine playstyle alignment and drive downstream adaptation logic.
+            </p>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Header Section */}
       <div className="flex items-center justify-between pb-6 border-b border-border/40">

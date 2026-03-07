@@ -4,6 +4,7 @@ import { MembershipDiagnostics } from '@/components/analytics/diagnostics/member
 import { EducationalDrawer } from '@/components/analytics/shared/educational-drawer';
 import { MetricDetailModal } from '@/components/analytics/shared/metric-detail-modal';
 import { Card } from '@/components/ui/card';
+import { useTutorial } from '@/lib/analytics/tutorial-context';
 import { useAnalytics } from '@/lib/hooks/use-analytics';
 import { usePipeline } from '@/lib/session/pipeline-context';
 import { BehaviorCategory } from '@/lib/types';
@@ -16,6 +17,7 @@ export function ArchetypesTab() {
   const { pipelineState } = usePipeline();
   const { session, currentRound } = useAnalytics();
   const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
+  const { tutorialMode } = useTutorial();
 
   const ClosestArchetype: BehaviorCategory = useMemo(() => {
     let maxSoftValObj: BehaviorCategory = pipelineState.behaviorCategories[0]
@@ -29,16 +31,18 @@ export function ArchetypesTab() {
   return (
     <div className="m-0 p-4 sm:p-5 space-y-6 w-full">
       {/* Beginner Intro Banner */}
-      <div className="p-3 rounded-lg border border-cyan-800/30 bg-cyan-950/20 flex items-start gap-2.5">
-        <GlobeLock className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
-        <div>
-          <p className="text-xs font-semibold text-cyan-300 mb-0.5">What is this tab?</p>
-          <p className="text-[11px] text-slate-400 leading-relaxed">
-            This shows <span className="text-slate-300">which player archetype the AI matched most</span> — Combat, Collection, or Exploration.
-            The radar chart visualises all three scores at once. A higher percentage means the player more closely fits that archetype.
-          </p>
+      {tutorialMode && (
+        <div className="p-3 rounded-lg border border-cyan-800/30 bg-cyan-950/20 flex items-start gap-2.5">
+          <GlobeLock className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
+          <div>
+            <p className="text-xs font-semibold text-cyan-300 mb-0.5">What is this tab?</p>
+            <p className="text-[11px] text-slate-400 leading-relaxed">
+              This shows <span className="text-slate-300">which player archetype the AI matched most</span> — Combat, Collection, or Exploration.
+              The radar chart visualises all three scores at once. A higher percentage means the player more closely fits that archetype.
+            </p>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Header Section */}
       <div className="flex items-center justify-between pb-4 border-b border-slate-800">
@@ -127,8 +131,8 @@ export function ArchetypesTab() {
         </div>
       </div>
 
-      {/* Archetype Comparison — always-visible reference table */}
-      <ArchetypeComparisonTable />
+      {/* Archetype Comparison — tutorial only */}
+      {tutorialMode && <ArchetypeComparisonTable />}
 
       <MetricDetailModal
         isOpen={!!selectedMetric}

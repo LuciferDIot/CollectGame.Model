@@ -3,6 +3,7 @@
 import React from 'react';
 import { EducationalDrawer } from '@/components/analytics/shared/educational-drawer';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
+import { useTutorial } from '@/lib/analytics/tutorial-context';
 import { usePipeline } from '@/lib/session/pipeline-context';
 import { BehaviorCategory } from '@/lib/types';
 import * as Dialog from '@radix-ui/react-dialog';
@@ -44,6 +45,7 @@ function PlainEnglishSummary({
   previousMultiplier?: number;
 }) {
   const [expanded, setExpanded] = useState(false);
+  const { tutorialMode } = useTutorial();
 
   if (categories.length === 0) return null;
 
@@ -133,7 +135,8 @@ function PlainEnglishSummary({
         ))}
       </div>
 
-      {/* ── Expandable calculation details ── */}
+      {/* ── Expandable calculation details (tutorial mode only) ── */}
+      {tutorialMode && (
       <button
         onClick={() => setExpanded(v => !v)}
         className="w-full flex items-center justify-between px-4 py-2.5 border-t border-slate-700/40 hover:bg-slate-800/30 transition-colors group"
@@ -145,8 +148,9 @@ function PlainEnglishSummary({
           ? <ChevronUp className="w-3.5 h-3.5 text-slate-600" />
           : <ChevronDown className="w-3.5 h-3.5 text-slate-600" />}
       </button>
+      )}
 
-      {expanded && (
+      {tutorialMode && expanded && (
         <div className="px-4 py-4 border-t border-slate-700/30 bg-slate-900/20 space-y-4 text-[11px] text-slate-400 leading-relaxed">
 
           {/* Step 1: Activity scoring */}
@@ -266,6 +270,7 @@ interface AnalyticsSlideOverProps {
 
 export function AnalyticsSlideOver({ open, onOpenChange }: AnalyticsSlideOverProps) {
   const { pipelineState } = usePipeline();
+  const { tutorialMode, toggleTutorialMode } = useTutorial();
 
   if (pipelineState.behaviorCategories.length === 0) {
     return (
@@ -317,9 +322,22 @@ export function AnalyticsSlideOver({ open, onOpenChange }: AnalyticsSlideOverPro
                 <p className="text-xs text-slate-500 font-mono">Real-time behavioral telemetry</p>
               </div>
             </div>
-            <Dialog.Close className="rounded-lg p-2 hover:bg-slate-800 transition-colors border border-transparent hover:border-slate-700">
-              <X className="w-5 h-5 text-slate-400" />
-            </Dialog.Close>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={toggleTutorialMode}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md border text-[10px] font-bold uppercase tracking-widest transition-colors ${
+                  tutorialMode
+                    ? 'border-cyan-500/40 bg-cyan-500/10 text-cyan-400'
+                    : 'border-slate-700 bg-transparent text-slate-600 hover:text-slate-400 hover:border-slate-600'
+                }`}
+              >
+                <Info className="w-3 h-3" />
+                Tutorial
+              </button>
+              <Dialog.Close className="rounded-lg p-2 hover:bg-slate-800 transition-colors border border-transparent hover:border-slate-700">
+                <X className="w-5 h-5 text-slate-400" />
+              </Dialog.Close>
+            </div>
           </div>
 
           {/* Main Scrollable Content Area */}

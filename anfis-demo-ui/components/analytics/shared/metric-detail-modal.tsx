@@ -9,6 +9,7 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet';
 import { METRIC_EXPLANATIONS } from '@/lib/analytics/educational-content';
+import { useTutorial } from '@/lib/analytics/tutorial-context';
 import { cn } from '@/lib/utils';
 import { BookOpen, Calculator, Eye, FlaskConical, Lightbulb, Wrench } from 'lucide-react';
 
@@ -27,8 +28,9 @@ export function MetricDetailModal({
   currentValue,
   status = 'neutral',
 }: MetricDetailModalProps) {
+  const { tutorialMode } = useTutorial();
   const content = METRIC_EXPLANATIONS[metricKey];
-  if (!content) return null;
+  if (!tutorialMode || !content) return null;
 
   // Only show live value if it's a meaningful data value (not a placeholder string)
   const meaninglessValues = ['Dynamic', 'Active', 'Definition', 'Info'];

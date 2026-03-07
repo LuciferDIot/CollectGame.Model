@@ -2,6 +2,7 @@
 
 import { EducationalDrawer } from '@/components/analytics/shared/educational-drawer';
 import { MetricDetailModal } from '@/components/analytics/shared/metric-detail-modal';
+import { useTutorial } from '@/lib/analytics/tutorial-context';
 import { usePipeline } from '@/lib/session/pipeline-context';
 import { BehaviorCategory } from '@/lib/types';
 import { cn } from '@/lib/utils';
@@ -12,6 +13,7 @@ export function AdaptationTab() {
   const { pipelineState } = usePipeline();
   const { behaviorCategories, output } = pipelineState;
   const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
+  const { tutorialMode } = useTutorial();
 
   // Helper to get category specific multiplier
   const getCategoryFactor = (catName: string): number => {
@@ -37,16 +39,18 @@ export function AdaptationTab() {
   return (
     <div className="m-0 p-4 sm:p-5 space-y-6 w-full">
       {/* Beginner Intro Banner */}
-      <div className="p-3 rounded-lg border border-amber-800/30 bg-amber-950/20 flex items-start gap-2.5">
-        <History className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-        <div>
-          <p className="text-xs font-semibold text-amber-300 mb-0.5">What is this tab?</p>
-          <p className="text-[11px] text-slate-400 leading-relaxed">
-            This shows <span className="text-slate-300">the game settings the AI adjusted</span> based on the player's detected behaviour.
-            Each row shows the original (base) value and the new (final) value. A positive % means the parameter was increased; negative means decreased.
-          </p>
+      {tutorialMode && (
+        <div className="p-3 rounded-lg border border-amber-800/30 bg-amber-950/20 flex items-start gap-2.5">
+          <History className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+          <div>
+            <p className="text-xs font-semibold text-amber-300 mb-0.5">What is this tab?</p>
+            <p className="text-[11px] text-slate-400 leading-relaxed">
+              This shows <span className="text-slate-300">the game settings the AI adjusted</span> based on the player's detected behaviour.
+              Each row shows the original (base) value and the new (final) value. A positive % means the parameter was increased; negative means decreased.
+            </p>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Window-to-Window Comparison */}
       <WindowComparison
@@ -197,36 +201,38 @@ export function AdaptationTab() {
           </ParameterCard>
         </div>
       </div>
-      {/* How Adaptation Works — Permanent Explainer */}
-      <div className="rounded-xl border border-slate-700/40 bg-slate-900/20 overflow-hidden">
-        <div className="px-4 py-3 border-b border-slate-700/30 flex items-center gap-2">
-          <SlidersHorizontal className="w-3.5 h-3.5 text-slate-500" />
-          <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">How adaptation works — the full chain</p>
-        </div>
-        <div className="px-4 py-4 space-y-4 text-[11px] text-slate-400 leading-relaxed">
-          <p>
-            The AI follows a 4-step chain each window to decide how to adjust the game:
-          </p>
-          <ol className="space-y-3 list-none">
-            <AdaptStepRow n="1" title="Measure behavior" color="text-cyan-400"
-              body="Raw game stats (hits, damage, distance, etc.) are collected over a 30-second window and normalised to [0–1] so they are comparable." />
-            <AdaptStepRow n="2" title="Classify play style" color="text-violet-400"
-              body="The AI scores your play style as a blend of three archetypes — Combat, Collection, Exploration — each getting a percentage (they always sum to 100%)." />
-            <AdaptStepRow n="3" title="Compute a global multiplier" color="text-amber-400"
-              body={`The ANFIS surrogate model predicts a single difficulty multiplier (range 0.6× – 1.4×). Above 1.0 means harder; below 1.0 means easier. Current: ${(output?.adjustedMultiplier ?? 1.0).toFixed(3)}×`} />
-            <AdaptStepRow n="4" title="Scale each parameter by archetype weight" color="text-emerald-400"
-              body="Each category parameter is scaled by its own category factor: factor = 1.0 + (globalMult − 1.0) × (0.5 + membership × 1.5). Combat players get harder combat settings; collectors get richer item economies; explorers get better movement." />
-          </ol>
-          <div className="pt-2 border-t border-slate-700/30">
-            <p className="text-slate-500">
-              <span className="text-slate-400 font-medium">Why the 0.5 baseline in the formula?</span>{' '}
-              Every player gets at least 50% of the global adaptation applied — no archetype is completely ignored.
-              The remaining 50% is driven by how strongly you match that archetype (your soft membership value).
-              A 100% Combat player gets 200% weight on combat parameters; a 0% Combat player still gets 50%.
+      {/* How Adaptation Works — Tutorial only */}
+      {tutorialMode && (
+        <div className="rounded-xl border border-slate-700/40 bg-slate-900/20 overflow-hidden">
+          <div className="px-4 py-3 border-b border-slate-700/30 flex items-center gap-2">
+            <SlidersHorizontal className="w-3.5 h-3.5 text-slate-500" />
+            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">How adaptation works — the full chain</p>
+          </div>
+          <div className="px-4 py-4 space-y-4 text-[11px] text-slate-400 leading-relaxed">
+            <p>
+              The AI follows a 4-step chain each window to decide how to adjust the game:
             </p>
+            <ol className="space-y-3 list-none">
+              <AdaptStepRow n="1" title="Measure behavior" color="text-cyan-400"
+                body="Raw game stats (hits, damage, distance, etc.) are collected over a 30-second window and normalised to [0–1] so they are comparable." />
+              <AdaptStepRow n="2" title="Classify play style" color="text-violet-400"
+                body="The AI scores your play style as a blend of three archetypes — Combat, Collection, Exploration — each getting a percentage (they always sum to 100%)." />
+              <AdaptStepRow n="3" title="Compute a global multiplier" color="text-amber-400"
+                body={`The ANFIS surrogate model predicts a single difficulty multiplier (range 0.6× – 1.4×). Above 1.0 means harder; below 1.0 means easier. Current: ${(output?.adjustedMultiplier ?? 1.0).toFixed(3)}×`} />
+              <AdaptStepRow n="4" title="Scale each parameter by archetype weight" color="text-emerald-400"
+                body="Each category parameter is scaled by its own category factor: factor = 1.0 + (globalMult − 1.0) × (0.5 + membership × 1.5). Combat players get harder combat settings; collectors get richer item economies; explorers get better movement." />
+            </ol>
+            <div className="pt-2 border-t border-slate-700/30">
+              <p className="text-slate-500">
+                <span className="text-slate-400 font-medium">Why the 0.5 baseline in the formula?</span>{' '}
+                Every player gets at least 50% of the global adaptation applied — no archetype is completely ignored.
+                The remaining 50% is driven by how strongly you match that archetype (your soft membership value).
+                A 100% Combat player gets 200% weight on combat parameters; a 0% Combat player still gets 50%.
+              </p>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       <div className="flex justify-center pt-4 opacity-20">
         <SlidersHorizontal className="w-5 h-5 text-slate-600" />
@@ -323,6 +329,7 @@ function WindowComparison({
   currentMultiplier?: number;
   previousMultiplier?: number;
 }) {
+  const { tutorialMode } = useTutorial();
   if (!previousCategories || previousCategories.length === 0) {
     return (
       <div className="p-3 rounded-lg border border-slate-700/40 bg-slate-900/20 flex items-center gap-2 text-slate-500">
@@ -392,25 +399,27 @@ function WindowComparison({
         })}
       </div>
 
-      {/* Delta → Parameter cascade explainer */}
-      <div className="px-4 py-4 border-t border-slate-700/30 bg-slate-900/20 space-y-2">
-        <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">How these deltas cascade to parameters</p>
-        <p className="text-[11px] text-slate-400 leading-relaxed">
-          Each archetype percentage feeds into a <span className="text-slate-300 font-medium">category factor</span> (a multiplier close to 1.0).
-          The factor is computed as: <span className="font-mono text-cyan-400">factor = 1.0 + (globalMult − 1.0) × (0.5 + membership × 1.5)</span>.
-        </p>
-        <p className="text-[11px] text-slate-400 leading-relaxed">
-          When that factor goes <span className="text-emerald-400">above 1.0</span>: parameters tied to that archetype get harder/more intense
-          (e.g., more enemies, less items timeout). When it goes <span className="text-rose-400">below 1.0</span>: those parameters ease off.
-          Some parameters scale directly (<span className="font-mono text-slate-300">base × factor</span>) and some inversely
-          (<span className="font-mono text-slate-300">base ÷ factor</span>) to balance challenge against player power.
-        </p>
-        <div className="grid grid-cols-1 gap-1.5 mt-2">
-          <CascadeRow category="Combat ↑" effect="enemy spawn ↓, enemy cap ↑, enemy health ↑, enemy damage ↑, player health ↓, player damage ↓" color="text-rose-400" />
-          <CascadeRow category="Collection ↑" effect="collectible count ↑, spawn interval ↓, collectible lifetime ↑" color="text-amber-400" />
-          <CascadeRow category="Exploration ↑" effect="stamina regen ↑, dash cooldown ↓" color="text-sky-400" />
+      {/* Delta → Parameter cascade explainer — tutorial only */}
+      {tutorialMode && (
+        <div className="px-4 py-4 border-t border-slate-700/30 bg-slate-900/20 space-y-2">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">How these deltas cascade to parameters</p>
+          <p className="text-[11px] text-slate-400 leading-relaxed">
+            Each archetype percentage feeds into a <span className="text-slate-300 font-medium">category factor</span> (a multiplier close to 1.0).
+            The factor is computed as: <span className="font-mono text-cyan-400">factor = 1.0 + (globalMult − 1.0) × (0.5 + membership × 1.5)</span>.
+          </p>
+          <p className="text-[11px] text-slate-400 leading-relaxed">
+            When that factor goes <span className="text-emerald-400">above 1.0</span>: parameters tied to that archetype get harder/more intense
+            (e.g., more enemies, less items timeout). When it goes <span className="text-rose-400">below 1.0</span>: those parameters ease off.
+            Some parameters scale directly (<span className="font-mono text-slate-300">base × factor</span>) and some inversely
+            (<span className="font-mono text-slate-300">base ÷ factor</span>) to balance challenge against player power.
+          </p>
+          <div className="grid grid-cols-1 gap-1.5 mt-2">
+            <CascadeRow category="Combat ↑" effect="enemy spawn ↓, enemy cap ↑, enemy health ↑, enemy damage ↑, player health ↓, player damage ↓" color="text-rose-400" />
+            <CascadeRow category="Collection ↑" effect="collectible count ↑, spawn interval ↓, collectible lifetime ↑" color="text-amber-400" />
+            <CascadeRow category="Exploration ↑" effect="stamina regen ↑, dash cooldown ↓" color="text-sky-400" />
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
