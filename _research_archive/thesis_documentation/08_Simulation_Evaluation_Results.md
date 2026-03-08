@@ -3,28 +3,28 @@
 ## 1. Simulated Evaluation Dataset
 To validate the ANFIS pipeline, we simulated a dataset of player telemetry windows representing diverse gameplay styles. The table below shows a subset of inputs (soft cluster membership + difficulty deltas) and the corresponding ANFIS difficulty multiplier output ($M$).
 
-| Window | Type | Soft Combat ($u_c$) | Soft Collect ($u_l$) | Soft Explore ($u_e$) | $\Delta$ Combat | $\Delta$ Collect | $\Delta$ Explore | Target $M$ |
+| Window | Type | Soft Combat | Soft Collect | Soft Explore | Δ Combat | Δ Collect | Δ Explore | Display $M$ |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| 1 | **Baseline** | 0.33 | 0.33 | 0.34 | 0.00 | 0.00 | 0.00 | **1.00** |
-| 2 | **High Combat** | 0.85 | 0.10 | 0.05 | +0.40 | -0.10 | -0.30 | **1.35** |
-| 3 | **Struggling** | 0.70 | 0.20 | 0.10 | -0.50 | -0.10 | +0.10 | **0.82** |
-| 4 | **Collector** | 0.10 | 0.80 | 0.10 | -0.10 | +0.40 | -0.10 | **1.15** |
-| 5 | **Explorer** | 0.15 | 0.15 | 0.70 | -0.05 | -0.05 | +0.30 | **1.08** |
-| 6 | **Mixed** | 0.45 | 0.45 | 0.10 | +0.10 | +0.15 | -0.10 | **1.18** |
-| 7 | **Idle/Passive**| 0.20 | 0.20 | 0.60 | -0.60 | -0.60 | -0.30 | **0.75** |
+| 1 | **Balanced** | 0.33 | 0.33 | 0.34 | 0.00 | 0.00 | 0.00 | **1.00** ← guaranteed by neutral-centred calibration |
+| 2 | **High Combat** | 0.85 | 0.10 | 0.05 | +0.40 | −0.10 | −0.30 | **~1.36** (HARDER) |
+| 3 | **Struggling** | 0.70 | 0.20 | 0.10 | −0.50 | −0.10 | +0.10 | **~0.82** (easier) |
+| 4 | **Collector** | 0.10 | 0.80 | 0.10 | −0.10 | +0.40 | −0.10 | **~0.87** (easier) |
+| 5 | **Explorer** | 0.15 | 0.15 | 0.70 | −0.05 | −0.05 | +0.30 | **~0.83** (easier) |
+| 6 | **Mixed** | 0.45 | 0.45 | 0.10 | +0.10 | +0.15 | −0.10 | **~1.10** (HARDER) |
+| 7 | **Idle/Passive**| 0.20 | 0.20 | 0.60 | −0.60 | −0.60 | −0.30 | **~0.72** (easier) |
 
-*Note: $M > 1.0$ increases difficulty (e.g., more enemies), $M < 1.0$ decreases it.*
+*$M > 1.0$: difficulty increases (more enemies, less loot). $M < 1.0$: difficulty decreases (fewer enemies, more loot). $M = 1.0$: no change. Display values computed via neutral-centred formula: $M_{\text{display}} = \text{clamp}(1.0 + (\text{raw} - 0.932) \times 2.0,\ 0.6,\ 1.4)$.*
 
-## 2. ANFIS Prediction Accuracy
-The ANFIS model (approximated via a 6-16-8-1 MLP surrogate) was evaluated on a test split (20%) of the simulated dataset.
+## 2. ANFIS Prediction Accuracy (v2.2.1 — corrected)
+The ANFIS model (approximated via a 6-16-8-1 MLP surrogate) was evaluated on a test split (20%) of the full synthetic dataset.
 
-*   **Training Samples**: 2,531
-*   **Test Samples**: 633
-*   **Mean Absolute Error (MAE)**: `0.0102`
-*   **Root Mean Squared Error (RMSE)**: `0.0145`
-*   **R² Score**: `0.982`
+*   **Total Samples**: 3,240 (80/20 split → 2,592 train / 648 test)
+*   **Mean Absolute Error (MAE)**: `0.0127`
+*   **R² Score**: `0.9264`
+*   **Convergence**: 21 iterations (LBFGS solver, max_iter=500)
+*   **mlp_neutral**: 0.932006 (neutral-centred calibration baseline)
 
-The low MAE indicates the surrogate model faithfully reproduces the fuzzy inference surface.
+The low MAE (1.3% of target span) indicates the surrogate faithfully reproduces the fuzzy inference surface. Note: earlier versions of this report cited R²=0.982 and MAE=0.0102 — those figures came from a biased training run (base=0.9) and a smaller dataset. The current figures reflect the corrected v2.2.1 retrain.
 
 ## 3. Calibration Study Results (N=7)
 A small-scale user study was conducted to calibrate the base difficulty modes before enabling full adaptation. Participants played three fixed modes in randomized order.
@@ -33,7 +33,7 @@ A small-scale user study was conducted to calibrate the base difficulty modes be
 *   **Mode C (Hard)**: $M=1.5$. Reported as "Frustratingly difficult" and "Unfair enemy spawns" by 5/7 users.
 *   **Mode B (Medium)**: $M=1.0$. Reported as "Balanced" but "Repetitive" by 4/7 users.
 
-**Conclusion**: The Adaptive System (v2.2) target range was calibrated to $[0.75, 1.40]$ to cover the "Boring" to "Challenging" spectrum without hitting the "Unfair" threshold of Mode C.
+**Conclusion**: The Adaptive System (v2.2.1) target range is $[0.60, 1.40]$. The lower bound (0.6×) corresponds to full assistance mode; the upper bound (1.4×) represents maximum challenge, below the "Unfair" threshold observed in Mode C ($M=1.5$). Balanced players are guaranteed to receive $M=1.0$ via neutral-centred calibration.
 
 ## 4. Visualization: Delta Impact on Difficulty
 The following matrix illustrates how changes in player performance ($\Delta$) shift the Difficulty Multiplier ($M$) for a balanced player ($u \approx 0.33$).

@@ -9,6 +9,7 @@ import {
     SheetTrigger,
 } from '@/components/ui/sheet';
 import { METRIC_EXPLANATIONS } from '@/lib/analytics/educational-content';
+import { useTutorial } from '@/lib/analytics/tutorial-context';
 import { BookOpen, Calculator, HelpCircle, Info, Lightbulb } from 'lucide-react';
 import { ReactNode } from 'react';
 
@@ -18,7 +19,13 @@ interface EducationalDrawerProps {
 }
 
 export function EducationalDrawer({ contentKey, trigger }: EducationalDrawerProps) {
+  const { tutorialMode } = useTutorial();
   const content = METRIC_EXPLANATIONS[contentKey];
+
+  // When tutorial mode is off, render the trigger passively (no sheet wrapper)
+  if (!tutorialMode) {
+    return trigger ? <>{trigger}</> : null;
+  }
 
   if (!content) {
     return <>{trigger}</>;

@@ -169,6 +169,11 @@ export interface MLPWeights {
   };
   version: string;
   status: string;
+  /** Empirical [min, max] of the MLP's raw output — stored for documentation. */
+  output_range?: number[];
+  /** MLP output for balanced (0.33,0.33,0.33) no-delta input — the semantic neutral point.
+   *  Recomputed and stored automatically by notebook 07 after each retrain. */
+  mlp_neutral?: number;
 }
 
 export interface DeploymentManifest {

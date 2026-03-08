@@ -29,16 +29,20 @@ Raw telemetry features ($X$) are scaled to the $[0, 1]$ range using parameters f
 
 $$ X'_{\text{norm}} = \frac{X - \text{min}}{\text{max} - \text{min}} $$
 
-### Step 2: Activity Score Calculation
-We calculate the "Activity Percentage" for each behavioral category by summing the normalized features and normalizing the result to a valid probability distribution (Sum = 1.0).
+### Step 2: Activity Score Calculation (v2.2)
+Each archetype score is computed as the **per-archetype average** of its normalized signals. This gives every archetype an equal ceiling of 1.0, preventing structural bias from feature-count asymmetry.
 
-**Component Sums**:
-*   $S_{\text{combat}} = \text{EnemiesHit} + \text{DamageDone} + \text{TimeInCombat} + \text{Kills}$
-*   $S_{\text{collect}} = \text{ItemsCollected} + \text{PickupAttempts} + \text{TimeNearInteractables}$
-*   $S_{\text{explore}} = \text{DistanceTraveled} + \text{TimeSprinting} + \text{TimeOutOfCombat}$
+**v2.2 Formulae** (two derived features added — computed before normalization):
 
-**Normalization**:
-$$ P_{\text{category}} = \frac{S_{\text{category}}}{S_{\text{combat}} + S_{\text{collect}} + S_{\text{explore}}} $$
+| Archetype | Features (5 / 4 / 2) | Formula |
+|-----------|----------------------|---------|
+| **Combat** | EnemiesHit, DamageDone, TimeInCombat, Kills, **DamagePerHit** | $\text{score\_combat} = \text{avg}(5\text{ features})$ |
+| **Collection** | ItemsCollected, PickupAttempts, TimeNearInteractables, **PickupAttemptRate** | $\text{score\_collect} = \text{avg}(4\text{ features})$ |
+| **Exploration** | DistanceTraveled, TimeSprinting | $\text{score\_explore} = \text{avg}(2\text{ features})$ |
+
+> **Why averages, not sums?** (v2.1 fix): Sums gave Combat a 4× ceiling over a 1-feature Exploration category. Averages guarantee a fair [0,1] ceiling per archetype.
+> **Why remove `timeOutOfCombat`?** (v2.1 fix): It accumulated *passively* for any player not fighting, mis-classifying attacker-intent players as Explorers on sparse-spawn maps.
+> **Why `DamagePerHit` and `PickupAttemptRate`?** (v2.2 addition): Sniper-style players deal high damage with few hits — without this, they were under-represented in Combat scoring. `PickupAttemptRate` distinguishes deliberate Collectors from incidental Explorers who pass near items without picking them up.
 
 ### Step 3: Soft Membership (Fuzzy Clustering)
 Players are classified into archetypes using **Inverse Distance Weighting (IDW)** based on the distance to pre-calculated centroids (`cluster_centroids.json`).
@@ -57,11 +61,18 @@ $$ \Delta_{\text{cat}}(t) = \mu_{\text{cat}}(t) - \mu_{\text{cat}}(t-1) $$
 This "Behavioral Velocity" is critical for detecting rapid playstyle shifts (e.g., sudden aggression) versus steady-state behavior.
 
 ### Step 5: ANFIS Inference (MLP Surrogate)
-A trained Multi-Layer Perceptron (MLP) predicts the difficulty multiplier.
+A trained Multi-Layer Perceptron (MLP) predicts a raw difficulty score, which is then mapped to the display multiplier via **neutral-centred calibration**.
 
 *   **Inputs**: $[\mu_{\text{c}}, \mu_{\text{l}}, \mu_{\text{e}}, \Delta_{\text{c}}, \Delta_{\text{l}}, \Delta_{\text{e}}]$ (6 dimensions)
-*   **Weights**: Loaded from `anfis_mlp_weights.json`.
-*   **Output**: $M_{\text{target}}$ (clamped between 0.5 and 1.5).
+*   **Architecture**: 6 → Dense(16, ReLU) → Dense(8, ReLU) → Dense(1, Linear)
+*   **Weights**: Loaded from `anfis_mlp_weights.json` (Test R²=0.9264, MAE=0.0127)
+*   **Calibration** (neutral-centred):
+
+$$M_{\text{display}} = \text{clamp}\!\left(1.0 + (\text{raw} - \text{mlp\_neutral}) \times 2.0,\ 0.6,\ 1.4\right)$$
+
+where $\text{mlp\_neutral} = 0.932006$ = MLP output for a balanced (⅓,⅓,⅓) no-delta player.
+
+> **Why neutral-centred?** A balanced player must semantically map to display=1.0 (no change). Min-max rescaling was sensitive to extreme training inputs and broke this guarantee. Neutral-centred calibration enforces it by construction. `mlp_neutral` is auto-recomputed and saved by notebook 07 after each retrain — no code changes needed.
 
 ### Step 6: Adaptation Logic
 The final game parameters are calculated using the **Archetype-Aware Adaptation** formula.

@@ -1,6 +1,7 @@
 'use client';
 
 import { EducationalDrawer } from '@/components/analytics/shared/educational-drawer';
+import { HelpfulTooltip } from '@/components/analytics/shared/helpful-tooltip';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -15,17 +16,17 @@ interface RulesPanelProps {
 export function RulesPanel({ rules }: RulesPanelProps) {
   // Logic already passed in sorted, but nice to be safe or re-sort if needed.
   // Assuming 'rules' passed here are the ones we want to show.
-  
+
   return (
     <div className="xl:col-span-4 flex flex-col gap-3 min-h-[300px]">
       <div className="flex items-center gap-2 text-slate-400 mb-1">
         <Zap className="w-3.5 h-3.5" />
-        <EducationalDrawer 
+        <EducationalDrawer
           contentKey="rule_firing_strength"
           trigger={
-             <span className="text-xs font-bold uppercase tracking-wider font-mono cursor-help hover:text-blue-400 transition-colors border-b border-dotted border-slate-600">
-                03. Inference Rules Trace
-             </span>
+            <span className="text-xs font-bold uppercase tracking-wider font-mono cursor-help hover:text-blue-400 transition-colors border-b border-dotted border-slate-600">
+              03. Inference Rules Trace
+            </span>
           }
         />
       </div>
@@ -51,9 +52,17 @@ export function RulesPanel({ rules }: RulesPanelProps) {
                   className="flex items-center gap-3 p-3 border-b border-slate-800/50 hover:bg-slate-900/30 transition-colors group"
                 >
                   <div className="w-8 shrink-0 flex flex-col items-center gap-0.5">
-                    <span className="text-[10px] font-mono text-slate-600">
-                      STR
-                    </span>
+                    <HelpfulTooltip
+                      trigger={
+                        <span className="text-[10px] font-mono text-slate-600 cursor-help hover:text-slate-400 transition-colors">
+                          STR
+                        </span>
+                      }
+                      title="Rule Firing Strength (STR)"
+                      description="How strongly this fuzzy rule fired for the current player input. Each ANFIS rule is an IF-THEN condition like 'IF combat is HIGH AND exploration is LOW THEN multiplier is +0.3'. STR is how well the player's current telemetry satisfies that condition."
+                      calculation={"STR = min(μ₁, μ₂, ..., μₙ)  — product of all antecedent membership values.\nRange: 0.0 (rule did not fire) → 1.0 (perfectly satisfied)."}
+                      interpretation={"≥ 0.5 (green) = rule strongly active — high influence on outcome.\n< 0.5 (blue)  = rule partially active — moderate contribution.\nOnly rules with STR > 0.01 are shown."}
+                    />
                     <span
                       className={cn(
                         "text-xs font-bold font-mono",

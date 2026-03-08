@@ -9,12 +9,14 @@ import { TelemetryPanel } from './behavior/telemetry-panel';
 
 import { EducationalDrawer } from '@/components/analytics/shared/educational-drawer';
 import { MetricDetailModal } from '@/components/analytics/shared/metric-detail-modal';
+import { useTutorial } from '@/lib/analytics/tutorial-context';
 import { useState } from 'react';
 
 export function BehaviorTab() {
   const { pipelineState } = usePipeline();
   const { normalizedFeatures, rulesFired, behaviorCategories } = pipelineState;
   const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
+  const { tutorialMode } = useTutorial();
 
   // Logic: Sort rules and filter
   const activeRules = [...(rulesFired || [])]
@@ -24,58 +26,78 @@ export function BehaviorTab() {
   // Logic: Flatten features
   const featuresList = normalizedFeatures
     ? Object.entries(normalizedFeatures).flatMap(([key, values]) => {
-        const val = Array.isArray(values) ? values[values.length - 1] : (values as number);
-        return { name: key, value: val };
-      })
+      const val = Array.isArray(values) ? values[values.length - 1] : (values as number);
+      return { name: key, value: val };
+    })
     : [];
 
   return (
-    <div className="h-full flex flex-col p-6 space-y-2 max-w-[1800px] mx-auto">
+    <div className="h-full flex flex-col p-4 sm:p-5 space-y-4 w-full animate-fade-in">
+      {/* System Context Banner — tutorial mode only */}
+      {tutorialMode && (
+        <div className="p-4 mb-6 rounded-xl border border-primary/20 bg-primary/5 backdrop-blur-sm flex items-start gap-4 shadow-2xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-16 -mt-16" />
+          <Activity className="w-5 h-5 text-primary shrink-0 mt-0.5 animate-pulse" />
+          <div>
+            <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-1">System Context</p>
+            <p className="text-xs text-muted-foreground leading-relaxed max-w-2xl">
+              This module visualizes the <span className="text-foreground font-bold italic">Behavioral Inference Sequence</span>. It decodes raw gameplay telemetry into fuzzy archetypes, utilizing soft-clustering to determine playstyle alignment and drive downstream adaptation logic.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Header Section */}
-      <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+      <div className="flex items-center justify-between pb-6 border-b border-border/40">
         <div>
-          <h2 className="text-lg font-bold text-slate-100 uppercase tracking-tight flex items-center gap-2">
-            <Activity className="w-5 h-5 text-blue-400" />
-            Behavioral Inference Engine
-            <EducationalDrawer 
+          <h2 className="text-xl font-black text-foreground uppercase tracking-tighter flex items-center gap-2 group">
+            <Activity className="w-6 h-6 text-primary group-hover:rotate-12 transition-transform" />
+            Inference Engine
+            <EducationalDrawer
               contentKey="anfis_pipeline_overview"
-              trigger={<span className="ml-2 px-1.5 py-0.5 rounded border border-blue-500/30 bg-blue-500/10 text-[10px] text-blue-300 cursor-help hover:bg-blue-500/20 transition-colors uppercase tracking-widest font-mono">Info</span>}
+              trigger={<span className="ml-3 px-2 py-0.5 rounded-lg border border-primary/30 bg-primary/10 text-[9px] text-primary cursor-help hover:bg-primary/20 transition-all uppercase tracking-widest font-black">Open Specs</span>}
             />
           </h2>
-          <p className="text-xs text-slate-400 font-mono mt-1">
-            REAL-TIME FUZZY LOGIC PIPELINE • CYCLE TICK: {pipelineState.executionTime.toFixed(2)}ms
+          <p className="text-[10px] text-muted-foreground/60 font-mono mt-1.5 uppercase tracking-widest flex items-center gap-3">
+            <span className="flex items-center gap-1.5">
+              <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
+              REAL-TIME_FUZZY_LOGIC
+            </span>
+            <span className="opacity-40">|</span>
+            <span>CYCLE_LATENCY: {pipelineState.executionTime.toFixed(3)}MS</span>
           </p>
         </div>
-        <Badge variant="outline" className="font-mono text-xs border-blue-900 bg-blue-950/30 text-blue-300">
-           ACTIVE RULES: {activeRules.length}
+        <Badge variant="outline" className="font-black text-[10px] border-primary/30 bg-primary/5 text-primary px-3 py-1 rounded-lg tracking-widest">
+          ACTIVE_RULES: {activeRules.length}
         </Badge>
       </div>
 
       {/* Main Grid Layout */}
-      <div className="grid grid-cols-1 gap-6 h-full min-h-0 pt-4">
-        
-        {/* 1. Feature Inputs */}
-        <TelemetryPanel 
-          features={featuresList} 
-          onMetricSelect={setSelectedMetric} 
+      <div className="space-y-6 pt-4">
+        {/* Top Row: Telemetry + Rules side by side on larger screens */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* 1. Feature Inputs */}
+          <TelemetryPanel
+            features={featuresList}
+            onMetricSelect={setSelectedMetric}
+          />
+
+          {/* 3. Rule Trace */}
+          <RulesPanel rules={activeRules} />
+        </div>
+
+        {/* Bottom Row: Archetype Decomposition full width */}
+        <ArchetypePanel
+          categories={behaviorCategories}
+          onMetricSelect={setSelectedMetric}
         />
-
-        {/* 2. Archetype Decomposition */}
-        <ArchetypePanel 
-          categories={behaviorCategories} 
-          onMetricSelect={setSelectedMetric} 
-        />
-
-        {/* 3. Rule Trace */}
-        <RulesPanel rules={activeRules} />
-
       </div>
 
-      <MetricDetailModal 
+      <MetricDetailModal
         isOpen={!!selectedMetric}
         onClose={() => setSelectedMetric(null)}
         metricKey={selectedMetric || ''}
-        currentValue="Active" 
+        currentValue="Active"
         status="neutral"
       />
     </div>

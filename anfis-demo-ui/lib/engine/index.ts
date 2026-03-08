@@ -1,14 +1,3 @@
-// ------------------------------------------------------------------
-// THE PIPELINE ORCHESTRATOR (The Conductor)
-// ------------------------------------------------------------------
-// This file is the "Brain" of the operation.
-// Like a conductor in an orchestra, it tells every instrument (algorithm)
-// when to play and what data to process.
-//
-// IT DOES NOT DO THE MATH ITSELF.
-// It calls other dedicated workers (Normalizer, Clusterer, MLP) to do the heavy lifting.
-// ------------------------------------------------------------------
-
 import { PipelineSessionManager } from '../session/session-manager';
 import { calculateActivityScores } from './activity';
 import { applyAdaptationContract } from './adaptation';
@@ -35,6 +24,7 @@ export class ANFISPipeline {
   private mlp: MLPInference;
   private sessionManager: PipelineSessionManager;
   private manifest: DeploymentManifest;
+  private mlpNeutral: number;
 
   constructor(
     scalerParams: ScalerParams,
@@ -47,54 +37,41 @@ export class ANFISPipeline {
     this.mlp = new MLPInference(mlpWeights);
     this.sessionManager = new PipelineSessionManager();
     this.manifest = manifest;
+    // MLP output for balanced (⅓,⅓,⅓) no-delta input — semantic neutral point.
+    // Auto-recomputed by notebook 07 after each retrain; stored in anfis_mlp_weights.json.
+    this.mlpNeutral = mlpWeights.mlp_neutral ?? 0.932;
   }
 
-  /**
-   * Main Pipeline Orchestrator
-   * Executes the 8-Step ANFIS processing flow as defined in Thesis Section 4.2.
-   * 
-   * @param telemetry Raw telemetry window from the client
-   * @param deaths Optional death events for context
-   */
   process(telemetry: TelemetryWindow): PipelineOutput {
     const perfTimings: Record<string, number> = {};
     const t0 = performance.now();
 
-    // Step 1: Telemetry Acquisition & Validation
-    // Thesis Section 4.2.1
+    // Step 1: Validate
     this.step1_AcquireAndValidate(telemetry);
 
-    // Step 2: Normalization
-    // Eq 3.1: Min-Max Scaling
+    // Step 2: Normalize (Min-Max, 12 features including 2 derived)
     const normalized = this.step2_NormalizeFeatures(telemetry.features);
 
-    // Step 3: Activity Scoring
-    // Eq 3.2: Heuristic Categorization
+    // Step 3: Activity scores (per-archetype averages → equal ceiling)
     const activityScores = this.step3_CalculateActivityScores(normalized);
 
-    // Step 4: Fuzzy Clustering (Fuzzification)
-    // Eq 3.5: Soft Membership (FCM-IDW)
+    // Step 4: Soft membership via IDW (K=3)
     const softMembership = this.step4_FuzzyClustering(activityScores);
 
-    // Step 5: Defuzzification & Temporal Dynamics
-    // Eq 4.2: Delta Calculation (Velocity)
-    // Parse timestamp if available (handles ISO strings)
+    // Step 5: Temporal deltas (window-to-window membership change)
     const timestamp = telemetry.timestamp
       ? new Date(telemetry.timestamp).getTime()
       : Date.now();
 
     const deltas = this.step5_ComputeDeltas(telemetry.userId, softMembership, timestamp);
 
-    // Step 6: Inference Engine (Rules Layer)
-    // Neural Surrogate Forward Pass
+    // Step 6: MLP forward pass (6→16→8→1)
     const { anfisInput, mlpResult } = this.step6_InferenceEngine(softMembership, deltas);
 
-    // Step 7: Adaptation Analysis
-    // Constraint satisfaction and parameter scaling
+    // Step 7: Neutral-centred calibration + parameter adaptation
     const { targetMultiplier, multiplierClamped, adaptedParameters } = this.step7_AdaptationAnalysis(mlpResult.result, softMembership);
 
-    // Step 8: Result Aggregation
-    // Final packaging for Client-Server contract
+    // Step 8: Aggregate result
     perfTimings.total = performance.now() - t0;
 
     return {
@@ -118,90 +95,41 @@ export class ANFISPipeline {
     } as any;
   }
 
-  // --- Private "Thesis Step" Implementations ---
-
-  /**
-   * Step 1: Acquisition & Validation
-   * Ensures data integrity before processing.
-   */
   private step1_AcquireAndValidate(telemetry: TelemetryWindow): void {
     validateDuration(telemetry.duration ?? 30);
   }
 
   /**
-   * Step 2: Feature Normalization (Min-Max)
-   * ---------------------------------------
-   * CONCEPT: "Comparing Apples to Apples"
-   * The game sends us data in different units (e.g., Distance in meters, Damage in points).
-   * The AI can't understand these raw numbers.
+   * Computes two derived features from raw telemetry before passing to the scaler.
    *
-   * WHAT WE DO:
-   * We first compute two derived features from raw telemetry, then squash all numbers
-   * into a range between 0 and 1 using the trained MinMax scaler.
+   * damagePerHit = damageDone / max(enemiesHit, 1)
+   *   Captures weapon-class-agnostic combat intensity. Snipers land few hits but
+   *   high damage per hit; without this, sniper-style players are underrepresented
+   *   in the combat score relative to their actual engagement.
    *
-   * DERIVED FEATURES (v2.2):
-   * - damagePerHit       = damageDone / max(enemiesHit, 1)
-   *     Captures weapon-class-agnostic combat intensity. Sniper players land
-   *     few hits but high damage-per-hit; spray players show the inverse.
-   *     Without this, snipers are underrepresented in the combat score.
-   *
-   * - pickupAttemptRate  = pickupAttempts / max(timeNearInteractables, 1)
-   *     Distinguishes deliberate collectors (high rate) from explorers who
-   *     pass near items incidentally (low rate). Reduces cross-archetype
-   *     contamination between Collection and Exploration clusters.
+   * pickupAttemptRate = pickupAttempts / max(timeNearInteractables, 1)
+   *   Distinguishes deliberate collectors (high rate) from explorers who pass near
+   *   items incidentally (low rate), reducing cross-archetype contamination.
    */
   private step2_NormalizeFeatures(features: any) {
-    // Pre-compute derived features from raw values before normalization
     const damage_per_hit = (features.damageDone ?? 0) / Math.max(features.enemiesHit ?? 0, 1);
     const pickup_attempt_rate = (features.pickupAttempts ?? 0) / Math.max(features.timeNearInteractables ?? 0, 1);
-
-    // Merge derived features with raw telemetry — scaler picks them up by name
     const enrichedFeatures = { ...features, damage_per_hit, pickup_attempt_rate };
     return this.normalizer.normalize(enrichedFeatures);
   }
 
-  /**
-   * Step 3: Activity Scoring
-   * ------------------------
-   * CONCEPT: "Rule of Thumb"
-   * Before asking the AI, we use simple logic to guess what the player is doing.
-   * This is a "Heuristic" - a mental shortcut.
-   */
   private step3_CalculateActivityScores(normalized: any) {
     return calculateActivityScores(normalized);
   }
 
-  /**
-   * Step 4: Fuzzy Clustering (The "Fuzzy" Part)
-   * -------------------------------------------
-   * CONCEPT: "Degrees of Truth"
-   * In traditional logic, a player is either "Aggressive" OR "Passive". (Black and White).
-   * In Fuzzy Logic, a player can be "80% Aggressive AND 20% Passive". (Shades of Grey).
-   * 
-   * WHAT WE DO:
-   * We calculate how close the player is to our predefined "Archetypes" (Combat, Collect, Explore).
-   */
   private step4_FuzzyClustering(activityScores: any) {
     return this.clustering.calculateMembership(activityScores);
   }
 
-  /**
-   * Step 5: Temporal Delta Computation
-   * Calculates the rate of change (Velocity) of the user's state.
-   * Delta = Current_Membership - Previous_Membership
-   */
   private step5_ComputeDeltas(userId: string, currentMembership: any, timestamp?: number) {
     return this.sessionManager.computeDeltasAndUpdate(userId, currentMembership);
   }
 
-  /**
-   * Step 6: Inference Engine (The "Brain")
-   * --------------------------------------
-   * CONCEPT: "Neural Surrogate"
-   * Real ANFIS rules are very slow to calculate mathematically.
-   * Instead, we trained a small Neural Network (MLP) to mimic the ANFIS rules perfectly.
-   * It's like having a cheat sheet that gives the answer instantly.
-   */
   private step6_InferenceEngine(softMembership: any, deltas: any) {
     const anfisInput = [
       softMembership.soft_combat,
@@ -212,7 +140,6 @@ export class ANFISPipeline {
       deltas.delta_explore,
     ];
 
-    // Object form for MLP (matches internal key structure)
     const inputObj = {
       soft_combat: softMembership.soft_combat,
       soft_collect: softMembership.soft_collect,
@@ -224,42 +151,40 @@ export class ANFISPipeline {
 
     return {
       anfisInput,
-      mlpResult: this.mlp.predict(inputObj) // <-- The Magic happens here
+      mlpResult: this.mlp.predict(inputObj)
     };
   }
 
-  /**
-   * Step 7: Adaptation Analysis
-   * ---------------------------
-   * CONCEPT: "The Contract"
-   * The AI gives us a "Global Multiplier" (e.g., 1.2x Difficulty).
-   * We need to translate this into specific changes for the game (e.g., Enemy Health * 1.2).
-   * 
-   * SAFETY:
-   * We also apply "Clamps" (0.6x to 1.4x) to ensure the game never becomes impossible
-   * or too boring, even if the AI suggests extreme values.
-   */
   private step7_AdaptationAnalysis(rawOutput: number, softMembership: any) {
     const { targetMultiplier, multiplierClamped } = this.computeTargetMultiplier(rawOutput);
     const adaptedParameters = applyAdaptationContract(targetMultiplier, softMembership);
-
     return { targetMultiplier, multiplierClamped, adaptedParameters };
   }
 
   /**
-   * Helper: Safety Clamping
-   * Ensures the Multiplier adheres to the deployment manifest constraints.
+   * Neutral-centred calibration:
+   *   display = clamp(1.0 + (raw − mlp_neutral) × AMPLIFICATION, 0.6, 1.4)
+   *
+   * mlp_neutral is the MLP's raw output for the balanced (⅓,⅓,⅓,0,0,0) input —
+   * the semantic definition of "no change needed". This ensures a balanced player
+   * always maps to exactly 1.0 regardless of how the training distribution shifts
+   * between retrains.
+   *
+   * AMPLIFICATION = 2.0: a raw deviation of ±0.4 from neutral (achievable by
+   * moderate archetype + delta combinations) spans ±0.8 of the display range,
+   * reaching the 0.6–1.4 extremes.
    */
   private computeTargetMultiplier(rawOutput: number): { targetMultiplier: number; multiplierClamped: boolean } {
     const [minM, maxM] = this.manifest.hard_constraints.target_multiplier_range;
-    const targetMultiplier = Math.max(minM, Math.min(maxM, rawOutput));
+    const AMPLIFICATION = 2.0;
+    const rescaled = 1.0 + (rawOutput - this.mlpNeutral) * AMPLIFICATION;
+    const targetMultiplier = Math.max(minM, Math.min(maxM, rescaled));
     return {
       targetMultiplier,
-      multiplierClamped: rawOutput !== targetMultiplier
+      multiplierClamped: rescaled !== targetMultiplier
     };
   }
 
-  // Delegate reset to session manager
   reset(userId?: string) {
     this.sessionManager.reset(userId);
   }
