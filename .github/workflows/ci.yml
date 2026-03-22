@@ -54,8 +54,8 @@ jobs:
 
       - name: Build production bundle
         run: |
-          npm run build || npx next build --webpack
-          ls .next/BUILD_ID || { echo "❌ .next not created after build"; exit 1; }
+          npx next build --webpack
+          ls .next/BUILD_ID || { echo "❌ .next not created"; exit 1; }
           echo "✅ Build succeeded"
 
   # ── 2. UNIT TESTS ───────────────────────────────────────────────────────────
@@ -127,17 +127,22 @@ jobs:
         run: npm ci
 
       - name: Build production bundle
-        run: npm run build || npx next build --webpack
+        run: npx next build --webpack
 
       - name: Start server & wait for ready
         run: |
-          npm run start &
-          echo "SERVER_PID=$!" >> $GITHUB_ENV
+          npx next start &
+          SERVER_PID=$!
+          echo "SERVER_PID=$SERVER_PID" >> $GITHUB_ENV
           for i in $(seq 1 30); do
             CODE=$(curl -s -o /dev/null -w "%{http_code}" \
               -X POST http://localhost:3000/api/pipeline \
               -H "Content-Type: application/json" -d '{}')
-            [ "$CODE" != "000" ] && echo "✅ Server ready (HTTP $CODE)" && break
+            if [ "$CODE" != "000" ]; then
+              echo "✅ Server ready (HTTP $CODE)"
+              break
+            fi
+            kill -0 $SERVER_PID 2>/dev/null || { echo "❌ Server process died"; exit 1; }
             echo "  Waiting... ($i/30)"; sleep 2
           done
 
@@ -179,17 +184,22 @@ jobs:
         run: npm ci
 
       - name: Build production bundle
-        run: npm run build || npx next build --webpack
+        run: npx next build --webpack
 
       - name: Start server & wait for ready
         run: |
-          npm run start &
-          echo "SERVER_PID=$!" >> $GITHUB_ENV
+          npx next start &
+          SERVER_PID=$!
+          echo "SERVER_PID=$SERVER_PID" >> $GITHUB_ENV
           for i in $(seq 1 30); do
             CODE=$(curl -s -o /dev/null -w "%{http_code}" \
               -X POST http://localhost:3000/api/pipeline \
               -H "Content-Type: application/json" -d '{}')
-            [ "$CODE" != "000" ] && echo "✅ Server ready (HTTP $CODE)" && break
+            if [ "$CODE" != "000" ]; then
+              echo "✅ Server ready (HTTP $CODE)"
+              break
+            fi
+            kill -0 $SERVER_PID 2>/dev/null || { echo "❌ Server process died"; exit 1; }
             echo "  Waiting... ($i/30)"; sleep 2
           done
 
