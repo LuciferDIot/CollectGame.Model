@@ -54,14 +54,14 @@ jobs:
                  -H "Content-Type: application/json" \
                  -d '{}')
             if [ "$STATUS" != "000" ]; then
-              echo "Server responded with HTTP $STATUS — ready."
+              echo "Server responded with HTTP $STATUS - ready."
               break
             fi
             echo "  Attempt $i: not ready yet, waiting 2s..."
             sleep 2
           done
 
-      - name: Test 1 — Valid payload returns HTTP 200
+      - name: Test 1 - Valid payload returns HTTP 200
         run: |
           STATUS=$(curl -s -o /tmp/resp1.json -w "%{http_code}" \
             -X POST http://localhost:3000/api/pipeline \
@@ -82,7 +82,7 @@ jobs:
                 "deathCount": 1
               }
             }')
-          echo "Test 1 — Status: $STATUS"
+          echo "Test 1 - Status: $STATUS"
           cat /tmp/resp1.json
           if [ "$STATUS" != "200" ]; then
             echo "FAIL: Expected 200, got $STATUS"
@@ -90,46 +90,46 @@ jobs:
           fi
           echo "PASS"
 
-      - name: Test 2 — Missing userId returns HTTP 400
+      - name: Test 2 - Missing userId returns HTTP 400
         run: |
           STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
             -X POST http://localhost:3000/api/pipeline \
             -H "Content-Type: application/json" \
             -d '{"telemetry":{"enemiesHit":10}}')
-          echo "Test 2 — Status: $STATUS"
+          echo "Test 2 - Status: $STATUS"
           if [ "$STATUS" != "400" ]; then
             echo "FAIL: Expected 400, got $STATUS"
             exit 1
           fi
           echo "PASS"
 
-      - name: Test 3 — Missing telemetry returns HTTP 400
+      - name: Test 3 - Missing telemetry returns HTTP 400
         run: |
           STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
             -X POST http://localhost:3000/api/pipeline \
             -H "Content-Type: application/json" \
             -d '{"userId":"user-a"}')
-          echo "Test 3 — Status: $STATUS"
+          echo "Test 3 - Status: $STATUS"
           if [ "$STATUS" != "400" ]; then
             echo "FAIL: Expected 400, got $STATUS"
             exit 1
           fi
           echo "PASS"
 
-      - name: Test 4 — Empty body returns HTTP 400
+      - name: Test 4 - Empty body returns HTTP 400
         run: |
           STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
             -X POST http://localhost:3000/api/pipeline \
             -H "Content-Type: application/json" \
             -d '{}')
-          echo "Test 4 — Status: $STATUS"
+          echo "Test 4 - Status: $STATUS"
           if [ "$STATUS" != "400" ]; then
             echo "FAIL: Expected 400, got $STATUS"
             exit 1
           fi
           echo "PASS"
 
-      - name: Test 5 — Warm latency under 200ms (5 runs)
+      - name: Test 5 - Warm latency under 200ms (5 runs)
         run: |
           FAIL=0
           for i in 1 2 3 4 5; do
@@ -154,14 +154,14 @@ jobs:
               FAIL=1
             fi
             if [ "$MS" -gt 200 ]; then
-              echo "  WARN: Run $i exceeded 200ms (${MS}ms) — acceptable on CI runners"
+              echo "  WARN: Run $i exceeded 200ms (${MS}ms) - acceptable on CI runners"
             fi
           done
           if [ "$FAIL" -ne 0 ]; then
             echo "FAIL: One or more latency runs returned a non-200 status."
             exit 1
           fi
-          echo "PASS — all 5 warm runs returned HTTP 200"
+          echo "PASS - all 5 warm runs returned HTTP 200"
 
       - name: Stop server
         if: always()
