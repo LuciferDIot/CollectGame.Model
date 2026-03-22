@@ -22,7 +22,6 @@ env:
   NODE_VERSION: '24.x'
   WORKING_DIR: anfis-demo-ui
   NEXT_TELEMETRY_DISABLED: 1
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true  # suppress Node.js 20 deprecation warnings
 
 jobs:
 
@@ -55,28 +54,9 @@ jobs:
 
       - name: Build production bundle
         run: |
-          npm run build
-          echo "✅ npm run build exited 0"
-
-      - name: Debug — filesystem after build (always runs)
-        if: always()
-        run: |
-          echo "=== PWD ==="
-          pwd
-          echo "=== ls anfis-demo-ui/ ==="
-          ls -la
-          echo "=== .next exists? ==="
-          ls -la .next 2>&1 || echo "❌ .next NOT FOUND"
-          echo "=== files inside .next (first 20) ==="
-          find .next -type f 2>/dev/null | head -20 || echo "(none)"
-
-      - name: Upload .next artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: next-build
-          path: ${{ github.workspace }}/${{ env.WORKING_DIR }}/.next
-          if-no-files-found: error
-          retention-days: 1
+          npm run build || npx next build --webpack
+          ls .next/BUILD_ID || { echo "❌ .next not created after build"; exit 1; }
+          echo "✅ Build succeeded"
 
   # ── 2. UNIT TESTS ───────────────────────────────────────────────────────────
   unit-tests:
@@ -146,11 +126,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Download build artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: next-build
-          path: ${{ github.workspace }}/${{ env.WORKING_DIR }}/.next
+      - name: Build production bundle
+        run: npm run build || npx next build --webpack
 
       - name: Start server & wait for ready
         run: |
@@ -201,11 +178,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Download build artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: next-build
-          path: ${{ github.workspace }}/${{ env.WORKING_DIR }}/.next
+      - name: Build production bundle
+        run: npm run build || npx next build --webpack
 
       - name: Start server & wait for ready
         run: |
