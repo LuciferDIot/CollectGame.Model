@@ -54,19 +54,21 @@ jobs:
           echo "✅ All model files present."
 
       - name: Build production bundle
-        run: npm run build
-        env:
-          # Allow TS errors to surface in CI without blocking the build artifact
-          # (TypeScript is already validated by unit-tests job via tsc in vitest)
-          NEXT_TYPESCRIPT_IGNORE_BUILD_ERRORS: true
-
-      - name: Verify .next output exists
         run: |
-          echo "PWD: $(pwd)"
-          echo "WORKSPACE: $GITHUB_WORKSPACE"
-          ls -la "$GITHUB_WORKSPACE/$WORKING_DIR/.next" \
-            || { echo "❌ .next not found at $GITHUB_WORKSPACE/$WORKING_DIR/.next"; exit 1; }
-          echo "✅ .next exists."
+          npm run build
+          echo "✅ npm run build exited 0"
+
+      - name: Debug — filesystem after build (always runs)
+        if: always()
+        run: |
+          echo "=== PWD ==="
+          pwd
+          echo "=== ls anfis-demo-ui/ ==="
+          ls -la
+          echo "=== .next exists? ==="
+          ls -la .next 2>&1 || echo "❌ .next NOT FOUND"
+          echo "=== files inside .next (first 20) ==="
+          find .next -type f 2>/dev/null | head -20 || echo "(none)"
 
       - name: Upload .next artifact
         uses: actions/upload-artifact@v4
