@@ -126,20 +126,26 @@ jobs:
       - name: Build production bundle
         run: npm run build
 
-      - name: Start server & wait for ready
+      - name: Start server in background
         run: |
           npm run start &
           echo "SERVER_PID=$!" >> $GITHUB_ENV
+
+      - name: Wait for server to be ready
+        run: |
           for i in $(seq 1 30); do
+            if curl -sf -X POST http://localhost:3000/api/pipeline \
+                 -H "Content-Type: application/json" -d '{}' \
+                 --output /dev/null 2>/dev/null; then
+              echo "Server ready."; break
+            fi
             STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
               -X POST http://localhost:3000/api/pipeline \
-              -H "Content-Type: application/json" -d '{}')
-            if [ "$STATUS" != "000" ]; then
-              echo "Server responded with HTTP $STATUS - ready."
-              break
+              -H "Content-Type: application/json" -d '{}' 2>/dev/null) || true
+            if [ "$STATUS" != "000" ] && [ -n "$STATUS" ]; then
+              echo "Server responded with HTTP $STATUS - ready."; break
             fi
-            echo "  Attempt $i: not ready yet, waiting 2s..."
-            sleep 2
+            echo "  Attempt $i: not ready yet, waiting 2s..."; sleep 2
           done
 
       - name: Run test — ${{ matrix.name }}
@@ -182,20 +188,26 @@ jobs:
       - name: Build production bundle
         run: npm run build
 
-      - name: Start server & wait for ready
+      - name: Start server in background
         run: |
           npm run start &
           echo "SERVER_PID=$!" >> $GITHUB_ENV
+
+      - name: Wait for server to be ready
+        run: |
           for i in $(seq 1 30); do
+            if curl -sf -X POST http://localhost:3000/api/pipeline \
+                 -H "Content-Type: application/json" -d '{}' \
+                 --output /dev/null 2>/dev/null; then
+              echo "Server ready."; break
+            fi
             STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
               -X POST http://localhost:3000/api/pipeline \
-              -H "Content-Type: application/json" -d '{}')
-            if [ "$STATUS" != "000" ]; then
-              echo "Server responded with HTTP $STATUS - ready."
-              break
+              -H "Content-Type: application/json" -d '{}' 2>/dev/null) || true
+            if [ "$STATUS" != "000" ] && [ -n "$STATUS" ]; then
+              echo "Server responded with HTTP $STATUS - ready."; break
             fi
-            echo "  Attempt $i: not ready yet, waiting 2s..."
-            sleep 2
+            echo "  Attempt $i: not ready yet, waiting 2s..."; sleep 2
           done
 
       - name: Run 5 warm latency probes
