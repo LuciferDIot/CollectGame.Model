@@ -22,6 +22,7 @@ env:
   NODE_VERSION: '24.x'
   WORKING_DIR: anfis-demo-ui
   NEXT_TELEMETRY_DISABLED: 1
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true  # suppress Node.js 20 deprecation warnings
 
 jobs:
 
@@ -61,16 +62,18 @@ jobs:
 
       - name: Verify .next output exists
         run: |
-          echo "--- Build output ---"
-          ls -la .next/ || { echo "❌ .next directory not found — build failed"; exit 1; }
+          echo "PWD: $(pwd)"
+          echo "WORKSPACE: $GITHUB_WORKSPACE"
+          ls -la "$GITHUB_WORKSPACE/$WORKING_DIR/.next" \
+            || { echo "❌ .next not found at $GITHUB_WORKSPACE/$WORKING_DIR/.next"; exit 1; }
           echo "✅ .next exists."
 
       - name: Upload .next artifact
         uses: actions/upload-artifact@v4
         with:
           name: next-build
-          path: ${{ env.WORKING_DIR }}/.next
-          if-no-files-found: error   # fail loudly, not silently
+          path: ${{ github.workspace }}/${{ env.WORKING_DIR }}/.next
+          if-no-files-found: error
           retention-days: 1
 
   # ── 2. UNIT TESTS ───────────────────────────────────────────────────────────
@@ -145,7 +148,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: next-build
-          path: ${{ env.WORKING_DIR }}/.next
+          path: ${{ github.workspace }}/${{ env.WORKING_DIR }}/.next
 
       - name: Start server & wait for ready
         run: |
@@ -200,7 +203,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: next-build
-          path: ${{ env.WORKING_DIR }}/.next
+          path: ${{ github.workspace }}/${{ env.WORKING_DIR }}/.next
 
       - name: Start server & wait for ready
         run: |
