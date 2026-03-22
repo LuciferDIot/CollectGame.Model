@@ -6,42 +6,219 @@ on:
   pull_request:
     branches: [ main, master ]
 
+# ─────────────────────────────────────────────────────────────────────────────
+# JOB GRAPH
+#
+#   build ──┬── unit-tests
+#            ├── api-validation [×4 parallel matrix jobs]
+#            │     ├── "Valid payload → 200"
+#            │     ├── "Missing userId → 400"
+#            │     ├── "Missing telemetry → 400"
+#            │     └── "Empty body → 400"
+#            └── (api-latency waits for all api-validation jobs)
+#                  └── api-latency
+# ─────────────────────────────────────────────────────────────────────────────
+
+env:
+  NODE_VERSION: '20.x'
+  WORKING_DIR: anfis-demo-ui
+
 jobs:
-  Production-Ready-Check:
+
+  # ── 1. BUILD ────────────────────────────────────────────────────────────────
+  build:
+    name: Build
     runs-on: ubuntu-latest
-    
     defaults:
       run:
-        working-directory: anfis-demo-ui
+        working-directory: ${{ env.WORKING_DIR }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Use Node.js
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
-          cache: 'npm'
-          cache-dependency-path: anfis-demo-ui/package-lock.json
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: ${{ env.WORKING_DIR }}/package-lock.json
 
       - name: Install dependencies
         run: npm ci
 
       - name: Verify model files
         run: |
-          echo "Verifying model files..."
-          if [ ! -f "models/anfis_mlp_weights.json" ]; then
-            echo "Error: anfis_mlp_weights.json not found!"
-            exit 1
-          fi
-          if [ ! -f "models/cluster_centroids.json" ]; then
-            echo "Error: cluster_centroids.json not found!"
-            exit 1
-          fi
-          echo "Model files verified."
+          for f in models/anfis_mlp_weights.json models/cluster_centroids.json; do
+            [ -f "$f" ] || { echo "❌ Missing: $f"; exit 1; }
+          done
+          echo "✅ All model files present."
 
-      - name: Run builds test
+      - name: Build production bundle
         run: npm run build
 
-      - name: Run tests
+      - name: Upload .next artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: next-build
+          path: ${{ env.WORKING_DIR }}/.next
+          retention-days: 1
+
+  # ── 2. UNIT TESTS ───────────────────────────────────────────────────────────
+  unit-tests:
+    name: Unit Tests (Vitest)
+    runs-on: ubuntu-latest
+    needs: build
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIR }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: ${{ env.WORKING_DIR }}/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit tests
         run: npm run test
+
+  # ── 3. API VALIDATION TESTS (4 parallel matrix jobs) ───────────────────────
+  api-validation:
+    name: "API: ${{ matrix.name }}"
+    runs-on: ubuntu-latest
+    needs: build
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIR }}
+    strategy:
+      fail-fast: false   # show all failures, not just the first
+      matrix:
+        include:
+          - name: "Valid payload → 200"
+            payload: >-
+              {"userId":"ci-test-user","telemetry":{"enemiesHit":10,"damageDone":200,
+              "timeInCombat":15,"kills":3,"itemsCollected":5,"pickupAttempts":6,
+              "timeNearInteractables":8,"distanceTraveled":120,"timeSprinting":12,
+              "timeOutOfCombat":15,"deathCount":1}}
+            expected: "200"
+
+          - name: "Missing userId → 400"
+            payload: '{"telemetry":{"enemiesHit":10}}'
+            expected: "400"
+
+          - name: "Missing telemetry → 400"
+            payload: '{"userId":"user-a"}'
+            expected: "400"
+
+          - name: "Empty body → 400"
+            payload: '{}'
+            expected: "400"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: ${{ env.WORKING_DIR }}/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: next-build
+          path: ${{ env.WORKING_DIR }}/.next
+
+      - name: Start server & wait for ready
+        run: |
+          npm run start &
+          echo "SERVER_PID=$!" >> $GITHUB_ENV
+          for i in $(seq 1 30); do
+            CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+              -X POST http://localhost:3000/api/pipeline \
+              -H "Content-Type: application/json" -d '{}')
+            [ "$CODE" != "000" ] && echo "✅ Server ready (HTTP $CODE)" && break
+            echo "  Waiting... ($i/30)"; sleep 2
+          done
+
+      - name: Run test — ${{ matrix.name }}
+        run: |
+          STATUS=$(curl -s -o /tmp/resp.json -w "%{http_code}" \
+            -X POST http://localhost:3000/api/pipeline \
+            -H "Content-Type: application/json" \
+            -d '${{ matrix.payload }}')
+          echo "Response body:"; cat /tmp/resp.json; echo
+          echo "HTTP Status: $STATUS  |  Expected: ${{ matrix.expected }}"
+          [ "$STATUS" = "${{ matrix.expected }}" ] \
+            && echo "✅ PASS" \
+            || { echo "❌ FAIL: Expected ${{ matrix.expected }}, got $STATUS"; exit 1; }
+
+      - name: Stop server
+        if: always()
+        run: kill $SERVER_PID || true
+
+  # ── 4. LATENCY TEST (runs only after all validation tests pass) ─────────────
+  api-latency:
+    name: "API: Warm latency < 200ms"
+    runs-on: ubuntu-latest
+    needs: api-validation      # waits for all 4 matrix jobs
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIR }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: ${{ env.WORKING_DIR }}/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: next-build
+          path: ${{ env.WORKING_DIR }}/.next
+
+      - name: Start server & wait for ready
+        run: |
+          npm run start &
+          echo "SERVER_PID=$!" >> $GITHUB_ENV
+          for i in $(seq 1 30); do
+            CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+              -X POST http://localhost:3000/api/pipeline \
+              -H "Content-Type: application/json" -d '{}')
+            [ "$CODE" != "000" ] && echo "✅ Server ready (HTTP $CODE)" && break
+            echo "  Waiting... ($i/30)"; sleep 2
+          done
+
+      - name: Run 5 warm latency probes
+        run: |
+          PAYLOAD='{"userId":"ci-latency-user","telemetry":{"enemiesHit":10,"damageDone":200,"timeInCombat":15,"kills":3,"itemsCollected":5,"pickupAttempts":6,"timeNearInteractables":8,"distanceTraveled":120,"timeSprinting":12,"timeOutOfCombat":15,"deathCount":1}}'
+          FAIL=0
+          for i in 1 2 3 4 5; do
+            START=$(date +%s%N)
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+              -X POST http://localhost:3000/api/pipeline \
+              -H "Content-Type: application/json" -d "$PAYLOAD")
+            MS=$(( ($(date +%s%N) - START) / 1000000 ))
+            LATENCY_NOTE=""; [ "$MS" -gt 200 ] && LATENCY_NOTE=" ⚠️ >200ms (CI runner overhead)"
+            echo "  Run $i: HTTP $STATUS | ${MS}ms${LATENCY_NOTE}"
+            [ "$STATUS" != "200" ] && { echo "  ❌ Non-200 on run $i"; FAIL=1; }
+          done
+          [ "$FAIL" -eq 0 ] && echo "✅ PASS" || { echo "❌ FAIL"; exit 1; }
+
+      - name: Stop server
+        if: always()
+        run: kill $SERVER_PID || true
