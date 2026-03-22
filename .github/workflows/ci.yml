@@ -9,38 +9,39 @@ on:
 # ─────────────────────────────────────────────────────────────────────────────
 # JOB GRAPH
 #
-#   build ──┬── unit-tests
-#            ├── API: Valid payload → 200      ─┐
-#            ├── API: Missing userId → 400      │  parallel
-#            ├── API: Missing telemetry → 400   │  matrix
-#            ├── API: Empty body → 400         ─┘
-#            └── (via api-validation needs)
-#                  └── API: Warm latency < 200ms
+#   build-and-test ─── runs all jobs sequentially in one runner:
+#     1. Build production bundle
+#     2. Unit Tests (Vitest)
+#     3. API: Valid payload → 200
+#     4. API: Missing userId → 400
+#     5. API: Missing telemetry → 400
+#     6. API: Empty body → 400
+#     7. API: Warm latency < 200ms (5 runs)
 # ─────────────────────────────────────────────────────────────────────────────
 
 env:
-  NODE_VERSION: '24.x'
-  WORKING_DIR: anfis-demo-ui
   NEXT_TELEMETRY_DISABLED: 1
 
 jobs:
 
-  # ── 1. BUILD ────────────────────────────────────────────────────────────────
-  build:
-    name: Build
+  build-and-test:
+    name: Build & Test
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+
     defaults:
       run:
-        working-directory: ${{ env.WORKING_DIR }}
+        working-directory: anfis-demo-ui
 
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: npm
-          cache-dependency-path: ${{ env.WORKING_DIR }}/package-lock.json
+          node-version: '20.x'
+          cache: 'npm'
+          cache-dependency-path: anfis-demo-ui/package-lock.json
 
       - name: Install dependencies
         run: npm ci
@@ -53,168 +54,96 @@ jobs:
           echo "✅ All model files present."
 
       - name: Build production bundle
-        run: |
-          npx next build --webpack
-          ls .next/BUILD_ID || { echo "❌ .next not created"; exit 1; }
-          echo "✅ Build succeeded"
-
-  # ── 2. UNIT TESTS ───────────────────────────────────────────────────────────
-  unit-tests:
-    name: Unit Tests (Vitest)
-    runs-on: ubuntu-latest
-    needs: build
-    defaults:
-      run:
-        working-directory: ${{ env.WORKING_DIR }}
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: npm
-          cache-dependency-path: ${{ env.WORKING_DIR }}/package-lock.json
-
-      - name: Install dependencies
-        run: npm ci
+        run: npm run build
 
       - name: Run unit tests
         run: npm run test
 
-  # ── 3. API VALIDATION TESTS (4 parallel matrix jobs) ───────────────────────
-  api-validation:
-    name: "API: ${{ matrix.name }}"
-    runs-on: ubuntu-latest
-    needs: build
-    defaults:
-      run:
-        working-directory: ${{ env.WORKING_DIR }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - name: "Valid payload → 200"
-            payload: >-
-              {"userId":"ci-test-user","telemetry":{"enemiesHit":10,"damageDone":200,
-              "timeInCombat":15,"kills":3,"itemsCollected":5,"pickupAttempts":6,
-              "timeNearInteractables":8,"distanceTraveled":120,"timeSprinting":12,
-              "timeOutOfCombat":15,"deathCount":1}}
-            expected: "200"
-
-          - name: "Missing userId → 400"
-            payload: '{"telemetry":{"enemiesHit":10}}'
-            expected: "400"
-
-          - name: "Missing telemetry → 400"
-            payload: '{"userId":"user-a"}'
-            expected: "400"
-
-          - name: "Empty body → 400"
-            payload: '{}'
-            expected: "400"
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: npm
-          cache-dependency-path: ${{ env.WORKING_DIR }}/package-lock.json
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build production bundle
-        run: npx next build --webpack
-
-      - name: Start server & wait for ready
+      - name: Start server in background
         run: |
-          npx next start &
-          SERVER_PID=$!
-          echo "SERVER_PID=$SERVER_PID" >> $GITHUB_ENV
+          npm run start &
+          echo "SERVER_PID=$!" >> $GITHUB_ENV
+
+      - name: Wait for server to be ready
+        run: |
+          echo "Waiting for server..."
           for i in $(seq 1 30); do
-            CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
               -X POST http://localhost:3000/api/pipeline \
-              -H "Content-Type: application/json" -d '{}')
-            if [ "$CODE" != "000" ]; then
-              echo "✅ Server ready (HTTP $CODE)"
+              -H "Content-Type: application/json" \
+              -d '{}')
+            if [ "$STATUS" != "000" ]; then
+              echo "Server responded with HTTP $STATUS - ready."
               break
             fi
-            kill -0 $SERVER_PID 2>/dev/null || { echo "❌ Server process died"; exit 1; }
-            echo "  Waiting... ($i/30)"; sleep 2
+            echo "  Attempt $i: not ready yet, waiting 2s..."
+            sleep 2
           done
 
-      - name: Run test — ${{ matrix.name }}
+      - name: "API: Valid payload → 200"
         run: |
-          STATUS=$(curl -s -o /tmp/resp.json -w "%{http_code}" \
+          STATUS=$(curl -s -o /tmp/resp1.json -w "%{http_code}" \
             -X POST http://localhost:3000/api/pipeline \
             -H "Content-Type: application/json" \
-            -d '${{ matrix.payload }}')
-          echo "Response body:"; cat /tmp/resp.json; echo
-          echo "HTTP Status: $STATUS  |  Expected: ${{ matrix.expected }}"
-          [ "$STATUS" = "${{ matrix.expected }}" ] \
-            && echo "✅ PASS" \
-            || { echo "❌ FAIL: Expected ${{ matrix.expected }}, got $STATUS"; exit 1; }
+            -d '{
+              "userId": "ci-test-user",
+              "telemetry": {
+                "enemiesHit": 10, "damageDone": 200, "timeInCombat": 15,
+                "kills": 3, "itemsCollected": 5, "pickupAttempts": 6,
+                "timeNearInteractables": 8, "distanceTraveled": 120,
+                "timeSprinting": 12, "timeOutOfCombat": 15, "deathCount": 1
+              }
+            }')
+          echo "Status: $STATUS"; cat /tmp/resp1.json; echo
+          [ "$STATUS" = "200" ] && echo "✅ PASS" || { echo "❌ FAIL: Expected 200, got $STATUS"; exit 1; }
 
-      - name: Stop server
-        if: always()
-        run: kill $SERVER_PID || true
-
-  # ── 4. LATENCY TEST (runs only after all validation tests pass) ─────────────
-  api-latency:
-    name: "API: Warm latency < 200ms"
-    runs-on: ubuntu-latest
-    needs: api-validation
-    defaults:
-      run:
-        working-directory: ${{ env.WORKING_DIR }}
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: npm
-          cache-dependency-path: ${{ env.WORKING_DIR }}/package-lock.json
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build production bundle
-        run: npx next build --webpack
-
-      - name: Start server & wait for ready
+      - name: "API: Missing userId → 400"
         run: |
-          npx next start &
-          SERVER_PID=$!
-          echo "SERVER_PID=$SERVER_PID" >> $GITHUB_ENV
-          for i in $(seq 1 30); do
-            CODE=$(curl -s -o /dev/null -w "%{http_code}" \
-              -X POST http://localhost:3000/api/pipeline \
-              -H "Content-Type: application/json" -d '{}')
-            if [ "$CODE" != "000" ]; then
-              echo "✅ Server ready (HTTP $CODE)"
-              break
-            fi
-            kill -0 $SERVER_PID 2>/dev/null || { echo "❌ Server process died"; exit 1; }
-            echo "  Waiting... ($i/30)"; sleep 2
-          done
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X POST http://localhost:3000/api/pipeline \
+            -H "Content-Type: application/json" \
+            -d '{"telemetry":{"enemiesHit":10}}')
+          echo "Status: $STATUS"
+          [ "$STATUS" = "400" ] && echo "✅ PASS" || { echo "❌ FAIL: Expected 400, got $STATUS"; exit 1; }
 
-      - name: Run 5 warm latency probes
+      - name: "API: Missing telemetry → 400"
         run: |
-          PAYLOAD='{"userId":"ci-latency-user","telemetry":{"enemiesHit":10,"damageDone":200,"timeInCombat":15,"kills":3,"itemsCollected":5,"pickupAttempts":6,"timeNearInteractables":8,"distanceTraveled":120,"timeSprinting":12,"timeOutOfCombat":15,"deathCount":1}}'
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X POST http://localhost:3000/api/pipeline \
+            -H "Content-Type: application/json" \
+            -d '{"userId":"user-a"}')
+          echo "Status: $STATUS"
+          [ "$STATUS" = "400" ] && echo "✅ PASS" || { echo "❌ FAIL: Expected 400, got $STATUS"; exit 1; }
+
+      - name: "API: Empty body → 400"
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X POST http://localhost:3000/api/pipeline \
+            -H "Content-Type: application/json" \
+            -d '{}')
+          echo "Status: $STATUS"
+          [ "$STATUS" = "400" ] && echo "✅ PASS" || { echo "❌ FAIL: Expected 400, got $STATUS"; exit 1; }
+
+      - name: "API: Warm latency < 200ms (5 runs)"
+        run: |
           FAIL=0
           for i in 1 2 3 4 5; do
             START=$(date +%s%N)
             STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
               -X POST http://localhost:3000/api/pipeline \
-              -H "Content-Type: application/json" -d "$PAYLOAD")
+              -H "Content-Type: application/json" \
+              -d '{
+                "userId": "ci-latency-user",
+                "telemetry": {
+                  "enemiesHit": 10, "damageDone": 200, "timeInCombat": 15,
+                  "kills": 3, "itemsCollected": 5, "pickupAttempts": 6,
+                  "timeNearInteractables": 8, "distanceTraveled": 120,
+                  "timeSprinting": 12, "timeOutOfCombat": 15, "deathCount": 1
+                }
+              }')
             MS=$(( ($(date +%s%N) - START) / 1000000 ))
-            LATENCY_NOTE=""; [ "$MS" -gt 200 ] && LATENCY_NOTE=" ⚠️ >200ms (CI runner overhead)"
-            echo "  Run $i: HTTP $STATUS | ${MS}ms${LATENCY_NOTE}"
+            echo "  Run $i: HTTP $STATUS | ${MS}ms"
+            [ "$MS" -gt 200 ] && echo "  ⚠️ >200ms (CI runner overhead acceptable)"
             [ "$STATUS" != "200" ] && { echo "  ❌ Non-200 on run $i"; FAIL=1; }
           done
           [ "$FAIL" -eq 0 ] && echo "✅ PASS" || { echo "❌ FAIL"; exit 1; }
