@@ -60,6 +60,7 @@ export function useDashboardControls({
           rulesFired: [],
           isRunning: false,
           executionTime: 0,
+          pipelineProcessTime: 0,
         });
     
         setCurrentStep(0);

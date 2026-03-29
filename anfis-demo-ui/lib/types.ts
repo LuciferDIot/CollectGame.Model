@@ -75,7 +75,8 @@ export interface PipelineState {
     rmseTest: number;
   };
   isRunning: boolean;
-  executionTime: number;
+  executionTime: number;       // Full fetch round-trip (browser → API → browser)
+  pipelineProcessTime: number; // Server-side pipeline compute only (from performance_timings.total)
   // Added for Analytics compatibility
   output?: {
     adjustedMultiplier: number;

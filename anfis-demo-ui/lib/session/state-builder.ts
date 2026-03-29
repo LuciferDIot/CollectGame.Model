@@ -14,10 +14,11 @@ const DEFAULT_STATE_VALUES = {
 
 // Helper: Pure object construction
 export const buildFinalStateObject = (
-    prevState: PipelineState, 
-    mapped: Partial<PipelineState>, 
-    steps: PipelineStep[], 
-    time: number
+    prevState: PipelineState,
+    mapped: Partial<PipelineState>,
+    steps: PipelineStep[],
+    time: number,
+    pipelineProcessTime: number = 0
 ): PipelineState => {
     return {
         ...prevState,
@@ -26,5 +27,6 @@ export const buildFinalStateObject = (
         steps,
         isRunning: false,
         executionTime: time,
+        pipelineProcessTime,
     } as PipelineState;
 }
