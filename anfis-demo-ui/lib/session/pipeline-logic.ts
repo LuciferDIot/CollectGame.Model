@@ -203,17 +203,17 @@ export const constructFinalState = (
     result: SimulationExecutionResult,
     executionTime: number
 ): PipelineState => {
-    const { mappedState, completedSteps } = result;
-    
-    console.log(`⏱️ Total execution time: ${executionTime.toFixed(2)}ms`);
-    
-    // Combine previous state with new results
-    // Like merging old and new information
+    const { mappedState, completedSteps, backendResult } = result;
+    const pipelineProcessTime = backendResult?.performance_timings?.total ?? 0;
+
+    console.log(`⏱️ Total execution time: ${executionTime.toFixed(2)}ms (pipeline: ${pipelineProcessTime.toFixed(3)}ms)`);
+
     return buildFinalStateObject(
-        prevState,         // What we knew before
-        mappedState,       // What we learned now
-        completedSteps,    // What we did
-        executionTime      // How long it took
+        prevState,
+        mappedState,
+        completedSteps,
+        executionTime,
+        pipelineProcessTime
     );
 }
 

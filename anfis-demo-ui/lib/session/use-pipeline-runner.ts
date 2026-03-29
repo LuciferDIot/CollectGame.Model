@@ -37,6 +37,7 @@ export function usePipelineRunner({
           steps: INITIAL_PIPELINE_STEPS,
           isRunning: true,
           executionTime: 0,
+          pipelineProcessTime: 0,
         }));
     };
 

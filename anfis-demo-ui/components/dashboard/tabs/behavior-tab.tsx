@@ -64,7 +64,9 @@ export function BehaviorTab() {
               REAL-TIME_FUZZY_LOGIC
             </span>
             <span className="opacity-40">|</span>
-            <span>CYCLE_LATENCY: {pipelineState.executionTime.toFixed(3)}MS</span>
+            <span title="Full browser-to-server-to-browser round trip">FETCH_LATENCY: {pipelineState.executionTime.toFixed(1)}MS</span>
+            <span className="opacity-40">|</span>
+            <span title="Server-side ANFIS pipeline compute only">PIPELINE_LATENCY: {pipelineState.pipelineProcessTime.toFixed(3)}MS</span>
           </p>
         </div>
         <Badge variant="outline" className="font-black text-[10px] border-primary/30 bg-primary/5 text-primary px-3 py-1 rounded-lg tracking-widest">

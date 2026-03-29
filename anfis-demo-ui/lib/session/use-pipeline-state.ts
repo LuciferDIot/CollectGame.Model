@@ -12,6 +12,7 @@ export function usePipelineStateHook() {
     rulesFired: [],
     isRunning: false,
     executionTime: 0,
+    pipelineProcessTime: 0,
   });
 
   const [currentStep, setCurrentStep] = useState(0);

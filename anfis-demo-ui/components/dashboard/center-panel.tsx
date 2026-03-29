@@ -41,8 +41,10 @@ export function CenterPanel() {
               <span className="opacity-50">STDBY_MODE</span>
             )}
             {pipelineState.executionTime > 0 && (
-              <span className="text-accent border-l border-white/10 pl-4">
-                {pipelineState.executionTime.toFixed(2)}ms
+              <span className="text-accent border-l border-white/10 pl-4 flex items-center gap-2">
+                <span title="Full fetch round-trip">{pipelineState.executionTime.toFixed(1)}ms fetch</span>
+                <span className="opacity-30">/</span>
+                <span className="text-emerald-400" title="Server-side pipeline compute only">{pipelineState.pipelineProcessTime.toFixed(3)}ms pipeline</span>
               </span>
             )}
           </div>
