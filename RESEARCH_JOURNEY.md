@@ -786,13 +786,13 @@ This evaluation was the **trigger for switching from Option A to Option B**.
 | Soft Membership — Exploration | 31.7% |
 | Mean Entropy | 1.4053 (near max 1.585) |
 
-### ANFIS Model Performance
+### ANFIS Model Performance (v2.2.1 Final)
 
 | Metric | Value |
 |--------|-------|
-| Test R² | 0.9224 |
-| Test MAE | 0.0108 |
-| Train R² | 0.8369 |
+| Test R² | 0.9264 |
+| Test MAE | 0.0127 |
+| Train R² | 0.8600 |
 | Target CV | 0.022 |
 | Target Range | [0.6, 1.4] |
 
@@ -809,7 +809,7 @@ This evaluation was the **trigger for switching from Option A to Option B**.
 ```yaml
 preprocessing:
   scaler: MinMaxScaler (uniform)
-  features: All 10 telemetry features
+  features: 12 (10 raw telemetry + 2 derived: damage_per_hit, pickup_attempt_rate)
   outlier_handling: None
 
 clustering:
@@ -842,7 +842,7 @@ Every major decision in this project was validated experimentally and then locke
 |----------|--------------------|----------|-------------------|
 | Normalisation | MinMax Uniform, Log-Sparse, Robust, Per-player | MinMax Uniform | A/B test + Grid search |
 | K value | 2, 3, 4, 5 | 3 | Grid search (108 configs) |
-| Feature set | 8 features, 10 features | 10 features | Grid search |
+| Feature set | 8 features, 10 features, 12 features | 12 features (10 raw + 2 derived) | Grid search + v2.2 derived features |
 | Outlier handling | 95th, 98th, 100th percentile | None (100th) | Grid search |
 | Feature weighting | Uniform, Exploration-reduced | Uniform | Sensitivity analysis |
 | Soft membership | Hard assignment, Inverse distance | Inverse distance | Design requirement |
