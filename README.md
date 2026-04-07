@@ -52,7 +52,7 @@ ANFIS-based adaptive difficulty system using K-Means clustering, fuzzy soft memb
 - **Conclusion**: Baseline already near-optimal; no configuration change warranted
 
 ### Delta Signal Analysis
-- **Δexplore ↔ Δtarget**: r = 0.839
+- **Δexplore ↔ Δtarget**: r = 0.808
 - **Δcombat ↔ Δtarget**: r = −0.471
 - **Feature weighting**: No improvement (rejected)
 - **Decision**: Add delta signals as ANFIS inputs

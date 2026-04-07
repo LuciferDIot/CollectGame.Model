@@ -40,12 +40,14 @@ Two problems:
 
 Additionally, using raw sums gave Combat (4 features) a 4× raw ceiling over a 1-feature category.
 
-Fix:
+Fix (v2.1):
 ```
-score_combat  = avg(enemiesHit, damageDone, timeInCombat, kills)            → [0,1]
-score_collect = avg(itemsCollected, pickupAttempts, timeNearInteractables)   → [0,1]
-score_explore = avg(distanceTraveled, timeSprinting)                         → [0,1]
+score_combat  = avg(enemiesHit, damageDone, timeInCombat, kills)            → [0,1]  (÷4)
+score_collect = avg(itemsCollected, pickupAttempts, timeNearInteractables)   → [0,1]  (÷3)
+score_explore = avg(distanceTraveled, timeSprinting)                         → [0,1]  (÷2)
 ```
+
+> **v2.2 update:** Derived features (`damage_per_hit`, `pickup_attempt_rate`) were added in v2.2, extending the averages to ÷5 (Combat) and ÷4 (Collect). See Final Configuration above for the current formula.
 
 Rerun sequence: notebooks 04 → 05 → 06 → 07.
 
@@ -140,11 +142,14 @@ CollectGame.Model/
 
 | Test Suite | Tests | Status |
 |------------|-------|--------|
-| TelemetryService | 30 | Pass |
-| NotificationService | 22 | Pass |
-| Domain Value Objects | 73 | Pass |
-| Timezone utilities | 6 | Pass |
-| **Total** | **131** | **Pass** |
+| TelemetryService | 8 | Pass |
+| NotificationService | 7 | Pass |
+| Domain Value Objects | 8 | Pass |
+| Timezone utilities | 2 | Pass |
+| UserController | 5 | Pass |
+| TelemetryController | 8 | Pass |
+| CalibrationController | 5 | Pass |
+| **Total** | **43** | **Pass** |
 
 ### Notebook 09 — MLP Surrogate Evaluation
 
