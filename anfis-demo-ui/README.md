@@ -1,4 +1,4 @@
-# ANFIS Adaptive Difficulty Engine (v2.2)
+﻿# ANFIS Adaptive Difficulty Engine (v2.2)
 
 This repository serves as the runtime demonstration and integration backend for the **Adaptive Neuro-Fuzzy Inference System (ANFIS)**. It implements the complete mathematical pipeline derived from the core research notebooks, allowing external game engines (Unity/Unreal) to query for real-time difficulty adjustments.
 
@@ -32,7 +32,7 @@ $$ X'_{\text{norm}} = \frac{X - \text{min}}{\text{max} - \text{min}} $$
 ### Step 2: Activity Score Calculation (v2.2)
 Each archetype score is computed as the **per-archetype average** of its normalized signals. This gives every archetype an equal ceiling of 1.0, preventing structural bias from feature-count asymmetry.
 
-**v2.2 Formulae** (two derived features added — computed before normalization):
+**v2.2 Formulae** (two derived features added - computed before normalization):
 
 | Archetype | Features (5 / 4 / 2) | Formula |
 |-----------|----------------------|---------|
@@ -42,7 +42,7 @@ Each archetype score is computed as the **per-archetype average** of its normali
 
 > **Why averages, not sums?** (v2.1 fix): Sums gave Combat a 4× ceiling over a 1-feature Exploration category. Averages guarantee a fair [0,1] ceiling per archetype.
 > **Why remove `timeOutOfCombat`?** (v2.1 fix): It accumulated *passively* for any player not fighting, mis-classifying attacker-intent players as Explorers on sparse-spawn maps.
-> **Why `DamagePerHit` and `PickupAttemptRate`?** (v2.2 addition): Sniper-style players deal high damage with few hits — without this, they were under-represented in Combat scoring. `PickupAttemptRate` distinguishes deliberate Collectors from incidental Explorers who pass near items without picking them up.
+> **Why `DamagePerHit` and `PickupAttemptRate`?** (v2.2 addition): Sniper-style players deal high damage with few hits - without this, they were under-represented in Combat scoring. `PickupAttemptRate` distinguishes deliberate Collectors from incidental Explorers who pass near items without picking them up.
 
 ### Step 3: Soft Membership (Fuzzy Clustering)
 Players are classified into archetypes using **Inverse Distance Weighting (IDW)** based on the distance to pre-calculated centroids (`cluster_centroids.json`).
@@ -72,7 +72,7 @@ $$M_{\text{display}} = \text{clamp}\!\left(1.0 + (\text{raw} - \text{mlp\_neutra
 
 where $\text{mlp\_neutral} = 0.932006$ = MLP output for a balanced (⅓,⅓,⅓) no-delta player.
 
-> **Why neutral-centred?** A balanced player must semantically map to display=1.0 (no change). Min-max rescaling was sensitive to extreme training inputs and broke this guarantee. Neutral-centred calibration enforces it by construction. `mlp_neutral` is auto-recomputed and saved by notebook 07 after each retrain — no code changes needed.
+> **Why neutral-centred?** A balanced player must semantically map to display=1.0 (no change). Min-max rescaling was sensitive to extreme training inputs and broke this guarantee. Neutral-centred calibration enforces it by construction. `mlp_neutral` is auto-recomputed and saved by notebook 07 after each retrain - no code changes needed.
 
 ### Step 6: Adaptation Logic
 The final game parameters are calculated using the **Archetype-Aware Adaptation** formula.
@@ -257,3 +257,4 @@ The "Pipeline Visualization" center panel now tracks state history.
     *   `final`: The AI-adjusted value to use.
     *   `clamped`: Boolean flag indicating if safety limits were hit.
 *   **validation**: System health checks. `all_params_in_bounds` confirms no hard limits were exceeded.
+

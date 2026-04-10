@@ -1,4 +1,4 @@
-# API Endpoint Test Evidence — Section 8.5
+﻿# API Endpoint Test Evidence - Section 8.5
 **System:** AURA (Adaptive User-Responsive Architecture)
 **Endpoint Under Test:** `POST /api/pipeline`
 **Server:** Next.js 16 dev server (`npm run dev`) on `http://localhost:3000`
@@ -19,7 +19,7 @@ All tests were executed in a second PowerShell terminal while the dev server was
 
 ---
 
-## Test 1 — Valid Full Payload (Happy Path)
+## Test 1 - Valid Full Payload (Happy Path)
 
 **Purpose:** Confirm the pipeline processes a complete telemetry payload and returns HTTP 200 with an adaptation result.
 
@@ -37,13 +37,13 @@ Write-Host "Test 1 (Valid): HTTP $($resp.StatusCode) | $([math]::Round($ms))ms"
 Test 1 (Valid): HTTP 200 | 8466ms
 ```
 
-> **Note:** The 8,466 ms is the one-time cold-start cost — Next.js compiles the route and the ANFIS pipeline singleton initialises on the very first request. All subsequent warm requests are well under 200 ms (see Test 5).
+> **Note:** The 8,466 ms is the one-time cold-start cost - Next.js compiles the route and the ANFIS pipeline singleton initialises on the very first request. All subsequent warm requests are well under 200 ms (see Test 5).
 
-**Result:** ✅ PASS (HTTP 200)
+**Result:** PASS (HTTP 200)
 
 ---
 
-## Test 2 — Missing `userId` (Validation Guard)
+## Test 2 - Missing `userId` (Validation Guard)
 
 **Purpose:** Confirm the API rejects requests that omit the `userId` field with HTTP 400.
 
@@ -62,11 +62,11 @@ try {
 Test 2 (Missing userId): HTTP 400 PASS (400 expected)
 ```
 
-**Result:** ✅ PASS (HTTP 400)
+**Result:** PASS (HTTP 400)
 
 ---
 
-## Test 3 — Missing `telemetry` Object (Validation Guard)
+## Test 3 - Missing `telemetry` Object (Validation Guard)
 
 **Purpose:** Confirm the API rejects requests that omit the `telemetry` object entirely with HTTP 400.
 
@@ -85,11 +85,11 @@ try {
 Test 3 (Missing telemetry): HTTP 400 PASS (400 expected)
 ```
 
-**Result:** ✅ PASS (HTTP 400)
+**Result:** PASS (HTTP 400)
 
 ---
 
-## Test 4 — Empty Body `{}` (Validation Guard)
+## Test 4 - Empty Body `{}` (Validation Guard)
 
 **Purpose:** Confirm the API rejects a completely empty JSON body with HTTP 400.
 
@@ -107,11 +107,11 @@ try {
 Test 4 (Empty body): HTTP 400 PASS (4xx expected)
 ```
 
-**Result:** ✅ PASS (HTTP 400)
+**Result:** PASS (HTTP 400)
 
 ---
 
-## Test 5 — Warm Latency (5 Runs)
+## Test 5 - Warm Latency (5 Runs)
 
 **Purpose:** Confirm round-trip latency is consistently below the 200 ms threshold after the pipeline singleton is initialised.
 
@@ -135,9 +135,9 @@ Latency run 4: 35ms
 Latency run 5: 39ms
 ```
 
-> Run this after Test 1 has already completed — that ensures the ANFIS pipeline singleton is warm.
+> Run this after Test 1 has already completed - that ensures the ANFIS pipeline singleton is warm.
 
-**Result:** ✅ PASS (all runs < 200 ms)
+**Result:** PASS (all runs < 200 ms)
 
 ---
 
@@ -145,17 +145,18 @@ Latency run 5: 39ms
 
 | # | Test Case | Payload | Expected HTTP | Actual HTTP | Latency | Result |
 |---|-----------|---------|--------------|-------------|---------|--------|
-| 1 | Valid full payload | 11 telemetry fields + userId | 200 OK | **200** | 8,466 ms (cold start) | ✅ PASS |
-| 2 | Missing `userId` | telemetry only | 400 Bad Request | **400** | — | ✅ PASS |
-| 3 | Missing `telemetry` | userId only | 400 Bad Request | **400** | — | ✅ PASS |
-| 4 | Empty body `{}` | — | 400 Bad Request | **400** | — | ✅ PASS |
-| 5 | Warm latency (×5) | Valid payload | < 200 ms | **35–47 ms** | avg ≈ 40 ms | ✅ PASS |
+| 1 | Valid full payload | 11 telemetry fields + userId | 200 OK | **200** | 8,466 ms (cold start) | PASS |
+| 2 | Missing `userId` | telemetry only | 400 Bad Request | **400** | - | PASS |
+| 3 | Missing `telemetry` | userId only | 400 Bad Request | **400** | - | PASS |
+| 4 | Empty body `{}` | - | 400 Bad Request | **400** | - | PASS |
+| 5 | Warm latency (×5) | Valid payload | < 200 ms | **35–47 ms** | avg ≈ 40 ms | PASS |
 
 ---
 
 ## Notes
 
 - **Cold-start:** The very first POST to the server incurs a one-time compilation + pipeline initialisation cost (~8 s in dev mode). In a production build (`next build && next start`) this is not present.
-- **Warm latency target:** < 200 ms — **achieved** (avg ≈ 40 ms).
+- **Warm latency target:** < 200 ms - **achieved** (avg ≈ 40 ms).
 - **Validator logic** is implemented in `app/api/pipeline/route.ts` and checks for `userId` and all 11 required telemetry fields before invoking the ANFIS engine.
-- Only **one API endpoint** exists in this system: `POST /api/pipeline`. This is by design — the ANFIS pipeline is a single inference path from telemetry window to adaptation parameters.
+- Only **one API endpoint** exists in this system: `POST /api/pipeline`. This is by design - the ANFIS pipeline is a single inference path from telemetry window to adaptation parameters.
+

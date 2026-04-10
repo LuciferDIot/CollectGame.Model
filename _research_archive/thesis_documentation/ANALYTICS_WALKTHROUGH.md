@@ -1,4 +1,4 @@
-# Academic Analytics Board - Final Walkthrough
+﻿# Academic Analytics Board - Final Walkthrough
 
 > **Objective**: Provide a **Thesis-Grade Evaluation Board** that explicitly splits "Offline Accuracy" from "Runtime Validity" to prove the ANFIS system works without retraining.
 
@@ -11,7 +11,7 @@ We have upgraded the dashboard to a **5-Section Academic Layout**. This board an
 ### 🔷 Section 1: Offline Model Evaluation (The "Trust Anchor")
 *   **Purpose**: Prove the static model quality.
 *   **Components**:
-    *   **Model Evaluation Card**: Locked, validated metrics (R²=0.9391, MAE=0.0112) — v2.2 final.
+    *   **Model Evaluation Card**: Locked, validated metrics (R²=0.9391, MAE=0.0112) - v2.2 final.
     *   **Comparative Evidence**: "Original vs. Option B" table showing the 18x Span gain and 450% Std gain.
 *   **Thesis Argument**: *"The model is statistically proven accurate (R²=0.94) on held-out data."*
 
@@ -19,8 +19,8 @@ We have upgraded the dashboard to a **5-Section Academic Layout**. This board an
 *   **Purpose**: Prove the runtime behavior matches training assumptions.
 *   **Components**:
     *   **Prediction Health**: Shows live $M$ with **Training Distribution Bands** ($\mu \pm 2\sigma$).
-        *   ✅ Green: Consistent
-        *   ⚠️ Yellow: Edge Behavior
+        *   Green: Consistent
+        *   Yellow: Edge Behavior
     *   **Clamp Stability Score**: Tracks "Free Range" operation.
         *   Target: < 5% Clamped (Safe).
 
@@ -42,7 +42,7 @@ We have upgraded the dashboard to a **5-Section Academic Layout**. This board an
 
 ---
 
-## 🚀 How to Demo for Thesis
+## How to Demo for Thesis
 1.  **Load & Run**: Start a simulation in the web app.
 2.  **Open "Analytics" Tab**: Scroll to Section 1.
     *   *Point out*: "Here is the R²=0.96 proof."
@@ -52,3 +52,4 @@ We have upgraded the dashboard to a **5-Section Academic Layout**. This board an
     *   *Point out*: "The correlation (r=0.8) proves it reacts to the player."
 
 This dashboard provides the explicit **visual proof** required for your defense.
+

@@ -1,4 +1,4 @@
-# Known Limitations and Future Work
+﻿# Known Limitations and Future Work
 
 > **Scope**: This document catalogs structural limitations of the ANFIS Adaptive Difficulty System (v2.1) that cannot be resolved within the current telemetry schema or dataset, and proposes concrete future improvements for each. Intended for inclusion in the Limitations and Future Work chapter of the thesis.
 
@@ -8,7 +8,7 @@
 
 ### 1.1 Problem Description
 
-The current telemetry schema records raw combat output — `damageDone`, `enemiesHit`, `timeInCombat`, and `kills` — without any information about the weapon used to achieve those outputs. This creates a fundamental ambiguity: the same numerical feature values can represent entirely different play styles depending on the weapon type equipped.
+The current telemetry schema records raw combat output - `damageDone`, `enemiesHit`, `timeInCombat`, and `kills` - without any information about the weapon used to achieve those outputs. This creates a fundamental ambiguity: the same numerical feature values can represent entirely different play styles depending on the weapon type equipped.
 
 **Example: Two combat-intent players in the same 30-second window**
 
@@ -33,7 +33,7 @@ enemiesHit    = fire_rate × accuracy × timeInCombat
 timeInCombat  = engagement_style (sniper: short, melee/SMG: long)
 ```
 
-Because the scaler is fitted across all weapon types simultaneously, the normalization range `[min, max]` is dominated by the player distribution of the most common weapon class. A heavy-weapon player's raw values may always normalize to the middle of the range, never reaching the high end — not because they are less combat-active, but because their weapon class inherently produces fewer but more powerful hits.
+Because the scaler is fitted across all weapon types simultaneously, the normalization range `[min, max]` is dominated by the player distribution of the most common weapon class. A heavy-weapon player's raw values may always normalize to the middle of the range, never reaching the high end - not because they are less combat-active, but because their weapon class inherently produces fewer but more powerful hits.
 
 ### 1.3 Impact on Archetype Classification
 
@@ -47,7 +47,7 @@ Because the scaler is fitted across all weapon types simultaneously, the normali
 - `damageDone` is moderate per hit but sustained
 - `enemiesHit` is high (many small hits)
 - `timeInCombat` is very high
-- **Result**: Combat activity score may be well-represented, but so is `timeNearInteractables` if enemies cluster near collectibles — cross-archetype contamination
+- **Result**: Combat activity score may be well-represented, but so is `timeNearInteractables` if enemies cluster near collectibles - cross-archetype contamination
 
 **Scenario: Area-of-effect (AOE) weapon player**
 - `damageDone` is very high (splash damage counted against multiple enemies)
@@ -58,7 +58,7 @@ Because the scaler is fitted across all weapon types simultaneously, the normali
 
 The current 10-feature telemetry schema (`enemiesHit`, `damageDone`, `timeInCombat`, `kills`, `itemsCollected`, `pickupAttempts`, `timeNearInteractables`, `distanceTraveled`, `timeSprinting`, `timeOutOfCombat`) does not include any weapon identifier or weapon-class label. The dataset used for training was collected without this dimension, and there is no post-hoc way to recover weapon type from the aggregate 30-second window statistics.
 
-Adding a derived ratio `damagePerHit = damageDone / max(enemiesHit, 1)` is possible within the current schema, but this ratio is ambiguous — it cannot distinguish between a skilled sniper (high damage, few hits by design) and a player who struggled to land hits (low accuracy, few hits unintentionally). The ratio is only meaningful when paired with a weapon class label.
+Adding a derived ratio `damagePerHit = damageDone / max(enemiesHit, 1)` is possible within the current schema, but this ratio is ambiguous - it cannot distinguish between a skilled sniper (high damage, few hits by design) and a player who struggled to land hits (low accuracy, few hits unintentionally). The ratio is only meaningful when paired with a weapon class label.
 
 ### 1.5 Proposed Future Improvement
 
@@ -94,7 +94,7 @@ The v2.1 revision addressed a similar structural ambiguity (`timeOutOfCombat` as
 
 ### 2.1 Problem Description
 
-`timeSprinting` is included in the Exploration activity score (`avg(distanceTraveled, timeSprinting)`) because movement is a primary indicator of exploration behavior. However, sprinting is not exclusive to explorers — combat-intent players also sprint to close distance on enemies, flank targets, or reposition after an engagement.
+`timeSprinting` is included in the Exploration activity score (`avg(distanceTraveled, timeSprinting)`) because movement is a primary indicator of exploration behavior. However, sprinting is not exclusive to explorers - combat-intent players also sprint to close distance on enemies, flank targets, or reposition after an engagement.
 
 ### 2.2 Impact
 
@@ -173,7 +173,7 @@ The system maintains per-player session state with a 40-second timeout. If a net
 
 ### 6.1 Problem Description
 
-The adaptation module applies a uniform sensitivity coefficient of 0.3 to all difficulty parameters when scaling from the MLP output multiplier. This means a 10% increase in the target multiplier produces the same relative change in enemy health, spawn rate, and movement speed — regardless of how much each parameter actually affects perceived difficulty.
+The adaptation module applies a uniform sensitivity coefficient of 0.3 to all difficulty parameters when scaling from the MLP output multiplier. This means a 10% increase in the target multiplier produces the same relative change in enemy health, spawn rate, and movement speed - regardless of how much each parameter actually affects perceived difficulty.
 
 ### 6.2 Impact
 
@@ -193,7 +193,7 @@ The adaptation module applies a uniform sensitivity coefficient of 0.3 to all di
 
 ### 7.1 Problem Description
 
-The ANFIS pipeline produces a **target multiplier** — a scalar in `[0.6, 1.4]` — that represents how difficulty should shift relative to a neutral baseline of 1.0. In the current implementation, this multiplier is applied as a simple scalar to individual enemy parameters:
+The ANFIS pipeline produces a **target multiplier** - a scalar in `[0.6, 1.4]` - that represents how difficulty should shift relative to a neutral baseline of 1.0. In the current implementation, this multiplier is applied as a simple scalar to individual enemy parameters:
 
 ```
 enemy_health    = base_health    × target_multiplier × sensitivity
@@ -202,11 +202,11 @@ enemy_damage    = base_damage    × target_multiplier × sensitivity
 spawn_rate      = base_spawn     × target_multiplier × sensitivity
 ```
 
-This approach works as a proof-of-concept but has a perceptual limitation: players typically cannot feel small percentage changes in enemy health or damage. A 10% increase in enemy health feels like "enemies take a few extra hits" — subtle and often imperceptible, especially in fast-paced games.
+This approach works as a proof-of-concept but has a perceptual limitation: players typically cannot feel small percentage changes in enemy health or damage. A 10% increase in enemy health feels like "enemies take a few extra hits" - subtle and often imperceptible, especially in fast-paced games.
 
 ### 7.2 A Better Adaptation Target: Global Enemy Cap
 
-A more direct and perceptible difficulty lever would be the **global enemy cap** — the maximum number of active enemies allowed in a zone or level at any time. Adjusting the enemy cap has immediate, perceivable impact:
+A more direct and perceptible difficulty lever would be the **global enemy cap** - the maximum number of active enemies allowed in a zone or level at any time. Adjusting the enemy cap has immediate, perceivable impact:
 
 | Target Multiplier | Action | Player Experience |
 |------------------|--------|-------------------|
@@ -232,21 +232,21 @@ Implementing a global enemy cap adjustment requires a running **Procedural Conte
 
 These operations, particularly navmesh queries, are GPU-accelerated in modern game engines (Unreal Engine NavMesh baking uses the GPU for large worlds). The research hardware available for this thesis had **limited GPU resources**, making continuous high-frequency PCG testing infeasible for an extended validation study.
 
-**Consequence for the thesis**: The adaptive difficulty system was validated in an **offline/simulation mode** — the ANFIS pipeline (classification → prediction) was evaluated against synthetic and recorded telemetry. The adaptation output (target multiplier) was verified to be numerically correct and semantically aligned, but the **full real-time closed-loop test** (ANFIS → PCG → player observation → new telemetry → ANFIS) was not executed for an extended session.
+**Consequence for the thesis**: The adaptive difficulty system was validated in an **offline/simulation mode** - the ANFIS pipeline (classification → prediction) was evaluated against synthetic and recorded telemetry. The adaptation output (target multiplier) was verified to be numerically correct and semantically aligned, but the **full real-time closed-loop test** (ANFIS → PCG → player observation → new telemetry → ANFIS) was not executed for an extended session.
 
 ### 7.4 What Was Validated vs. What Was Not
 
 | Component | Validation Status | Notes |
 |-----------|-----------------|-------|
-| Telemetry normalization | ✅ Validated offline | Against recorded data |
-| Activity scoring (v2.1) | ✅ Validated offline | Notebook 04 |
-| K-Means clustering | ✅ Validated offline | Silhouette = 0.3752 |
-| Soft membership (IDW) | ✅ Validated offline | Numerically stable |
-| Temporal delta computation | ✅ Validated offline | r=0.808 for Δexplore |
-| MLP inference | ✅ Validated offline | R² = 0.9391 (v2.2 rerun) |
-| Scalar parameter adaptation | ✅ Validated in demo UI | Health/speed/damage multipliers |
-| **Global enemy cap adaptation** | ❌ **Not implemented** | PCG infrastructure required |
-| **Full real-time closed-loop** | ❌ **Not validated** | GPU resource constraint |
+| Telemetry normalization | Validated offline | Against recorded data |
+| Activity scoring (v2.1) | Validated offline | Notebook 04 |
+| K-Means clustering | Validated offline | Silhouette = 0.3752 |
+| Soft membership (IDW) | Validated offline | Numerically stable |
+| Temporal delta computation | Validated offline | r=0.808 for Δexplore |
+| MLP inference | Validated offline | R² = 0.9391 (v2.2 rerun) |
+| Scalar parameter adaptation | Validated in demo UI | Health/speed/damage multipliers |
+| **Global enemy cap adaptation** | **Not implemented** | PCG infrastructure required |
+| **Full real-time closed-loop** | **Not validated** | GPU resource constraint |
 
 ### 7.5 Proposed Future Implementation
 
@@ -270,7 +270,7 @@ This limitation demonstrates a practical constraint of ML-based adaptive difficu
 
 > **The ML component (ANFIS pipeline) and the game engine component (PCG) require independent validation due to hardware resource separation. A complete end-to-end system test requires production-grade infrastructure beyond typical academic research constraints.**
 
-This is consistent with the broader adaptive game AI literature, where learned difficulty controllers are commonly validated in simulation before integration testing. The thesis contribution — the ANFIS pipeline design, the Option B target formula, and the v2.1 activity scoring fix — is fully validated within the simulation scope. PCG integration remains a deployment-phase engineering task.
+This is consistent with the broader adaptive game AI literature, where learned difficulty controllers are commonly validated in simulation before integration testing. The thesis contribution - the ANFIS pipeline design, the Option B target formula, and the v2.1 activity scoring fix - is fully validated within the simulation scope. PCG integration remains a deployment-phase engineering task.
 
 ---
 
@@ -293,18 +293,19 @@ This is consistent with the broader adaptive game AI literature, where learned d
 
 The limitations above are documented for completeness. Within the thesis, the following boundaries apply:
 
-1. **Weapon-type limitation is acknowledged but not resolved** — the current dataset does not include weapon type, and the thesis contribution is the ANFIS pipeline design and the v2.1 activity scoring fix, not weapon-specific modeling.
+1. **Weapon-type limitation is acknowledged but not resolved** - the current dataset does not include weapon type, and the thesis contribution is the ANFIS pipeline design and the v2.1 activity scoring fix, not weapon-specific modeling.
 
-2. **`timeSprinting` and `timeNearInteractables` ambiguities are accepted** — these are structural properties of the feature set that are common in behavioral telemetry systems. The v2.1 fix addressed the most impactful and tractable one (`timeOutOfCombat`).
+2. **`timeSprinting` and `timeNearInteractables` ambiguities are accepted** - these are structural properties of the feature set that are common in behavioral telemetry systems. The v2.1 fix addressed the most impactful and tractable one (`timeOutOfCombat`).
 
-3. **Session timeout is acceptable** for the thesis prototype — it is a production-readiness concern beyond the research scope.
+3. **Session timeout is acceptable** for the thesis prototype - it is a production-readiness concern beyond the research scope.
 
-4. **Uniform sensitivity is a simplification that is explicitly noted** in the adaptation module — it is out of scope for a scoring accuracy fix.
+4. **Uniform sensitivity is a simplification that is explicitly noted** in the adaptation module - it is out of scope for a scoring accuracy fix.
 
-5. **GPU resource constraints prevented full PCG integration** — the ANFIS pipeline is validated in simulation. The global enemy cap adaptation and closed-loop real-time testing are identified as future work requiring production GPU infrastructure. This is consistent with standard practice in adaptive game AI research, where the learned controller is validated separately from the game engine integration.
+5. **GPU resource constraints prevented full PCG integration** - the ANFIS pipeline is validated in simulation. The global enemy cap adaptation and closed-loop real-time testing are identified as future work requiring production GPU infrastructure. This is consistent with standard practice in adaptive game AI research, where the learned controller is validated separately from the game engine integration.
 
 The thesis argues that despite these limitations, the system achieves its core objective: producing a statistically valid, generalizing model (R² = 0.9391, v2.2) that adapts difficulty based on real behavioral signals. Future work can address each limitation incrementally as telemetry infrastructure matures.
 
 ---
 
 *Created: 2026-03-06 | Updated: 2026-03-07 | Version: v2.2 | Status: THESIS-READY*
+

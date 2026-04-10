@@ -1,4 +1,4 @@
-# Thesis Source Document — CollectGame.Telemetry Repository
+﻿# Thesis Source Document - CollectGame.Telemetry Repository
 **System**: AURA (Adaptive User-Responsive Architecture)
 **Repo**: CollectGame.Telemetry
 **Role**: Real-time telemetry collection backend (game → database)
@@ -6,7 +6,7 @@
 **Deployment**: Render (https://telemetry-collection.onrender.com)
 **Author**: K. W. J. P. Geevinda
 
-> This document covers the telemetry backend — the infrastructure layer that receives gameplay data from the Unreal Engine game client and stores it for analysis by the CalibrationAnalysis and CollectGame.Model pipelines. Combine with the other two repo source docs for the full thesis.
+> This document covers the telemetry backend - the infrastructure layer that receives gameplay data from the Unreal Engine game client and stores it for analysis by the CalibrationAnalysis and CollectGame.Model pipelines. Combine with the other two repo source docs for the full thesis.
 
 ---
 
@@ -120,7 +120,7 @@ interface ITelemetry {
 }
 ```
 
-**Indexes**: `userId` (ascending), `timestamp` (descending) — optimised for per-user time-series queries.
+**Indexes**: `userId` (ascending), `timestamp` (descending) - optimised for per-user time-series queries.
 
 ### 3.2 Calibration Telemetry (`CalibrationTelemetry` model)
 Used during the calibration study (before adaptation was enabled):
@@ -128,7 +128,7 @@ Used during the calibration study (before adaptation was enabled):
 ```typescript
 interface ICalibrationTelemetry {
   userId: ObjectId;
-  modeId: number;              // 1, 2, or 3 — the game mode
+  modeId: number;              // 1, 2, or 3 - the game mode
   timestamp: Date;
   telemetryWindowSeconds: number;  // Default: 30
 
@@ -147,7 +147,7 @@ interface ICalibrationTelemetry {
 
 **Key difference from standard telemetry**: includes `modeId` (which mode was active) and separates `heartsCollected` and `coinsCollected` as sub-categories of items. This granularity was needed for the calibration analysis to distinguish item types.
 
-**Indexes**: `userId`, `modeId`, `timestamp` — supports both per-mode and per-user calibration queries.
+**Indexes**: `userId`, `modeId`, `timestamp` - supports both per-mode and per-user calibration queries.
 
 ### 3.3 Death Event (`DeathEvent` model)
 Discrete event logging (separate from the 30-second aggregation):
@@ -198,7 +198,7 @@ POST /api/users/init
 }
 ```
 
-**Research significance**: `consentAgreed: true` is mandatory — no telemetry can be submitted without prior user registration and explicit consent. This satisfies research ethics requirements.
+**Research significance**: `consentAgreed: true` is mandatory - no telemetry can be submitted without prior user registration and explicit consent. This satisfies research ethics requirements.
 
 ### 4.2 Primary Unreal Engine Telemetry
 ```
@@ -299,7 +299,7 @@ Achievement notifications are generated automatically on each telemetry submissi
 |------|---------|
 | `TOP_RANK` | Leaderboard position milestone (Top 1, 3, 10, 25, 50, 100) |
 | `RANK_IMPROVEMENT` | Climbing 10+ positions in a single session |
-| `CATEGORY_CHAMPION` | Best Attacker (kills), Explorer (distance), or Collector (items) — first time |
+| `CATEGORY_CHAMPION` | Best Attacker (kills), Explorer (distance), or Collector (items) - first time |
 | `TIME_RECORD` | Best performance in a 5-minute window |
 | `MILESTONE` | Cumulative thresholds (100 kills, 500 items, etc.) |
 | `COMPARATIVE` | K/D ratio, accuracy, damage comparisons vs. other players |
@@ -317,9 +317,9 @@ Achievement notifications are generated automatically on each telemetry submissi
 ### 5.3 Notification Delivery
 - Stored in MongoDB per user with read/unread state
 - Returned inline with every telemetry response (avoid extra round-trips)
-- `GET /api/users/notifications/:userId?unreadOnly=true` — fetch pending notifications
-- `POST /api/users/notifications/:notificationId/read` — mark as read
-- `DELETE /api/users/notifications/:notificationId` — dismiss
+- `GET /api/users/notifications/:userId?unreadOnly=true` - fetch pending notifications
+- `POST /api/users/notifications/:notificationId/read` - mark as read
+- `DELETE /api/users/notifications/:notificationId` - dismiss
 
 ---
 
@@ -351,7 +351,7 @@ All errors (validation failures, DB errors, unexpected exceptions) are:
 1. Formatted as `{ "error": "Description" }` JSON with appropriate HTTP status
 2. Logged to the `error_logs` MongoDB collection with: timestamp, error message, stack trace, associated `userId` (if available)
 
-This provides a persistent audit trail of all failures — important for a research system where data integrity is critical.
+This provides a persistent audit trail of all failures - important for a research system where data integrity is critical.
 
 ---
 
@@ -364,7 +364,7 @@ This provides a persistent audit trail of all failures — important for a resea
 | Config file | `render.yaml` |
 | Health check | `GET /healthz` |
 | Rate limiting | 1000 req / 15 min per IP |
-| Timezone | Sri Lanka (UTC+5:30) — `getSriLankanTime()` utility used for all timestamps |
+| Timezone | Sri Lanka (UTC+5:30) - `getSriLankanTime()` utility used for all timestamps |
 
 **Why Render?** Free-tier cloud hosting with automatic HTTPS, health monitoring, and GitHub integration. Suitable for research-scale traffic (7 participants, ≈30s request interval per player).
 
@@ -403,7 +403,7 @@ Run with: `npm test`
 | Config | `render.yaml`, environment variables |
 | Rate limiting | `express-rate-limit` |
 | Logging | Custom request logger middleware + MongoDB error_logs |
-| Testing | (project test runner — npm test) |
+| Testing | (project test runner - npm test) |
 
 ---
 
@@ -441,17 +441,18 @@ Run with: `npm test`
 ## 12. Thesis Contributions from This Repo
 
 ### Infrastructure Contribution
-1. **Engine-agnostic telemetry pipeline**: The backend accepts telemetry from Unreal Engine via a standard REST API, making the ANFIS pipeline independent of the specific game engine — any engine that can issue HTTP POSTs every 30 seconds can integrate with AURA.
+1. **Engine-agnostic telemetry pipeline**: The backend accepts telemetry from Unreal Engine via a standard REST API, making the ANFIS pipeline independent of the specific game engine - any engine that can issue HTTP POSTs every 30 seconds can integrate with AURA.
 
 2. **Dual-mode collection**: Standard gameplay telemetry and calibration-mode telemetry are stored in separate collections, preserving the clean boundary between calibration phase and training phase.
 
-3. **Consent-first design**: User registration with `consentAgreed: true` is mandatory before any data can be submitted — directly aligned with research ethics requirements.
+3. **Consent-first design**: User registration with `consentAgreed: true` is mandatory before any data can be submitted - directly aligned with research ethics requirements.
 
 ### Engineering Decisions with Thesis Relevance
 - **30-second windowing enforced at the client**: The backend accepts whatever window the game sends but stores `telemetryWindowSeconds` for traceability. The 30-second window was determined by the ANFIS pipeline requirements, not the backend.
 - **Separate death events**: Deaths are logged as discrete timestamped events rather than aggregated into the telemetry window. This enables precise temporal alignment in the CalibrationAnalysis notebook (nearest-following-window rule).
-- **No model training here**: This backend is purely a data collection layer. No ML occurs in this repo — it feeds data to the two analysis repos.
+- **No model training here**: This backend is purely a data collection layer. No ML occurs in this repo - it feeds data to the two analysis repos.
 
 ---
 
 *Document generated: 2026-03-07 | Repo: CollectGame.Telemetry | Status: Deployed and operational*
+

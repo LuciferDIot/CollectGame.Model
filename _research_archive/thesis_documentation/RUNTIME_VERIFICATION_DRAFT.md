@@ -1,4 +1,4 @@
-# Thesis Section: Runtime Verification and System Stability
+﻿# Thesis Section: Runtime Verification and System Stability
 
 ## 6.4 Evaluation of Runtime Stability and Correctness
 
@@ -37,3 +37,4 @@ The **Responsiveness Indicator** demonstrates a strong causal link between playe
 
 ### 6.5 Conclusion of Runtime Evaluation
 The Runtime Analytics Board provides empirical proof that the deployed ANFIS v2.2 model constitutes a **stable, responsive, and safe control system**. By separating the *offline proof of learning* from the *online proof of consistency*, we successfully validated the system's effectiveness without requiring real-time ground truth labels. The "Option B" design solves the signal collapse issue of the original system while maintaining zero clamp saturation.
+

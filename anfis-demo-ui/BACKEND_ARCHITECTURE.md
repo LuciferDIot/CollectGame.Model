@@ -1,10 +1,10 @@
-# Backend Architecture & Complete Request-Response Flow
+﻿# Backend Architecture & Complete Request-Response Flow
 
 > **For Non-Technical Readers:** This document explains how our AI-powered game difficulty system works, from the moment a player's data arrives to when we send back perfectly-tuned game settings. No machine learning knowledge required!
 
 ---
 
-## 📋 Table of Contents
+## Table of Contents
 
 1. [API Endpoints Reference](#api-endpoints-reference)
 2. [The Big Picture](#the-big-picture)
@@ -28,7 +28,7 @@
 
 ---
 
-#### ✅ Request
+#### Request
 
 ```http
 POST /api/pipeline
@@ -59,26 +59,26 @@ Content-Type: application/json
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `userId` | `string` | ✅ Yes | Unique player identifier for session tracking |
-| `telemetry` | `object` | ✅ Yes | Flat object with all 11 gameplay feature fields |
-| `telemetry.enemiesHit` | `number` | ✅ Yes | Number of successful hits on enemies |
-| `telemetry.damageDone` | `number` | ✅ Yes | Total damage dealt to enemies |
-| `telemetry.timeInCombat` | `number` | ✅ Yes | Seconds spent in combat |
-| `telemetry.kills` | `number` | ✅ Yes | Number of enemy kills |
-| `telemetry.itemsCollected` | `number` | ✅ Yes | Number of collectibles picked up |
-| `telemetry.pickupAttempts` | `number` | ✅ Yes | Number of pickup interactions attempted |
-| `telemetry.timeNearInteractables` | `number` | ✅ Yes | Seconds spent near interactable objects |
-| `telemetry.distanceTraveled` | `number` | ✅ Yes | Distance traveled in meters |
-| `telemetry.timeSprinting` | `number` | ✅ Yes | Seconds spent sprinting |
-| `telemetry.timeOutOfCombat` | `number` | ✅ Yes | Seconds spent outside combat |
-| `telemetry.deathCount` | `number` | ✅ Yes | Number of player deaths this window |
-| `telemetry.damagePerHit` | `number` | ✅ Yes | Derived: `damageDone / max(enemiesHit, 1)` (v2.2) |
-| `telemetry.pickupAttemptRate` | `number` | ✅ Yes | Derived: `pickupAttempts / max(timeNearInteractables, 1)` (v2.2) |
-| `reset` | `boolean` | ❌ No | If `true`, resets session memory before processing |
+| `userId` | `string` | Yes | Unique player identifier for session tracking |
+| `telemetry` | `object` | Yes | Flat object with all 11 gameplay feature fields |
+| `telemetry.enemiesHit` | `number` | Yes | Number of successful hits on enemies |
+| `telemetry.damageDone` | `number` | Yes | Total damage dealt to enemies |
+| `telemetry.timeInCombat` | `number` | Yes | Seconds spent in combat |
+| `telemetry.kills` | `number` | Yes | Number of enemy kills |
+| `telemetry.itemsCollected` | `number` | Yes | Number of collectibles picked up |
+| `telemetry.pickupAttempts` | `number` | Yes | Number of pickup interactions attempted |
+| `telemetry.timeNearInteractables` | `number` | Yes | Seconds spent near interactable objects |
+| `telemetry.distanceTraveled` | `number` | Yes | Distance traveled in meters |
+| `telemetry.timeSprinting` | `number` | Yes | Seconds spent sprinting |
+| `telemetry.timeOutOfCombat` | `number` | Yes | Seconds spent outside combat |
+| `telemetry.deathCount` | `number` | Yes | Number of player deaths this window |
+| `telemetry.damagePerHit` | `number` | Yes | Derived: `damageDone / max(enemiesHit, 1)` (v2.2) |
+| `telemetry.pickupAttemptRate` | `number` | Yes | Derived: `pickupAttempts / max(timeNearInteractables, 1)` (v2.2) |
+| `reset` | `boolean` | No | If `true`, resets session memory before processing |
 
 ---
 
-#### ✅ Success Response (`200 OK`)
+#### Success Response (`200 OK`)
 
 ```json
 {
@@ -329,10 +329,10 @@ Content-Type: application/json
 | `deltas` | `delta_combat` | `number` | Change velocity for Combat (current − previous) |
 | `deltas` | `delta_collect` | `number` | Change velocity for Collection |
 | `deltas` | `delta_explore` | `number` | Change velocity for Exploration |
-| `anfis_input` | — | `number[]` | 6-element vector: [3 memberships, 3 deltas] |
-| `mlp_output` | — | `number` | Raw MLP neural network output |
-| `inference.rulesFired` | — | `array` | Hidden neuron activations sorted by strength (8 neurons) |
-| `target_multiplier` | — | `number` | Final clamped difficulty multiplier [0.6, 1.4] |
+| `anfis_input` | - | `number[]` | 6-element vector: [3 memberships, 3 deltas] |
+| `mlp_output` | - | `number` | Raw MLP neural network output |
+| `inference.rulesFired` | - | `array` | Hidden neuron activations sorted by strength (8 neurons) |
+| `target_multiplier` | - | `number` | Final clamped difficulty multiplier [0.6, 1.4] |
 | `adapted_parameters` | `{param_id}` | `AdaptedParameter` | Per-parameter adaptation with `id`, `base`, `final`, `clamped`, `metadata` |
 | `validation` | `membership_sum` | `number` | Sum of soft memberships (should ≈ 1.0) |
 | `validation` | `delta_range_ok` | `boolean` | Whether all deltas are within [-1.05, 1.05] |
@@ -359,7 +359,7 @@ Content-Type: application/json
 
 ---
 
-#### ❌ Error Response: Validation Failure (`400 Bad Request`)
+#### Error Response: Validation Failure (`400 Bad Request`)
 
 **Missing `userId`:**
 ```json
@@ -384,7 +384,7 @@ Content-Type: application/json
 
 ---
 
-#### ❌ Error Response: Server Error (`500 Internal Server Error`)
+#### Error Response: Server Error (`500 Internal Server Error`)
 
 ```json
 {
@@ -481,7 +481,7 @@ To clear session memory for a user before processing (resets delta tracking):
 
 ---
 
-## 🎯 The Big Picture
+## The Big Picture
 
 ### What Problem Are We Solving?
 
@@ -505,7 +505,7 @@ Game Becomes Perfectly Tuned!
 
 ---
 
-## 🚀 Complete Request-Response Journey
+## Complete Request-Response Journey
 
 ### The Kitchen Analogy
 
@@ -727,7 +727,7 @@ pct_explore = score_explore / (score_combat + score_collect + score_explore)
     - **`pickupAttemptRate` (Collection)**: Distinguishes intentional loot interaction from incidental proximity while exploring.
 - **Averages, not sums (v2.1)**: Each archetype has a max score of 1.0 regardless of feature count.
   Using sums gave Combat (now 5 features) a major raw-score advantage over Exploration (2). Averaging removes this bias.
-- **`timeOutOfCombat` excluded from Exploration**: This signal is passive — it increases
+- **`timeOutOfCombat` excluded from Exploration**: This signal is passive - it increases
   whenever the player is not in combat, regardless of intent. On maps with sparse enemy
   spawns, a combat-seeking player accumulates high Exploration score purely from waiting.
   `timeOutOfCombat` is also the complement of `timeInCombat` (both max at 30.5s; they sum
@@ -852,9 +852,9 @@ Difficulty Multiplier: 1.15 (increase difficulty by 15%)
 
 **The Translation:**
 ```
-  ✓ Enemy Health: (Base × Multiplier) × Sensitivity [S=0.20]
-  ✓ Enemy Damage: (Base × Multiplier) × Sensitivity [S=0.25]
-  ✓ Spawn Rate:   (Base × Multiplier) × Sensitivity [S=0.35]
+  Enemy Health: (Base × Multiplier) × Sensitivity [S=0.20]
+  Enemy Damage: (Base × Multiplier) × Sensitivity [S=0.25]
+  Spawn Rate:   (Base × Multiplier) × Sensitivity [S=0.35]
 ```
 
 **The Safety & Sensitivity (v2.2):**
@@ -892,7 +892,7 @@ Difficulty Multiplier: 1.15 (increase difficulty by 15%)
 
 ---
 
-## 📁 Code Architecture & File Map
+## Code Architecture & File Map
 
 ### Core Pipeline Files
 
@@ -956,7 +956,7 @@ app/
 
 ---
 
-## 🧠 Key Algorithms Explained Simply
+## Key Algorithms Explained Simply
 
 ### Algorithm 1: Soft Membership (Fuzzy Clustering)
 
@@ -1063,7 +1063,7 @@ With Delta:
 
 ---
 
-## 📊 Data Structures & Formats
+## Data Structures & Formats
 
 ### Input Format (Request)
 
@@ -1147,9 +1147,9 @@ With Delta:
 
 ```typescript
 Checks:
-  ✓ All required fields present?
-  ✓ Data types correct?
-  ✓ Values in reasonable range?
+  All required fields present?
+  Data types correct?
+  Values in reasonable range?
   
 If Failed:
   → Reject request with clear error message
@@ -1195,7 +1195,7 @@ We Show:     "Taking longer than usual. Please wait..."
 
 ---
 
-## 🎓 Thesis Section Mapping
+## Thesis Section Mapping
 
 | Implementation | Thesis Section | Description |
 |---------------|----------------|-------------|
@@ -1210,7 +1210,7 @@ We Show:     "Taking longer than usual. Please wait..."
 
 ---
 
-## 🚀 Performance Metrics
+## Performance Metrics
 
 ```
 Average Processing Time: 42ms
@@ -1227,7 +1227,7 @@ Memory Usage: ~15MB per pipeline instance
 
 ---
 
-## 📝 Summary
+## Summary
 
 **For Developers:**
 - Clear separation of concerns (each file has one job)
@@ -1249,5 +1249,6 @@ Memory Usage: ~15MB per pipeline instance
 
 ---
 
-*Last Updated: March 2026 — v2.2.1 (Activity Scoring fix: averages + timeOutOfCombat excluded from exploration)*
+*Last Updated: March 2026 - v2.2.1 (Activity Scoring fix: averages + timeOutOfCombat excluded from exploration)*
 *For questions, see inline code comments or reach out to the development team.*
+

@@ -1,4 +1,4 @@
-# ANFIS Adaptive Difficulty System - Development Journey
+﻿# ANFIS Adaptive Difficulty System - Development Journey
 
 **From Catastrophic Failure to Validated Success**
 
@@ -194,13 +194,13 @@ M_final = clip(M, 0.6, 1.4)
 
 **Empirical Validation** (3,240 samples):
 ```
-Min:  0.6094  ✓
-Max:  1.0207  ✓
-Mean: 0.8007  ✓ (expected player bias below neutral)
-Std:  0.0625  ✓ (5.5x original)
-Span: 0.4113  ✓ (18x original)
-Clamp_low:  0.0%  ✓
-Clamp_high: 0.0%  ✓
+Min:  0.6094  
+Max:  1.0207  
+Mean: 0.8007  (expected player bias below neutral)
+Std:  0.0625  (5.5x original)
+Span: 0.4113  (18x original)
+Clamp_low:  0.0%  
+Clamp_high: 0.0%  
 ```
 
 **Acceptance Criteria Met**:
@@ -351,7 +351,7 @@ Even correct implementations need:
 
 **Model Version**: v2.2 (Option B Canonical)
 
-**Status**: ✅ VALIDATED | ✅ DEPLOYABLE | ✅ THESIS-READY
+**Status**: VALIDATED | DEPLOYABLE | THESIS-READY
 
 **Artifacts**:
 - `core/notebooks/06_ANFIS_Preparation.ipynb`: Canonical target generation
@@ -413,11 +413,11 @@ Even correct implementations need:
 
 | Version | BASE | Soft Coefs | Delta Coefs | Death | Std | Span | R² | Status |
 |---------|------|------------|-------------|-------|-----|------|----|----|
-| Original | 1.0 | - | - | -0.1 | 0.011 | 0.023 | -4.69 | ❌ Failed |
-| Option A | 1.0 | 0.3/0.25/0.2 | - | -0.4 | 0.020 | - | - | ❌ Insufficient |
-| Option B v1 | 1.0 | 0.15/0.12/0.1 | 0.5/0.35/0.3 | -0.2 | 0.058 | 0.38 | - | ⚠️ High mean |
-| Option B v2 | 0.9 | 0.15/0.12/0.1 | 0.5/0.35/0.3 | -0.2 | 0.060 | - | - | ⚠️ Suboptimal |
-| **v2.2 FINAL** | **0.9** | **0.22/0.18/0.15** | **0.55/0.4/0.35** | **-0.25** | **0.062** | **0.41** | **0.94** | **✅ Success** |
+| Original | 1.0 | - | - | -0.1 | 0.011 | 0.023 | -4.69 | Failed |
+| Option A | 1.0 | 0.3/0.25/0.2 | - | -0.4 | 0.020 | - | - | Insufficient |
+| Option B v1 | 1.0 | 0.15/0.12/0.1 | 0.5/0.35/0.3 | -0.2 | 0.058 | 0.38 | - | High mean |
+| Option B v2 | 0.9 | 0.15/0.12/0.1 | 0.5/0.35/0.3 | -0.2 | 0.060 | - | - | Suboptimal |
+| **v2.2 FINAL** | **0.9** | **0.22/0.18/0.15** | **0.55/0.4/0.35** | **-0.25** | **0.062** | **0.41** | **0.94** | **Success** |
 
 *Note: Soft coefficients apply to centered features (x - 0.5) in final version*
 
@@ -429,7 +429,7 @@ Even correct implementations need:
 
 ---
 
-## Phase 7: Post-Production Activity Scoring Revision (v2.1) — March 2026
+## Phase 7: Post-Production Activity Scoring Revision (v2.1) - March 2026
 
 ### Issue Identification
 
@@ -446,7 +446,7 @@ The v2.0 `score_explore` formula included `timeOutOfCombat`:
 score_explore_v2 = sum(distanceTraveled, timeSprinting, timeOutOfCombat)
 ```
 
-`timeOutOfCombat` is a **passive signal** — it increases automatically whenever the player is not in combat, regardless of intent or action. On a map with 3–5 enemies at spawn time:
+`timeOutOfCombat` is a **passive signal** - it increases automatically whenever the player is not in combat, regardless of intent or action. On a map with 3–5 enemies at spawn time:
 - Player walks toward spawn area: `timeOutOfCombat` accumulates continuously
 - Player reaches area, no enemies yet: `timeOutOfCombat` still accumulates
 - Player begins searching adjacent zone: `timeOutOfCombat` still accumulates
@@ -464,7 +464,7 @@ A second issue was identified simultaneously: sum-based scoring gave Combat (4 f
 **Decision taken**: Switch to per-archetype **averages** (sum ÷ feature count).
 **Rationale**: Each archetype ceiling becomes 1.0 regardless of feature count. A player maximising all features in any archetype gets score = 1.0, making comparisons truly fair.
 
-**Accepted limitation**: Feature count still affects confidence — an archetype with 4 well-designed features is more robustly measured than one with 2. This is documented rather than hidden.
+**Accepted limitation**: Feature count still affects confidence - an archetype with 4 well-designed features is more robustly measured than one with 2. This is documented rather than hidden.
 
 ### Solution
 
@@ -480,8 +480,8 @@ score_explore = df[['distanceTraveled','timeSprinting']].mean(axis=1)
 
 The fix works within the existing 10-feature dataset because:
 1. The bias came from formula design, not data quality
-2. The passive signal was always wrong to include — removing it requires no new data
-3. Averages replace sums algebraically — same features, different aggregation
+2. The passive signal was always wrong to include - removing it requires no new data
+3. Averages replace sums algebraically - same features, different aggregation
 
 This demonstrates a key research principle: **structural bias from feature engineering can be corrected without new data collection**, provided the root cause is properly diagnosed.
 
@@ -494,13 +494,13 @@ Notebooks 04 → 05 → 06 → 07 rerun on 2026-03-06:
 
 ---
 
-## Phase 8: v2.2 Derived Features — March 2026
+## Phase 8: v2.2 Derived Features - March 2026
 
 ### Issue Identification
 
 **Context**: Post v2.1 deployment, analysis of the Combat and Collection archetype scoring revealed that two archetypes were still underdiscriminated:
 
-1. **Combat archetype**: A player who fires 50 shots and hits 5 enemies looks identical in raw features to one who fires 5 shots and hits 5 enemies — both record `enemiesHit=5`. Without a damage efficiency signal, high-accuracy/low-volume combat is conflated with spray-and-pray.
+1. **Combat archetype**: A player who fires 50 shots and hits 5 enemies looks identical in raw features to one who fires 5 shots and hits 5 enemies - both record `enemiesHit=5`. Without a damage efficiency signal, high-accuracy/low-volume combat is conflated with spray-and-pray.
 
 2. **Collection archetype**: A player who spends 25 of 30 seconds near an interactable but only attempts 2 pickups (casual/accidental) is classified the same as one who attempts 15 pickups in that same window. `pickupAttempts` alone misses intent.
 
@@ -508,7 +508,7 @@ These gaps were identified as **Limitation 1** and **Limitation 2** in `09_Known
 
 ### Solution: Two Derived Features
 
-Both features are computed **server-side** from existing raw telemetry before normalization — no new game instrumentation required.
+Both features are computed **server-side** from existing raw telemetry before normalization - no new game instrumentation required.
 
 ```python
 # Feature 11 (Combat discriminator)
@@ -574,6 +574,7 @@ Samples: 3,240
 
 **Notes on R² shift from v2.1 → v2.2**:
 - Train R² decreased (0.8813 vs ~0.96) while Test R² improved generalization gap
-- This reflects a more complex and informative input space — harder for the model to overfit
+- This reflects a more complex and informative input space - harder for the model to overfit
 - Test MAE (0.0112) is lower than v2.1 test_mae (0.0107 was pre-v2.2 rerun; note the upstream changes to clustering affect all downstream values)
 - All deployment constraints remain: target multiplier clipped to [0.6, 1.4], output range [0.5, 1.5] in runtime
+

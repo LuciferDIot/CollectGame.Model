@@ -1,13 +1,13 @@
-# Design Decision: Training Bias Fix & Neutral-Centred Calibration
+﻿# Design Decision: Training Bias Fix & Neutral-Centred Calibration
 
 **Version**: v2.2.1
 **Date**: March 7, 2026
 
 ---
 
-## 1. The Problem — "Always Easier"
+## 1. The Problem - "Always Easier"
 
-After deploying v2.2 and running the demo UI with diverse player inputs, analytics consistently reported *"easier by X%"* — no matter how aggressive or high-performing the simulated player was. This was a critical semantic failure: a system that can never say "harder" provides no useful adaptive difficulty.
+After deploying v2.2 and running the demo UI with diverse player inputs, analytics consistently reported *"easier by X%"* - no matter how aggressive or high-performing the simulated player was. This was a critical semantic failure: a system that can never say "harder" provides no useful adaptive difficulty.
 
 ---
 
@@ -40,11 +40,11 @@ Even for a *pure combat player* (combat=1.0, collect=0, explore=0) with no delta
 M = 0.9 + 0.22×(0.5) + 0.18×(−0.5) + 0.15×(−0.5) = 0.9 + 0.11 − 0.09 − 0.075 = 0.845
 ```
 
-This means the MLP was trained on targets that were *never above ~1.02* for realistic membership values (only very large positive deltas could push past 1.0). The model correctly learned the training distribution — but that distribution was biased entirely below semantic neutrality.
+This means the MLP was trained on targets that were *never above ~1.02* for realistic membership values (only very large positive deltas could push past 1.0). The model correctly learned the training distribution - but that distribution was biased entirely below semantic neutrality.
 
 **Key Insight**: The state terms sum to zero for a balanced player, but each is individually negative because they are centered at 0.5, not 0.333. The sum of centered terms: `0.22×(1/3−0.5) + 0.18×(1/3−0.5) + 0.15×(1/3−0.5) = (0.22+0.18+0.15)×(−0.167) = 0.55×(−0.167) ≈ −0.092`. This is a **fixed structural offset** that cannot be overcome by the membership values themselves.
 
-### 2.2 Failed First Fix — Min-Max Rescaling
+### 2.2 Failed First Fix - Min-Max Rescaling
 
 An initial attempted fix tried to map the MLP's empirical output range to the display range:
 ```
@@ -52,7 +52,7 @@ display = min_display + (raw − min_raw) / (max_raw − min_raw) × (max_displa
 ```
 where `output_range = [0.49, 1.12]` was computed by sweeping delta=±1.0 inputs.
 
-This failed because extreme delta values (±1.0) are unrealistic in practice — actual players produce deltas in roughly [−0.3, +0.3]. Using ±1.0 pulled `min_raw` to 0.49, making every realistic player input appear "above the midpoint" → always HARDER. The root cause was the same training bias, just shifted to a new symptom.
+This failed because extreme delta values (±1.0) are unrealistic in practice - actual players produce deltas in roughly [−0.3, +0.3]. Using ±1.0 pulled `min_raw` to 0.49, making every realistic player input appear "above the midpoint" → always HARDER. The root cause was the same training bias, just shifted to a new symptom.
 
 ---
 
@@ -104,7 +104,7 @@ The Next.js engine reads this value at startup:
 this.mlpNeutral = mlpWeights.mlp_neutral ?? 0.932;  // fallback if missing
 ```
 
-No code changes are needed after a retrain — only re-running notebooks 06–07 and copying the updated `anfis_mlp_weights.json`.
+No code changes are needed after a retrain - only re-running notebooks 06–07 and copying the updated `anfis_mlp_weights.json`.
 
 ---
 
@@ -112,9 +112,9 @@ No code changes are needed after a retrain — only re-running notebooks 06–07
 
 | Property | Min-Max Rescaling | Neutral-Centred |
 |----------|------------------|-----------------|
-| **Semantic guarantee** | ❌ Midpoint of output range ≠ balanced player | ✅ Balanced player **always** maps to 1.0 |
-| **Sensitivity to training data extremes** | ❌ Extreme delta inputs shift min/max | ✅ Only balanced input matters for calibration |
-| **Self-updating after retrain** | ❌ Output range must be recomputed manually | ✅ `mlp_neutral` auto-stored by notebook 07 |
+| **Semantic guarantee** | Midpoint of output range ≠ balanced player | Balanced player **always** maps to 1.0 |
+| **Sensitivity to training data extremes** | Extreme delta inputs shift min/max | Only balanced input matters for calibration |
+| **Self-updating after retrain** | Output range must be recomputed manually | `mlp_neutral` auto-stored by notebook 07 |
 | **Mathematical basis** | Empirical range mapping | Semantic anchor point |
 | **Amplification** | Implicit (depends on range) | Explicit constant (2.0) |
 
@@ -126,11 +126,11 @@ The `AMPLIFICATION = 2.0` constant means a raw deviation of ±0.4 from neutral (
 
 | Scenario | Raw MLP | Display | Direction |
 |----------|---------|---------|-----------|
-| Balanced (⅓,⅓,⅓), Δ=0 | 0.932 | **1.000** | Neutral ✅ |
-| High combat (0.85,0.10,0.05), Δcombat=+0.3 | ~1.11 | **1.127** | HARDER ✅ |
-| High explore (0.15,0.15,0.70), Δexplore=+0.3 | ~0.87 | **0.829** | easier ✅ |
-| Collector (0.10,0.80,0.10), Δcollect=+0.3 | ~0.88 | **0.865** | easier ✅ |
-| Struggling (Δcombat=−0.4, deaths=0.5) | ~0.85 | **0.840** | easier ✅ |
+| Balanced (⅓,⅓,⅓), Δ=0 | 0.932 | **1.000** | Neutral |
+| High combat (0.85,0.10,0.05), Δcombat=+0.3 | ~1.11 | **1.127** | HARDER |
+| High explore (0.15,0.15,0.70), Δexplore=+0.3 | ~0.87 | **0.829** | easier |
+| Collector (0.10,0.80,0.10), Δcollect=+0.3 | ~0.88 | **0.865** | easier |
+| Struggling (Δcombat=−0.4, deaths=0.5) | ~0.85 | **0.840** | easier |
 
 All 19 unit tests pass. TypeScript type check clean.
 
@@ -140,8 +140,8 @@ All 19 unit tests pass. TypeScript type check clean.
 
 | Metric | v2.2 (biased) | v2.2.1 (corrected) | Notes |
 |--------|--------------|---------------------|-------|
-| Test R² | 0.9391 | **0.9264** | Slight decrease expected — wider variance is harder to fit |
-| Test MAE | 0.0112 | **0.0127** | ±1.3% of [0.6,1.4] span — acceptable |
+| Test R² | 0.9391 | **0.9264** | Slight decrease expected - wider variance is harder to fit |
+| Test MAE | 0.0112 | **0.0127** | ±1.3% of [0.6,1.4] span - acceptable |
 | Target min | 0.609 | **0.600** | Reaches lower clamp |
 | Target max | 1.021 | **1.107** | Now reaches above neutral |
 | Target mean | 0.801 | **0.902** | Approaching the correct centre |
@@ -159,7 +159,7 @@ All 19 unit tests pass. TypeScript type check clean.
 - The neutral-centred approach defines the calibration semantically (balanced player = 1.0) rather than statistically (midpoint of output range). This is robust to distribution shifts between retrains.
 - `AMPLIFICATION = 2.0` was chosen such that ±0.4 raw deviation (the practical range for moderate-intensity gameplay) spans ±0.8 of the display range, leaving margin before the hard clamps.
 
-**Alternative considered and rejected**: Per-feature output range sweep with extreme inputs — rejected because unrealistic extreme deltas (±1.0) dominate the range computation, making every realistic player appear "above average" → always HARDER.
+**Alternative considered and rejected**: Per-feature output range sweep with extreme inputs - rejected because unrealistic extreme deltas (±1.0) dominate the range computation, making every realistic player appear "above average" → always HARDER.
 
 ---
 
@@ -174,3 +174,4 @@ All 19 unit tests pass. TypeScript type check clean.
 | `anfis-demo-ui/models/anfis_mlp_weights.json` | Retrained weights + `mlp_neutral: 0.932006` |
 | `anfis-demo-ui/models/training_stats.json` | Updated with correct post-retrain target distribution |
 | `anfis-demo-ui/lib/analytics/educational-content.ts` | `how_surrogate_model_works` updated with new metrics and calibration formula |
+

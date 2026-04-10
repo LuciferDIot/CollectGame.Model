@@ -1,4 +1,4 @@
-# System Verification and Implementation Report
+﻿# System Verification and Implementation Report
 
 ## 1. Introduction
 This report documents the final configuration and verification status of the ANFIS-based Adaptive Difficulty System (Version 2.0). The system architecture has been frozen following comprehensive experimental validation and is prepared for deployment.
@@ -47,7 +47,7 @@ The system evolved through two major iterations:
 ## 6. Conclusion
 The system implementation is internally consistent, scientifically validated, and ready for integration into the thesis dissertation. The architecture strikes an optimal balance between computational efficiency and behavioral modeling accuracy.
 
-## 7. Post-Production Revision (v2.1) — March 2026
+## 7. Post-Production Revision (v2.1) - March 2026
 
 ### 7.1 Issue Identified
 Following live gameplay observation after v2.0 production deployment, a systematic classification error was identified through user feedback: players with clear Combat intent were being classified as Explorers during the early portion of sessions when enemy spawns were sparse.
@@ -55,12 +55,12 @@ Following live gameplay observation after v2.0 production deployment, a systemat
 ### 7.2 Root Cause
 Two structural problems were identified in the v2.0 activity scoring formula:
 
-**Problem 1 — Passive Signal Inclusion**: `timeOutOfCombat` was included in the Exploration score. This feature accumulates for any player not in active combat, including players searching for enemies on a low-density map. The v2.0 formula was:
+**Problem 1 - Passive Signal Inclusion**: `timeOutOfCombat` was included in the Exploration score. This feature accumulates for any player not in active combat, including players searching for enemies on a low-density map. The v2.0 formula was:
 ```
 score_explore = distanceTraveled + timeSprinting + timeOutOfCombat  (sum-based)
 ```
 
-**Problem 2 — Feature Count Asymmetry**: Using raw sums gave Combat (4 features, max=4) a structural ceiling advantage over Collection (3 features, max=3) and Exploration (3 features, max=3). This created subtle but consistent over-classification toward Combat during high-activity sessions.
+**Problem 2 - Feature Count Asymmetry**: Using raw sums gave Combat (4 features, max=4) a structural ceiling advantage over Collection (3 features, max=3) and Exploration (3 features, max=3). This created subtle but consistent over-classification toward Combat during high-activity sessions.
 
 ### 7.3 Fix Applied (v2.1)
 ```
@@ -70,15 +70,15 @@ score_explore = avg(distanceTraveled, timeSprinting)                       → [
 ```
 
 Key changes:
-1. Per-archetype **averages** (÷ feature count) — equal ceiling of 1.0 for all archetypes
-2. `timeOutOfCombat` **removed** from Exploration — only active movement signals used
+1. Per-archetype **averages** (÷ feature count) - equal ceiling of 1.0 for all archetypes
+2. `timeOutOfCombat` **removed** from Exploration - only active movement signals used
 
 No new telemetry data was collected. The fix operates entirely within the existing 10-feature dataset.
 
 ### 7.4 Pipeline Regeneration
 Notebooks 04 → 05 → 06 → 07 were rerun on 2026-03-06. All model artifacts updated:
-- `cluster_centroids.json` — regenerated with v2.1 activity scores
-- `anfis_mlp_weights.json` — retrained on new soft membership values
+- `cluster_centroids.json` - regenerated with v2.1 activity scores
+- `anfis_mlp_weights.json` - retrained on new soft membership values
 - Post-rerun metrics: test_mae = 0.0107, train_mae = 0.0125
 
 ### 7.5 Revised System Status
@@ -89,21 +89,22 @@ The system is **fully production-ready** under v2.1. The issue, its root cause, 
 
 ---
 
-## Section 8: v2.2 Update — Derived Features (2026-03-07)
+## Section 8: v2.2 Update - Derived Features (2026-03-07)
 
 ### 8.1 Summary
 Two derived features were added to the pipeline to address archetype discrimination gaps identified after v2.1 deployment:
 
-- **`damage_per_hit`** = `damageDone / max(enemiesHit, 1)` — distinguishes high-accuracy from high-volume combat
-- **`pickup_attempt_rate`** = `pickupAttempts / max(timeNearInteractables, 1)` — distinguishes deliberate collectors from incidental ones
+- **`damage_per_hit`** = `damageDone / max(enemiesHit, 1)` - distinguishes high-accuracy from high-volume combat
+- **`pickup_attempt_rate`** = `pickupAttempts / max(timeNearInteractables, 1)` - distinguishes deliberate collectors from incidental ones
 
 Both are computed server-side from existing raw telemetry before normalization. The feature vector expanded from 10 → 12.
 
 ### 8.2 Pipeline Regeneration
 Notebooks 03 → 10 rerun on 2026-03-07. All integration assertions pass (9/9):
-- `scaler_params.json` — 12 features
-- `anfis_mlp_weights.json` — retrained on new inputs
+- `scaler_params.json` - 12 features
+- `anfis_mlp_weights.json` - retrained on new inputs
 - Post-rerun metrics: **test_r2 = 0.9391**, test_mae = 0.0112, Δexplore r = 0.8394
 
 ### 8.3 Final System Status
-**Version**: 2.2.0 | **Status**: PRODUCTION ✅
+**Version**: 2.2.0 | **Status**: PRODUCTION Done
+

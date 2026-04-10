@@ -1,4 +1,4 @@
-# ANFIS MLP Evaluation Report
+﻿# ANFIS MLP Evaluation Report
 
 **Date**: 2026-01-28 (updated March 7, 2026)
 **Version**: v2.2.1 (Option B Canonical)
@@ -17,14 +17,14 @@ The MLP surrogate achieved R² = 0.9566 on unseen data after resolving target va
 
 | Metric | Value | Status |
 |--------|-------|--------|
-| **Samples** | 3,240 | ✓ |
-| **Min** | 0.6094 | ✓ Healthy |
-| **Max** | 1.0207 | ✓ Healthy |
-| **Mean** | 0.8007 | ✓ Expected (players skew below neutral) |
-| **Std Dev** | 0.0625 | ✓ **5.5x improvement** |
-| **Span** | 0.4113 | ✓ **17.9x improvement** |
-| **Clamp Low** | 0.0% | ✓ No saturation |
-| **Clamp High** | 0.0% | ✓ No saturation |
+| **Samples** | 3,240 | |
+| **Min** | 0.6094 | Healthy |
+| **Max** | 1.0207 | Healthy |
+| **Mean** | 0.8007 | Expected (players skew below neutral) |
+| **Std Dev** | 0.0625 | **5.5x improvement** |
+| **Span** | 0.4113 | **17.9x improvement** |
+| **Clamp Low** | 0.0% | No saturation |
+| **Clamp High** | 0.0% | No saturation |
 
 ### Before/After Comparison
 
@@ -47,11 +47,11 @@ The MLP surrogate achieved R² = 0.9566 on unseen data after resolving target va
 
 ### Key Observations
 
-1. **Generalization**: Test R² (0.9566) ≥ Train R² (0.9550) — no overfitting.
+1. **Generalization**: Test R² (0.9566) ≥ Train R² (0.9550) - no overfitting.
 
 2. **Error**: MAE ≈ 0.013 (3% of target span [0.6, 1.4]).
 
-3. **Convergence**: 230 iterations — clean learning curve.
+3. **Convergence**: 230 iterations - clean learning curve.
 
 ---
 
@@ -123,9 +123,9 @@ Criteria met:
 
 ## Thesis Contribution
 
-1. Fuzzy-membership constraints can cause variance collapse in supervised learning targets — σ dropped from 0.062 to 0.011, making gradient descent fail.
+1. Fuzzy-membership constraints can cause variance collapse in supervised learning targets - σ dropped from 0.062 to 0.011, making gradient descent fail.
 2. Hybrid feature engineering (soft membership + deltas) restores the learning signal without changing architecture.
-3. The failure was statistical, not architectural — the MLP was sufficient once the target signal had adequate variance.
+3. The failure was statistical, not architectural - the MLP was sufficient once the target signal had adequate variance.
 
 ---
 
@@ -165,11 +165,11 @@ Following production deployment of v2.2 (Option B), live gameplay observation re
 ### Impact on Model Artifacts
 
 The change to activity scoring required regenerating all downstream artifacts:
-1. `4_activity_contributions.csv` — new activity scores per window
-2. `5_clustered_telemetry.csv` — new cluster assignments
-3. `cluster_centroids.json` — new centroid positions in pct_combat/collect/explore space
-4. `6_anfis_dataset.csv` — new soft membership and delta values
-5. `anfis_mlp_weights.json` — retrained MLP on new inputs
+1. `4_activity_contributions.csv` - new activity scores per window
+2. `5_clustered_telemetry.csv` - new cluster assignments
+3. `cluster_centroids.json` - new centroid positions in pct_combat/collect/explore space
+4. `6_anfis_dataset.csv` - new soft membership and delta values
+5. `anfis_mlp_weights.json` - retrained MLP on new inputs
 
 ### Post-Rerun Metrics (2026-03-06)
 
@@ -179,7 +179,7 @@ The change to activity scoring required regenerating all downstream artifacts:
 | test_mae | 0.0107 |
 | Architecture | 6-16-8-1 |
 
-The model continues to generalize well (test_mae < train_mae). The R² structure from Option B is preserved as the target formula and MLP architecture were not changed — only the upstream activity score computation was corrected.
+The model continues to generalize well (test_mae < train_mae). The R² structure from Option B is preserved as the target formula and MLP architecture were not changed - only the upstream activity score computation was corrected.
 
 ### Thesis Significance
 
@@ -223,7 +223,7 @@ Two derived features were added, computed from existing raw telemetry before nor
 | Train R² | ~0.96 | 0.8813 | More complex input space |
 | Test R² | ~0.96 | **0.9391** | Strong generalization maintained |
 | Δexplore r | 0.808 | **0.8394** | Improved temporal signal quality |
-| Integration tests | — | **9/9 pass** | All pipeline assertions verified |
+| Integration tests | - | **9/9 pass** | All pipeline assertions verified |
 
 ### Deployment Verdict (v2.2)
 
@@ -234,7 +234,7 @@ All production criteria continue to be met:
 - [x] 9/9 integration tests pass
 - [x] Both model artifacts synced: `_research_archive/data/models/` and `anfis-demo-ui/models/`
 
-**Note on Train R² decrease**: The gap between train (0.881) and test (0.939) R² is unusual but explained by the richer input space from derived features — the model has more informative signals, reducing overfitting tendency. Test performance is the authoritative deployment metric.
+**Note on Train R² decrease**: The gap between train (0.881) and test (0.939) R² is unusual but explained by the richer input space from derived features - the model has more informative signals, reducing overfitting tendency. Test performance is the authoritative deployment metric.
 
 ---
 
@@ -246,7 +246,7 @@ All production criteria continue to be met:
 
 After deploying v2.2, live analytics consistently showed "easier by X%" regardless of player archetype. Root cause investigation identified:
 
-**Root Cause 1 — Training formula used `base=0.9`**
+**Root Cause 1 - Training formula used `base=0.9`**
 
 The original Option B formula was:
 ```
@@ -260,7 +260,7 @@ For a balanced player (⅓,⅓,⅓, deltas=0):
 
 This biased the entire training distribution below 1.0. The MLP never learned to predict "harder", because no realistic input combination could produce a target > 1.0 without large positive deltas.
 
-**Root Cause 2 — Min-max rescaling used extreme inputs**
+**Root Cause 2 - Min-max rescaling used extreme inputs**
 
 The attempted fix (min-max rescaling of MLP output range) computed bounds using delta=±1.0, pulling the min to 0.49. Since realistic players always produce outputs above this extreme, every realistic session appeared "above midpoint" → always HARDER.
 
@@ -297,10 +297,10 @@ The slight R² decrease (0.9391 → 0.9264) is expected: the corrected target di
 
 | Scenario | Raw MLP | Display | Correct? |
 |----------|---------|---------|----------|
-| Balanced (⅓,⅓,⅓), Δ=0 | 0.932 | **1.000** | ✅ Neutral |
-| High combat + Δcombat=+0.3 | ~1.11 | **1.127** | ✅ HARDER |
-| High explore + Δexplore=+0.3 | ~0.87 | **0.829** | ✅ easier |
-| Struggling (deaths=0.5) | ~0.85 | **0.840** | ✅ easier |
+| Balanced (⅓,⅓,⅓), Δ=0 | 0.932 | **1.000** | Neutral |
+| High combat + Δcombat=+0.3 | ~1.11 | **1.127** | HARDER |
+| High explore + Δexplore=+0.3 | ~0.87 | **0.829** | easier |
+| Struggling (deaths=0.5) | ~0.85 | **0.840** | easier |
 
 ### Thesis Significance
 
@@ -308,4 +308,5 @@ This addendum demonstrates a subtle but critical failure mode: a training formul
 
 ---
 
-**Final Status**: VALIDATED ✅ | DEPLOYABLE ✅ | THESIS-READY ✅
+**Final Status**: VALIDATED | DEPLOYABLE | THESIS-READY Done
+

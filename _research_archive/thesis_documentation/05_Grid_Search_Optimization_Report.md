@@ -1,4 +1,4 @@
-# Optimization Study: Parameter Tuning and Configuration Selection
+﻿# Optimization Study: Parameter Tuning and Configuration Selection
 
 ## 1. Introduction
 
@@ -60,3 +60,4 @@ While K=2 offered statistically superior separation, optimizing purely for Silho
 
 ## 5. Conclusion
 The optimization study confirms that the baseline configuration is not merely a default choice but a performant, stable, and theoretically sound solution for this specific application. The absence of significant gains from complex preprocessing validates the robustness of the core 10-feature telemetry set.
+

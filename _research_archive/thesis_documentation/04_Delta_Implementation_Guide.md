@@ -1,4 +1,4 @@
-# Technical Specification: Temporal Delta Integration
+﻿# Technical Specification: Temporal Delta Integration
 
 ## 1. Overview
 This document details the implementation of the temporal delta signal, integrated into the ANFIS-based difficulty system to capture real-time trends in player behavior. This feature allows the system to differentiate between static states (e.g., "currently collecting") and dynamic shifts (e.g., "accelerating exploration rate").
@@ -40,3 +40,4 @@ The MLP surrogate model (Notebook `07_ANFIS_Training.ipynb`) was retrained on th
 
 ## 4. Validation
 The integration was validated by visualizing the delta distributions in Notebook `08_Evaluation_Visualizations.ipynb`. Results confirmed that the signals closely track behavioral shifts, providing a centered distribution around zero with active tails corresponding to distinct phase changes in gameplay.
+

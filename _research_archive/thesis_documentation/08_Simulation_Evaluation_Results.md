@@ -1,4 +1,4 @@
-# Research Evaluation Report: ANFIS Adaptive Difficulty
+﻿# Research Evaluation Report: ANFIS Adaptive Difficulty
 
 ## 1. Simulated Evaluation Dataset
 To validate the ANFIS pipeline, we simulated a dataset of player telemetry windows representing diverse gameplay styles. The table below shows a subset of inputs (soft cluster membership + difficulty deltas) and the corresponding ANFIS difficulty multiplier output ($M$).
@@ -15,7 +15,7 @@ To validate the ANFIS pipeline, we simulated a dataset of player telemetry windo
 
 *$M > 1.0$: difficulty increases (more enemies, less loot). $M < 1.0$: difficulty decreases (fewer enemies, more loot). $M = 1.0$: no change. Display values computed via neutral-centred formula: $M_{\text{display}} = \text{clamp}(1.0 + (\text{raw} - 0.932) \times 2.0,\ 0.6,\ 1.4)$.*
 
-## 2. ANFIS Prediction Accuracy (v2.2.1 — corrected)
+## 2. ANFIS Prediction Accuracy (v2.2.1 - corrected)
 The ANFIS model (approximated via a 6-16-8-1 MLP surrogate) was evaluated on a test split (20%) of the full synthetic dataset.
 
 *   **Total Samples**: 3,240 (80/20 split → 2,592 train / 648 test)
@@ -24,7 +24,7 @@ The ANFIS model (approximated via a 6-16-8-1 MLP surrogate) was evaluated on a t
 *   **Convergence**: 21 iterations (LBFGS solver, max_iter=500)
 *   **mlp_neutral**: 0.932006 (neutral-centred calibration baseline)
 
-The low MAE (1.3% of target span) indicates the surrogate faithfully reproduces the fuzzy inference surface. Note: earlier versions of this report cited R²=0.982 and MAE=0.0102 — those figures came from a biased training run (base=0.9) and a smaller dataset. The current figures reflect the corrected v2.2.1 retrain.
+The low MAE (1.3% of target span) indicates the surrogate faithfully reproduces the fuzzy inference surface. Note: earlier versions of this report cited R²=0.982 and MAE=0.0102 - those figures came from a biased training run (base=0.9) and a smaller dataset. The current figures reflect the corrected v2.2.1 retrain.
 
 ## 3. Calibration Study Results (N=7)
 A small-scale user study was conducted to calibrate the base difficulty modes before enabling full adaptation. Participants played three fixed modes in randomized order.
@@ -58,3 +58,4 @@ To verify these simulation results in the live game, we implemented the "Trust A
     *   **Failure Mode**: If the dot remains in the center during combat, the Feature Extraction Logic is broken.
 
 *See `ANALYTICS_WALKTHROUGH.md` for the full live verification protocol.*
+

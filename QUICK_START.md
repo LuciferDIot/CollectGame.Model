@@ -4,13 +4,13 @@
 
 ---
 
-## ✅ System Status: PRODUCTION READY
+## System Status: PRODUCTION READY
 
-All experimentation complete. Architecture frozen. Delta integration specified. Documentation finalized.
+All experimentation is complete. Architecture frozen. Delta integration specified. Documentation finalized.
 
 ---
 
-## 🚀 Running the Pipeline
+## Running the Pipeline
 
 ### Step 1: Navigate to Notebooks Directory
 ```bash
@@ -37,15 +37,15 @@ jupyter notebook
 
 ---
 
-## 📁 Expected Data Structure
+## Expected Data Structure
 
 ```
 CollectGame.Model/
 ├── data/
-│   ├── telemetry_phase_2.users.csv          ← Must exist
-│   ├── telemetry_phase_2.telemetries.csv    ← Must exist
-│   ├── telemetry_phase_2.deathevents.csv    ← Must exist
-│   └── processed/                            ← Created automatically
+│   ├── telemetry_phase_2.users.csv          <- Must exist
+│   ├── telemetry_phase_2.telemetries.csv    <- Must exist
+│   ├── telemetry_phase_2.deathevents.csv    <- Must exist
+│   └── processed/                            <- Created automatically
 │       ├── merged_telemetry.csv
 │       ├── 2_gameplay_summary.csv
 │       ├── 3_normalized_telemetry.csv
@@ -54,12 +54,12 @@ CollectGame.Model/
 │       ├── 6_anfis_dataset.csv
 │       └── viz_*.png
 └── core/
-    └── notebooks/ ← Run from here
+    └── notebooks/ <- Run from here
 ```
 
 ---
 
-## ⚠️ Before Running
+## Before Running
 
 **Check that raw data files exist**:
 - `F:\Campus\FYP\Implementation\CollectGame.Model\data\telemetry_phase_2.users.csv`
@@ -70,7 +70,7 @@ If files are missing, the first notebook will fail with `FileNotFoundError`.
 
 ---
 
-## 🔧 Troubleshooting
+## Troubleshooting
 
 ### Error: "No such file or directory: 'data/...'"
 **Solution**: Paths are already fixed to `../../data/`. Make sure you're running from `core/notebooks/` directory.
@@ -82,11 +82,11 @@ pip install pandas numpy matplotlib seaborn scikit-learn jupyterlab
 ```
 
 ### Notebook won't execute
-**Solution**: Restart kernel and run cells in order (Kernel → Restart & Clear Output)
+**Solution**: Restart kernel and run cells in order (Kernel -> Restart & Clear Output)
 
 ---
 
-## 📊 Final Outputs
+## Final Outputs
 
 After running all 8 notebooks successfully:
 
@@ -102,19 +102,19 @@ After running all 8 notebooks successfully:
 
 ---
 
-## ✅ Success Indicators
+## Success Indicators
 
 After running all notebooks, you should see:
-- ✅ No errors in any notebook
-- ✅ All CSV files in `data/processed/`
-- ✅ Soft membership columns in `5_clustered_telemetry.csv`
-- ✅ Delta columns (delta_combat, delta_collect, delta_explore)
-- ✅ 6-feature input in `6_anfis_dataset.csv`
-- ✅ Visualizations generated
+- No errors in any notebook
+- All CSV files in `data/processed/`
+- Soft membership columns in `5_clustered_telemetry.csv`
+- Delta columns (delta_combat, delta_collect, delta_explore)
+- 6-feature input in `6_anfis_dataset.csv`
+- Visualizations generated
 
 ---
 
-## 📚 Documentation
+## Documentation
 
 - **System Overview**: `../../README.md`
 - **Configuration**: `../pipeline_config.yaml`
@@ -123,11 +123,11 @@ After running all notebooks, you should see:
 
 ---
 
-## 🎓 For Thesis
+## For Thesis
 
 This pipeline produces all results and visualizations needed for thesis chapters:
 - Methodology: Document these 8 steps
 - Results: Use metrics from outputs
 - Visualizations: Include all `viz_*.png` files
 
-**Status**: Production-ready, experimentally validated, thesis-defensible ✅
+**Status**: Production-ready, experimentally validated, thesis-defensible

@@ -1,4 +1,4 @@
-# Academic Analytics Board - Implementation Plan
+﻿# Academic Analytics Board - Implementation Plan
 
 **Objective**: Upgrade runtime diagnostics to a **Thesis-Grade Evaluation Board** that explicitly separates *Offline Accuracy* (static) from *Runtime Validity* (dynamic).
 
@@ -34,9 +34,9 @@
 *   **Content**:
     *   **Rolling Correlation**: $corr(|\Delta Behavior|, |\Delta M|)$.
     *   **Interpretation**:
-        *   $>0.6$: Strong Alignment (✅)
+        *   $>0.6$: Strong Alignment (Done)
         *   $0.3-0.6$: Moderate
-        *   $<0.3$: Weak Coupling (⚠️)
+        *   $<0.3$: Weak Coupling (Note:)
 *   **Updates**:
     *   Update `compute.ts` to calculate Pearson correlation on rolling window.
     *   Update `ResponsivenessIndicator` to use correlation instead of heuristics.
@@ -80,11 +80,12 @@
 
 ---
 
-## 🔒 Constraints Checklist
-*   ✅ No Model Retraining.
-*   ✅ No "Runtime R²" (impossible).
-*   ✅ No formula changes.
-*   ✅ All new panels are Read-Only views.
+## Constraints Checklist
+*   No Model Retraining.
+*   No "Runtime R²" (impossible).
+*   No formula changes.
+*   All new panels are Read-Only views.
 
 ## 🏁 Deliverable
 A dashboard that answers: *"How do we know it works?"* via **Offline Proof + Online Consistency**.
+

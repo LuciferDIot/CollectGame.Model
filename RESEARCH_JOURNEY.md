@@ -1,4 +1,4 @@
-# ANFIS Adaptive Difficulty System — Research Journey
+﻿# ANFIS Adaptive Difficulty System - Research Journey
 
 > A complete record of every option explored, experiment conducted, decision made, and path taken during the development of the ANFIS-based adaptive difficulty model for CollectGame.
 
@@ -11,25 +11,25 @@
 1. [Project Goal](#1-project-goal)
 2. [Data Collection & Raw Inputs](#2-data-collection--raw-inputs)
 3. [Pipeline Overview (8 Notebooks)](#3-pipeline-overview-8-notebooks)
-4. [Notebook 01 — Data Loading & Merging](#4-notebook-01--data-loading--merging)
-5. [Notebook 02 — Gameplay Summary & Session Cleaning](#5-notebook-02--gameplay-summary--session-cleaning)
-6. [Notebook 03 — Feature Normalization](#6-notebook-03--feature-normalization)
-7. [Notebook 04 — Activity Contribution Analysis](#7-notebook-04--activity-contribution-analysis)
-8. [Notebook 05 — Clustering (K-Means & Soft Membership)](#8-notebook-05--clustering-k-means--soft-membership)
-9. [Notebook 06 — ANFIS Data Preparation & Target Generation](#9-notebook-06--anfis-data-preparation--target-generation)
-10. [Notebook 07 — ANFIS Training (MLP Surrogate)](#10-notebook-07--anfis-training-mlp-surrogate)
-11. [Notebook 08 — Evaluation & Visualizations](#11-notebook-08--evaluation--visualizations)
-12. [A/B Testing — Experiment A vs Experiment B](#12-ab-testing--experiment-a-vs-experiment-b)
+4. [Notebook 01 - Data Loading & Merging](#4-notebook-01--data-loading--merging)
+5. [Notebook 02 - Gameplay Summary & Session Cleaning](#5-notebook-02--gameplay-summary--session-cleaning)
+6. [Notebook 03 - Feature Normalization](#6-notebook-03--feature-normalization)
+7. [Notebook 04 - Activity Contribution Analysis](#7-notebook-04--activity-contribution-analysis)
+8. [Notebook 05 - Clustering (K-Means & Soft Membership)](#8-notebook-05--clustering-k-means--soft-membership)
+9. [Notebook 06 - ANFIS Data Preparation & Target Generation](#9-notebook-06--anfis-data-preparation--target-generation)
+10. [Notebook 07 - ANFIS Training (MLP Surrogate)](#10-notebook-07--anfis-training-mlp-surrogate)
+11. [Notebook 08 - Evaluation & Visualizations](#11-notebook-08--evaluation--visualizations)
+12. [A/B Testing - Experiment A vs Experiment B](#12-ab-testing--experiment-a-vs-experiment-b)
 13. [Grid Search Optimization (108 Configurations)](#13-grid-search-optimization-108-configurations)
 14. [Delta Signal Analysis & Temporal Refinement](#14-delta-signal-analysis--temporal-refinement)
-15. [Target Formula Evolution (Option A → Option B)](#15-target-formula-evolution-option-a--option-b)
+15. [Target Formula Evolution (Option A to Option B)](#15-target-formula-evolution-option-a--option-b)
 16. [Critical Bugs Encountered & Fixed](#16-critical-bugs-encountered--fixed)
 17. [Model Artifacts & Deployment Outputs](#17-model-artifacts--deployment-outputs)
 18. [Independent Analyses](#18-independent-analyses)
 19. [Final Metrics & Production Configuration](#19-final-metrics--production-configuration)
 20. [Frozen Decisions Summary](#20-frozen-decisions-summary)
-21. [Activity Scoring Revision (v2.1) — March 2026](#21-activity-scoring-revision-v21--march-2026)
-22. [Derived Features & Sensitivity Breakthrough (v2.2) — March 2026](#22-derived-features--sensitivity-breakthrough-v22--march-2026)
+21. [Activity Scoring Revision (v2.1) - March 2026](#21-activity-scoring-revision-v21--march-2026)
+22. [Derived Features & Sensitivity Breakthrough (v2.2) - March 2026](#22-derived-features--sensitivity-breakthrough-v22--march-2026)
 
 ---
 
@@ -57,7 +57,7 @@ Build an **ANFIS (Adaptive Neuro-Fuzzy Inference System)–based adaptive diffic
 |----------|----------|
 | **Combat** | `enemiesHit`, `damageDone`, `timeInCombat`, `kills` |
 | **Collection** | `itemsCollected`, `pickupAttempts`, `timeNearInteractables` |
-| **Exploration** | `distanceTraveled`, `timeSprinting` _(`timeOutOfCombat` removed — see v2.1)_ |
+| **Exploration** | `distanceTraveled`, `timeSprinting` _(`timeOutOfCombat` removed - see v2.1)_ |
 
 **Why these 12?** They map directly to the three gameplay pillars. The addition of derived features in v2.2 (Damage per Hit and Pickup Rate) ensures that precision combat and intentional gathering are correctly weighted relative to raw volume.
 
@@ -101,7 +101,7 @@ Raw CSVs
 
 ---
 
-## 4. Notebook 01 — Data Loading & Merging
+## 4. Notebook 01 - Data Loading & Merging
 
 **Path**: `core/notebooks/01_Data_Loading_and_Merging.ipynb`
 
@@ -128,7 +128,7 @@ death_time ≤ window_timestamp < death_time + 30
 | File | Rows | Description |
 |------|------|-------------|
 | `merged_telemetry.csv` | 4,297 | Cleaned, merged telemetry |
-| `merged_deathevents.csv` | — | Death events merged with user info |
+| `merged_deathevents.csv` | - | Death events merged with user info |
 
 ### Design Decision
 
@@ -136,7 +136,7 @@ death_time ≤ window_timestamp < death_time + 30
 
 ---
 
-## 5. Notebook 02 — Gameplay Summary & Session Cleaning
+## 5. Notebook 02 - Gameplay Summary & Session Cleaning
 
 **Path**: `core/notebooks/02_Gameplay_Summary.ipynb`
 
@@ -157,11 +157,11 @@ death_time ≤ window_timestamp < death_time + 30
 | File | Rows | Users | Description |
 |------|------|-------|-------------|
 | `2_cleaned_telemetry_for_modelling.csv` | 3,240 | 45 | Filtered, trimmed dataset |
-| `2_player_summary.csv` | 45 | — | Per-player statistics |
+| `2_player_summary.csv` | 45 | - | Per-player statistics |
 
 ---
 
-## 6. Notebook 03 — Feature Normalization
+## 6. Notebook 03 - Feature Normalization
 
 **Path**: `core/notebooks/03_Normalization.ipynb`
 
@@ -178,10 +178,10 @@ df[features] = scaler.fit_transform(df[features].fillna(0))
 
 | Method | Result | Decision |
 |--------|--------|----------|
-| **MinMaxScaler (Uniform)** | [0, 1] bounds, stable for neural networks | ✅ **Selected** |
-| **Log-Sparse Scaler** | +0.4% Silhouette improvement | ❌ Rejected — destroyed interpretability |
-| **RobustScaler** | No fixed bounds | ❌ Rejected — risks gradient explosion in MLP |
-| **Per-player Min-Max** | Captures individual behavioural ranges | ❌ Rejected — loses cross-player comparability |
+| **MinMaxScaler (Uniform)** | [0, 1] bounds, stable for neural networks | **Selected** |
+| **Log-Sparse Scaler** | +0.4% Silhouette improvement | ❌ Rejected - destroyed interpretability |
+| **RobustScaler** | No fixed bounds | ❌ Rejected - risks gradient explosion in MLP |
+| **Per-player Min-Max** | Captures individual behavioural ranges | ❌ Rejected - loses cross-player comparability |
 
 ### Why Uniform MinMaxScaler Won
 
@@ -192,7 +192,7 @@ df[features] = scaler.fit_transform(df[features].fillna(0))
 
 ### Critical Bug (Phase 1)
 
-In Phase 1, the scaler was **not actually applied** — `fit_transform()` was never called. Raw features like `distanceTraveled` (range 0–5,000) dominated clustering, causing 98.6% of windows to be classified as "Exploration". This was the single most impactful bug in the project. See [Critical Bugs](#16-critical-bugs-encountered--fixed).
+In Phase 1, the scaler was **not actually applied** - `fit_transform()` was never called. Raw features like `distanceTraveled` (range 0–5,000) dominated clustering, causing 98.6% of windows to be classified as "Exploration". This was the single most impactful bug in the project. See [Critical Bugs](#16-critical-bugs-encountered--fixed).
 
 ### Output
 
@@ -202,7 +202,7 @@ In Phase 1, the scaler was **not actually applied** — `fit_transform()` was ne
 
 ---
 
-## 7. Notebook 04 — Activity Contribution Analysis
+## 7. Notebook 04 - Activity Contribution Analysis
 
 **Path**: `core/notebooks/04_Activity_Contributions.ipynb`
 
@@ -224,7 +224,7 @@ pct_explore = score_explore / score_total
 
 ### Why Percentages?
 
-Raw scores are additive sums of normalised features. Converting to percentages creates a **compositional representation** — each window's behaviour is described as a proportion of each archetype, always summing to 1.0.
+Raw scores are additive sums of normalised features. Converting to percentages creates a **compositional representation** - each window's behaviour is described as a proportion of each archetype, always summing to 1.0.
 
 ### Critical Bug (Phase 1)
 
@@ -238,7 +238,7 @@ The column selector accidentally included both normalised features AND raw `rawJ
 
 ---
 
-## 8. Notebook 05 — Clustering (K-Means & Soft Membership)
+## 8. Notebook 05 - Clustering (K-Means & Soft Membership)
 
 **Path**: `core/notebooks/05_Clustering.ipynb`
 
@@ -269,9 +269,9 @@ Features: `['pct_combat', 'pct_collect', 'pct_explore']`
 | Collection | 970 | 29.9% |
 | Combat | 403 | 12.4% |
 
-### Soft Membership — The Key Innovation
+### Soft Membership - The Key Innovation
 
-Hard K-Means assigns each window to exactly one cluster. This is too coarse for difficulty adaptation — a player at 60% combat / 30% exploration / 10% collection should get different treatment than a player at 100% combat.
+Hard K-Means assigns each window to exactly one cluster. This is too coarse for difficulty adaptation - a player at 60% combat / 30% exploration / 10% collection should get different treatment than a player at 100% combat.
 
 **Soft membership** uses inverse distance to all centroids:
 
@@ -297,16 +297,16 @@ First window for each player is initialised to 0.
 
 **Why deltas?** A player with 80% combat and rising engagement should be treated differently from 80% combat and declining engagement. Deltas add temporal context. See [Delta Signal Analysis](#14-delta-signal-analysis--temporal-refinement).
 
-### K Value Selection — Options Explored
+### K Value Selection - Options Explored
 
 | K | Silhouette | Decision | Reason |
 |---|------------|----------|--------|
-| 2 | 0.4166 | ❌ Rejected | Higher metric but lumps "Collectors" and "Explorers" into one cluster — incompatible with the 3-archetype game design |
-| **3** | **0.3752** | **✅ Selected** | Maps perfectly to the three gameplay pillars (Combat, Collection, Exploration) |
+| 2 | 0.4166 | ❌ Rejected | Higher metric but lumps "Collectors" and "Explorers" into one cluster - incompatible with the 3-archetype game design |
+| **3** | **0.3752** | **Selected** | Maps perfectly to the three gameplay pillars (Combat, Collection, Exploration) |
 | 4 | Lower | ❌ Rejected | Splits archetypes unnecessarily, no game design justification |
 | 5 | Lower | ❌ Rejected | Over-segmentation, unstable clusters |
 
-**Why accept lower Silhouette for K=3?** The clustering serves the game design, not the other way around. K=2's higher metric is meaningless if it cannot distinguish collectors from explorers — a distinction that directly affects difficulty tuning.
+**Why accept lower Silhouette for K=3?** The clustering serves the game design, not the other way around. K=2's higher metric is meaningless if it cannot distinguish collectors from explorers - a distinction that directly affects difficulty tuning.
 
 ### Output
 
@@ -316,7 +316,7 @@ First window for each player is initialised to 0.
 
 ---
 
-## 9. Notebook 06 — ANFIS Data Preparation & Target Generation
+## 9. Notebook 06 - ANFIS Data Preparation & Target Generation
 
 **Path**: `core/notebooks/06_ANFIS_Preparation.ipynb`
 
@@ -335,11 +335,11 @@ Constructs the final 6-feature ANFIS input dataset with a computed target variab
 | 5 | `delta_collect` | Temporal | Δ soft_collect |
 | 6 | `delta_explore` | Temporal | Δ soft_explore |
 
-### Target Variable — The Most Critical Decision
+### Target Variable - The Most Critical Decision
 
 The target variable is the **difficulty multiplier** the model learns to predict. Two options were explored:
 
-#### Option A — Static Heuristic (Rejected)
+#### Option A - Static Heuristic (Rejected)
 
 ```
 Target = 1.0 - (0.1 × deaths) + (0.05 × normalised_activity)
@@ -347,10 +347,10 @@ Clipped to [0.5, 1.5]
 ```
 
 - **Result**: Target variance σ = 0.011 (collapsed to near-constant ~1.02)
-- **Problem**: MLP could not learn — predicting the mean was optimal (R² = -4.69)
+- **Problem**: MLP could not learn - predicting the mean was optimal (R² = -4.69)
 - **Root cause**: Deaths were too rare and activity intensity too uniform to generate meaningful variance
 
-#### Option B — Delta-Weighted Canonical (Selected ✅)
+#### Option B - Delta-Weighted Canonical (Selected Done)
 
 ```
 Target = 0.9
@@ -386,7 +386,7 @@ Option A failed because the MLP had no meaningful signal to learn from. The targ
 
 ---
 
-## 10. Notebook 07 — ANFIS Training (MLP Surrogate)
+## 10. Notebook 07 - ANFIS Training (MLP Surrogate)
 
 **Path**: `core/notebooks/07_ANFIS_Training.ipynb`
 
@@ -415,10 +415,10 @@ Input (6) → Hidden (16, ReLU) → Hidden (8, ReLU) → Output (1, Linear)
 
 | Aspect | Full ANFIS | MLP Surrogate |
 |--------|-----------|---------------|
-| Runtime speed | Slower (rule evaluation) | ✅ Faster (matrix multiply) |
-| Game engine portability | Needs custom fuzzy parser | ✅ Native linear algebra |
+| Runtime speed | Slower (rule evaluation) | Faster (matrix multiply) |
+| Game engine portability | Needs custom fuzzy parser | Native linear algebra |
 | Interpretability | Higher | Lower (but fuzzy logic is embedded in inputs) |
-| Training complexity | Higher | ✅ Simple (scikit-learn) |
+| Training complexity | Higher | Simple (scikit-learn) |
 
 The fuzzy logic is already embedded in the **input features** (soft membership, deltas). The MLP approximates the *surface* that maps these fuzzy inputs to a difficulty multiplier, combining the benefits of both approaches.
 
@@ -428,7 +428,7 @@ The fuzzy logic is already embedded in the **input features** (soft membership, 
 |--------|-------|------|
 | R² | 0.8369 | **0.9224** |
 | MAE | 0.0127 | **0.0108** |
-| Iterations | 23 | — |
+| Iterations | 23 | - |
 
 **Key observation**: Test R² > Train R² indicates excellent generalisation (no overfitting).
 
@@ -457,7 +457,7 @@ Weights and biases are serialised to JSON for game engine deployment:
 
 ---
 
-## 11. Notebook 08 — Evaluation & Visualizations
+## 11. Notebook 08 - Evaluation & Visualizations
 
 **Path**: `core/notebooks/08_Evaluation_Visualizations.ipynb`
 
@@ -477,12 +477,12 @@ Generates validation visualisations to confirm model quality and present results
 ### Validation Insights
 
 - Archetype distribution confirms natural clustering into three distinct groups
-- Soft membership heatmap shows players are rarely "pure" — most windows have mixed membership
+- Soft membership heatmap shows players are rarely "pure" - most windows have mixed membership
 - Delta distributions are centred at 0 with meaningful tails (behaviour does change)
 
 ---
 
-## 12. A/B Testing — Experiment A vs Experiment B
+## 12. A/B Testing - Experiment A vs Experiment B
 
 ### Experiment Design
 
@@ -514,13 +514,13 @@ Both experiments ran the full 8-notebook pipeline independently.
 
 ### Why A Won
 
-- **Global normalisation** preserves cross-player comparability — "high combat" means the same thing for all players
+- **Global normalisation** preserves cross-player comparability - "high combat" means the same thing for all players
 - **Per-player normalisation** (B) made each player's scale relative, introducing noise in clustering
 - B's slight advantage in entropy and combat balance was outweighed by worse cluster separation
 
 ### Decision
 
-✅ **Experiment A (Baseline / Uniform MinMaxScaler) adopted as production pipeline.**
+**Experiment A (Baseline / Uniform MinMaxScaler) adopted as production pipeline.**
 
 ---
 
@@ -554,8 +554,8 @@ Systematically validate whether any alternative preprocessing could significantl
 
 ### Key Findings
 
-1. **K=2 had highest Silhouette (0.4166, +11%)** but was **rejected** — it cannot distinguish collectors from explorers, violating game design requirements
-2. **Best K=3 configuration**: Silhouette 0.3764 (+0.4% over baseline) — **not statistically significant**
+1. **K=2 had highest Silhouette (0.4166, +11%)** but was **rejected** - it cannot distinguish collectors from explorers, violating game design requirements
+2. **Best K=3 configuration**: Silhouette 0.3764 (+0.4% over baseline) - **not statistically significant**
 3. **Log-Sparse normalisation**: +0.4% gain but destroyed interpretability
 4. **Feature reduction (8 vs 10)**: Marginal gains, but losing 2 features reduces model expressiveness
 
@@ -603,17 +603,17 @@ When a player's exploration engagement increases (Δexplore > 0), the target mul
 
 ### Decision
 
-✅ **Delta signals added to ANFIS inputs**, expanding from 3 features (soft membership only) to 6 features (soft membership + deltas). This was the only approved refinement to the frozen architecture, justified by the strong r=0.808 correlation.
+**Delta signals added to ANFIS inputs**, expanding from 3 features (soft membership only) to 6 features (soft membership + deltas). This was the only approved refinement to the frozen architecture, justified by the strong r=0.808 correlation.
 
 ---
 
-## 15. Target Formula Evolution (Option A → Option B)
+## 15. Target Formula Evolution (Option A to Option B)
 
 This was the **most critical turning point** in the entire project.
 
-### The Problem — Variance Collapse
+### The Problem - Variance Collapse
 
-The original target formula (Option A) produced targets clustered at ~1.02 with σ = 0.011. The neural network had nothing to learn — predicting the mean was optimal, yielding R² = -4.69 (worse than a constant prediction).
+The original target formula (Option A) produced targets clustered at ~1.02 with σ = 0.011. The neural network had nothing to learn - predicting the mean was optimal, yielding R² = -4.69 (worse than a constant prediction).
 
 ### Root Cause Analysis
 
@@ -621,7 +621,7 @@ The original target formula (Option A) produced targets clustered at ~1.02 with 
 2. **Activity too uniform**: Normalised activity intensity was nearly constant across windows
 3. **Fuzzy constraints**: Soft membership values were already bounded [0, 1], limiting variance
 
-### Option A — Static Heuristic
+### Option A - Static Heuristic
 
 ```
 Target = 1.0 - (0.1 × deaths) + (0.05 × normalised_activity)
@@ -630,7 +630,7 @@ Clipped to [0.5, 1.5]
 
 **Statistics**: Mean 1.024, σ 0.011, Span 0.023
 
-### Option B — Delta-Weighted Canonical (v2.2)
+### Option B - Delta-Weighted Canonical (v2.2)
 
 ```
 Target = 0.9
@@ -664,13 +664,13 @@ Clipped to [0.6, 1.4]
 | Target span | 0.023 | **0.41** (18×) |
 | Model R² | -4.69 | **0.9224** |
 | Model MAE | ~0.011 | **0.0108** |
-| Trainability | ❌ Broken | ✅ Functional |
+| Trainability | ❌ Broken | Functional |
 
 ---
 
 ## 16. Critical Bugs Encountered & Fixed
 
-### Bug 1 — Missing Normalisation (Phase 1)
+### Bug 1 - Missing Normalisation (Phase 1)
 
 - **Symptom**: 98.6% of windows classified as "Exploration"
 - **Root cause**: `MinMaxScaler.fit_transform()` was never called; raw feature values were used
@@ -678,7 +678,7 @@ Clipped to [0.6, 1.4]
 - **Fix**: Apply MinMaxScaler strictly to all 10 features before any downstream computation
 - **Lesson**: Always verify normalisation by checking feature ranges after transformation
 
-### Bug 2 — Column Selector Including Raw Features (Phase 1)
+### Bug 2 - Column Selector Including Raw Features (Phase 1)
 
 - **Symptom**: Activity scores were wildly unbalanced (Exploration score ~4,500 vs Combat ~0.5)
 - **Root cause**: The column selector matched both `distanceTraveled` (normalised) and `rawJson.distanceTraveled` (raw) columns
@@ -686,13 +686,13 @@ Clipped to [0.6, 1.4]
 - **Fix**: Strictly filter to normalised columns only using explicit column lists
 - **Lesson**: Never use substring matching for column selection in DataFrames
 
-### Bug 3 — Target Variance Collapse (Option A)
+### Bug 3 - Target Variance Collapse (Option A)
 
 - **Symptom**: Model R² = -4.69 (worse than predicting the mean)
 - **Root cause**: Target variable had σ = 0.011, making all targets effectively identical
 - **Impact**: MLP could not learn any meaningful mapping
 - **Fix**: Redesigned target formula (Option B) with delta-weighted coefficients
-- **Lesson**: Always inspect target variable distribution before training — low variance means no learning signal
+- **Lesson**: Always inspect target variable distribution before training - low variance means no learning signal
 
 ### Combined Impact
 
@@ -736,7 +736,7 @@ Telemetry (30s window)
 
 ### Export Script
 
-`export_model_artifacts.py` — Loads processed CSVs, extracts model parameters, re-trains MLP if needed, and exports all artifacts to JSON for TypeScript/game engine deployment.
+`export_model_artifacts.py` - Loads processed CSVs, extracts model parameters, re-trains MLP if needed, and exports all artifacts to JSON for TypeScript/game engine deployment.
 
 ---
 
@@ -756,9 +756,9 @@ Contains the **Option A failure evidence**:
 
 | File | Key Content |
 |------|-------------|
-| `metrics.json` | R² = -4.69 (train: -5.39, val: -4.59) — catastrophic failure |
+| `metrics.json` | R² = -4.69 (train: -5.39, val: -4.59) - catastrophic failure |
 | `split_info.json` | Train: 2,159 / Val: 491 / Test: 514 samples |
-| `verdict.json` | "SEVERELY OVERFITTED (CRITICAL FAILURE)" — sensitivity analysis showed soft_combat had max impact of only 0.145 |
+| `verdict.json` | "SEVERELY OVERFITTED (CRITICAL FAILURE)" - sensitivity analysis showed soft_combat had max impact of only 0.145 |
 | `plots/distribution.png` | Target distribution visualisation |
 | `plots/residuals.png` | Residual analysis |
 | `plots/sensitivity.png` | Feature sensitivity analysis |
@@ -773,17 +773,17 @@ This evaluation was the **trigger for switching from Option A to Option B**.
 
 | Metric | Value | Threshold | Status |
 |--------|-------|-----------|--------|
-| Silhouette Score | 0.3752 | > 0.3 | ✅ Pass |
-| Davies-Bouldin Index | 0.9768 | < 1.5 | ✅ Pass |
-| Calinski-Harabasz Score | 2,109.3 | High = good | ✅ Strong |
+| Silhouette Score | 0.3752 | > 0.3 | Pass |
+| Davies-Bouldin Index | 0.9768 | < 1.5 | Pass |
+| Calinski-Harabasz Score | 2,109.3 | High = good | Strong |
 
 ### Behavioural Modelling
 
 | Metric | Value |
 |--------|-------|
-| Soft Membership — Combat | 29.5% |
-| Soft Membership — Collection | 38.8% |
-| Soft Membership — Exploration | 31.7% |
+| Soft Membership - Combat | 29.5% |
+| Soft Membership - Collection | 38.8% |
+| Soft Membership - Exploration | 31.7% |
 | Mean Entropy | 1.4053 (near max 1.585) |
 
 ### ANFIS Model Performance (v2.2.1 Final)
@@ -907,7 +907,7 @@ CollectGame.Model/
 
 ---
 
-## 21. Activity Scoring Revision (v2.1) — March 2026
+## 21. Activity Scoring Revision (v2.1) - March 2026
 
 ### Background
 
@@ -928,21 +928,21 @@ pct_explore      = score_explore / (score_combat + score_collect + score_explore
 
 Two structural problems were identified:
 
-**Problem 1 — Passive Accumulation**
+**Problem 1 - Passive Accumulation**
 `timeOutOfCombat` measures the absence of combat, not the presence of exploration. A player
 standing still in an empty area accumulates this signal identically to a player deliberately
 mapping terrain. On a sparse-enemy map, every second of searching for enemies that do not
-yet exist becomes an Exploration vote. The player's true intent — combat — is invisible to
+yet exist becomes an Exploration vote. The player's true intent - combat - is invisible to
 the system until enemies arrive.
 
-**Problem 2 — Redundancy with `timeInCombat`**
+**Problem 2 - Redundancy with `timeInCombat`**
 `timeInCombat` + `timeOutOfCombat` = total session window duration (30 seconds).
 Including both features introduces a hard linear dependency: as combat time rises, out-of-
 combat time falls by exactly the same amount. This creates inverse coupling that structurally
 suppresses Combat classification whenever `timeInCombat` is low, even if that is purely
 because no enemies were available.
 
-**Problem 3 — Feature Count Asymmetry (also fixed)**
+**Problem 3 - Feature Count Asymmetry (also fixed)**
 The sum-based formula gave Combat (4 features, raw range [0, 4]) a higher raw ceiling than
 Collection (3 features, [0, 3]) or Exploration ([0, 3] in v2, [0, 2] in v2.1). While this
 partially cancelled in the percentage calculation, it created subtle imbalances in mixed
@@ -960,17 +960,17 @@ pct_X = score_X / (score_combat + score_collect + score_explore)
 ```
 
 Exploration now measures only **deliberate movement**: covering distance and sprinting.
-A player who stands still searching for enemies contributes 0 to Exploration score —
+A player who stands still searching for enemies contributes 0 to Exploration score-
 which accurately reflects their intent.
 
 ### Expected Behavioural Impact
 
 | Scenario | v2.0 Classification | v2.1 Classification |
 |----------|--------------------|--------------------|
-| Attacker waiting for enemies to spawn (stationary) | Explorer (passive `timeOutOfCombat`) | Neutral (33/33/33 — no activity) |
+| Attacker waiting for enemies to spawn (stationary) | Explorer (passive `timeOutOfCombat`) | Neutral (33/33/33 - no activity) |
 | Attacker moving to search for enemies | Explorer (movement + `timeOutOfCombat`) | Mixed Combat/Explorer (movement only, corrected) |
-| Attacker killing enemies | Combat ✅ | Combat ✅ |
-| Pure Explorer traversing map | Explorer ✅ | Explorer ✅ (now requires actual movement) |
+| Attacker killing enemies | Combat | Combat |
+| Pure Explorer traversing map | Explorer | Explorer (now requires actual movement) |
 
 ### Limitations of This Fix
 
@@ -995,7 +995,7 @@ Rerun: 04 → 05 → 06 → 07
 Notebook 05 now includes an automatic export cell that writes `cluster_centroids.json`
 directly to `anfis-demo-ui/models/` upon completion.
 
-### Pipeline Regeneration Status — Completed 2026-03-06
+### Pipeline Regeneration Status - Completed 2026-03-06
 
 Notebooks 04 → 05 → 06 → 07 were rerun with the v2.1 formula.
 
@@ -1018,14 +1018,14 @@ The pipeline is now correctly aligned with the v2.1 activity scoring formula. Al
 
 ---
 
-## 22. Derived Features & Sensitivity Breakthrough (v2.2) — March 2026
+## 22. Derived Features & Sensitivity Breakthrough (v2.2) - March 2026
 
 **Date**: March 6, 2026  
-**Status**: ✅ COMPLETE
+**Status**: COMPLETE
 
 ### Motivation
 Two weaknesses identified in the v2.1 activity scoring:
-1. **Sniper blind spot**: `enemiesHit` alone penalises high-damage-per-shot players (snipers, shotguns). A player landing 3 heavy shots deals far more combat impact than one landing 30 weak pellets — yet only hit count was considered.
+1. **Sniper blind spot**: `enemiesHit` alone penalises high-damage-per-shot players (snipers, shotguns). A player landing 3 heavy shots deals far more combat impact than one landing 30 weak pellets - yet only hit count was considered.
 2. **Explorer contamination**: Explorers passing near items incidentally scored collection credit even without interaction intent. `pickupAttemptRate` separates deliberate collectors from passive passers-by.
 
 ### Changes Applied
@@ -1052,3 +1052,4 @@ All notebooks reruns as of 2026-03-06:
 | `cluster_centroids.json` | 3 centroids re-computed on v2.2 activity scores |
 
 **Case sensitivity bug fix**: The engine initially computed features as `damagePerHit`/`pickupAttemptRate` (camelCase) but the scaler expected `damage_per_hit`/`pickup_attempt_rate` (snake_case). Fixed in `lib/engine/index.ts`.
+

@@ -1,17 +1,17 @@
-# Thesis Source Document — CollectGame.CalibrationAnalysis Repository
+﻿# Thesis Source Document - CollectGame.CalibrationAnalysis Repository
 **System**: AURA (Adaptive User-Responsive Architecture)
 **Repo**: CollectGame.CalibrationAnalysis
 **Phase**: Pre-Adaptation Calibration
 **Date**: January 2026 (complete by 2026-01-19)
 **Author**: K. W. J. P. Geevinda
 
-> This document covers the calibration phase of AURA — the controlled study that established the neutral gameplay baseline before the adaptive system was trained. Combine with `repo_CollectGame_Model_thesis_source.md` and `repo_Telemetry_thesis_source.md` for the full thesis.
+> This document covers the calibration phase of AURA - the controlled study that established the neutral gameplay baseline before the adaptive system was trained. Combine with `repo_CollectGame_Model_thesis_source.md` and `repo_Telemetry_thesis_source.md` for the full thesis.
 
 ---
 
 ## 1. Purpose and Position in AURA Pipeline
 
-The CalibrationAnalysis repo implements the **pre-adaptation calibration phase** — the first phase of AURA before any adaptive learning occurs.
+The CalibrationAnalysis repo implements the **pre-adaptation calibration phase** - the first phase of AURA before any adaptive learning occurs.
 
 ```
 [THIS REPO]
@@ -73,7 +73,7 @@ Participants were not informed of these labels during play.
 
 ## 3. Notebook Pipeline (7 Notebooks)
 
-### Notebook 00 — Dataset Generation (`00_generate_calibration_dataset.ipynb`)
+### Notebook 00 - Dataset Generation (`00_generate_calibration_dataset.ipynb`)
 **Purpose**: Temporal alignment of raw telemetry windows with discrete death events.
 
 **Alignment Rule**:
@@ -82,14 +82,14 @@ Participants were not informed of these labels during play.
 This aligns each death with the window that contains it (telemetry timestamps mark the end of the 30s interval).
 
 **Outputs**:
-- `data/processed/calibration_dataset.csv` — augmented with:
+- `data/processed/calibration_dataset.csv` - augmented with:
   - `deathOccurredInWindow` (binary 0/1)
   - `deathCountInWindow` (integer count)
 - Handling multiple deaths: if multiple deaths fall in one window, `deathCountInWindow` reflects the total count while `deathOccurredInWindow` = 1
 
 **Design principle**: Values are *aligned*, not corrected, interpolated, or retroactively smoothed. If no death occurs in a window, both fields = 0.
 
-### Notebook 01 — Integrity Check (`01_integrity_check.ipynb`)
+### Notebook 01 - Integrity Check (`01_integrity_check.ipynb`)
 **Purpose**: Validate that the calibration dataset preserves structural, temporal, and experimental integrity.
 
 **Checks performed**:
@@ -100,19 +100,19 @@ This aligns each death with the window that contains it (telemetry timestamps ma
 
 **Gate**: Must pass before proceeding. Any failure halts the pipeline.
 
-### Notebook 02 — Mode Profiling (`02_mode_profiling.ipynb`)
+### Notebook 02 - Mode Profiling (`02_mode_profiling.ipynb`)
 **Purpose**: Compute descriptive statistics for each metric within each mode to establish a behavioural fingerprint.
 
-**Feature role configuration**: `config/feature_roles.json` externally defines which metrics belong to which archetype (Combat, Exploration, Collection) — preventing semantic bias from being baked into the analysis code.
+**Feature role configuration**: `config/feature_roles.json` externally defines which metrics belong to which archetype (Combat, Exploration, Collection) - preventing semantic bias from being baked into the analysis code.
 
 **Statistics computed per mode per metric**:
 - Mean, variance, standard deviation
 - Sparsity (% of windows with zero activity)
-- Stability (standard deviation over time — detects "death cascades" or "boredom streaks")
+- Stability (standard deviation over time - detects "death cascades" or "boredom streaks")
 
 **Output**: `data/processed/mode_profiles.csv`
 
-### Notebook 03 — Parameter Derivation (`03_parameter_derivation.ipynb`)
+### Notebook 03 - Parameter Derivation (`03_parameter_derivation.ipynb`)
 **Purpose**: Select the neutral baseline mode and derive initial PCG parameters.
 
 **Neutrality Score formula**:
@@ -132,7 +132,7 @@ NeutralityScore = (w1 × MeanSparsity) + (w2 × DeathRate) + (w3 × MeanStdDev)
 
 **Transition declaration**: Explicitly declares end of calibration → beginning of adaptive training phase. From this point, all future telemetry is used for adaptive model training, not calibration refinement.
 
-### Notebook 04 — Survey Analysis (`04_survey_analysis.ipynb`)
+### Notebook 04 - Survey Analysis (`04_survey_analysis.ipynb`)
 **Purpose**: Aggregate participant questionnaire responses to establish subjective mode rankings.
 
 **Processing steps**:
@@ -145,9 +145,9 @@ NeutralityScore = (w1 × MeanSparsity) + (w2 × DeathRate) + (w3 × MeanStdDev)
 - `data/processed/survey_summary.csv`
 - `data/processed/survey_rankings.json`
 
-**Independence**: Survey analysis is conducted independently of gameplay telemetry — no merging of datasets before subjective results are computed (prevents contamination).
+**Independence**: Survey analysis is conducted independently of gameplay telemetry - no merging of datasets before subjective results are computed (prevents contamination).
 
-### Notebook 05 — Baseline Justification (`05_baseline_justification.ipynb`)
+### Notebook 05 - Baseline Justification (`05_baseline_justification.ipynb`)
 **Purpose**: Detailed documentation of why the selected mode satisfies neutrality criteria.
 
 **Content**:
@@ -160,7 +160,7 @@ NeutralityScore = (w1 × MeanSparsity) + (w2 × DeathRate) + (w3 × MeanStdDev)
 - `reports/neutral_baseline_justification.md`
 - `data/processed/mode_classifications.json`
 
-### Script 06 — Calibration Report (`06_calibration_report.py`)
+### Script 06 - Calibration Report (`06_calibration_report.py`)
 **Purpose**: Integrate objective and subjective results into final academic-tone report.
 
 **Core content**:
@@ -183,8 +183,8 @@ NeutralityScore = (w1 × MeanSparsity) + (w2 × DeathRate) + (w3 × MeanStdDev)
 | 3 | 50.31% | 0.2258 | 335.93 | 106.48 |
 
 **Objective winner: Mode 1**
-- Balanced activity (48.15% sparsity — not too active, not too passive)
-- Manageable death rate (0.0556/window — one death per ~18 windows)
+- Balanced activity (48.15% sparsity - not too active, not too passive)
+- Manageable death rate (0.0556/window - one death per ~18 windows)
 - Stable gameplay (lowest relative std deviation)
 
 Mode 1 occupies the "Goldilocks zone": not trivially easy, not frustratingly hard, and not structurally favouring any single playstyle.
@@ -215,7 +215,7 @@ Participants tend to prefer modes that feel *engaging* or *rewarding* (subjectiv
 
 **Justification**:
 1. **Neutral starting point**: The adaptive system requires an unbiased baseline that does not structurally favour specific playstyles. Mode 2's higher perceived engagement may already introduce a collection or exploration bias.
-2. **Runtime adaptation**: Player preferences will be learned dynamically during gameplay — the calibration baseline need not be the most enjoyable, only the most neutral.
+2. **Runtime adaptation**: Player preferences will be learned dynamically during gameplay - the calibration baseline need not be the most enjoyable, only the most neutral.
 3. **Generalisability**: Behavioural neutrality generalises better across diverse player populations than small-sample (n=7) subjective votes.
 
 This decision reflects the core distinction in the thesis: **calibration seeks a neutral starting point, not an optimal one**.
@@ -269,7 +269,7 @@ Using an external config (rather than hardcoded groupings) means the analysis no
 | Data manipulation | pandas (DataFrames, CSV I/O) |
 | Numerical ops | NumPy |
 | Configuration | JSON (`config/feature_roles.json`) |
-| Data storage | CSV format (`data/processed/`) — transparent and interoperable |
+| Data storage | CSV format (`data/processed/`) - transparent and interoperable |
 | Report generation | Automated Markdown report from `06_calibration_report.py` |
 
 ---
@@ -297,15 +297,16 @@ Using an external config (rather than hardcoded groupings) means the analysis no
 ## 8. Thesis Contributions from This Repo
 
 ### Methodological Contributions
-1. **Dual validation approach**: Both objective telemetry and subjective surveys employed — demonstrates triangulation of evidence in the calibration methodology
-2. **Transparent neutrality scoring**: Algorithm is explicitly defined, reproducible, and documented — suitable for peer review
+1. **Dual validation approach**: Both objective telemetry and subjective surveys employed - demonstrates triangulation of evidence in the calibration methodology
+2. **Transparent neutrality scoring**: Algorithm is explicitly defined, reproducible, and documented - suitable for peer review
 3. **Separation of concerns**: Clear boundary between calibration phase (this repo) and training phase (CollectGame.Model) prevents data contamination
 
 ### Research Insights
-1. **Objective-subjective discrepancy**: Players prefer modes that *feel* engaging (Mode 2), but *feel* engaging ≠ statistically neutral. Mode 1 has the lowest death rate and sparsity balance — properties a player cannot directly perceive, but which are critical for a neutral ML baseline.
-2. **Cold-start neutrality**: The calibration approach provides a principled answer to "what difficulty should the game start at?" — the mode with the lowest composite neutrality score, not the most popular.
-3. **Archetype coverage**: Mode 1's 48.15% sparsity indicates balanced engagement across archetypes — no single type of player saturates the mode.
+1. **Objective-subjective discrepancy**: Players prefer modes that *feel* engaging (Mode 2), but *feel* engaging ≠ statistically neutral. Mode 1 has the lowest death rate and sparsity balance - properties a player cannot directly perceive, but which are critical for a neutral ML baseline.
+2. **Cold-start neutrality**: The calibration approach provides a principled answer to "what difficulty should the game start at?" - the mode with the lowest composite neutrality score, not the most popular.
+3. **Archetype coverage**: Mode 1's 48.15% sparsity indicates balanced engagement across archetypes - no single type of player saturates the mode.
 
 ---
 
 *Document generated: 2026-03-07 | Repo: CollectGame.CalibrationAnalysis | Phase complete: 2026-01-19*
+

@@ -8,7 +8,7 @@
 
 ## System Overview
 
-ANFIS-based adaptive difficulty system using K-Means clustering, fuzzy soft membership, and an MLP surrogate model. Classifies player behavior into three archetypes (Combat, Collection, Exploration) and adjusts game difficulty in real time based on behavioral telemetry and temporal trends.
+ANFIS-based adaptive difficulty system using K-Means clustering, fuzzy soft membership, and an MLP surrogate model. It classifies player behavior into three archetypes (Combat, Collection, Exploration) and adjusts game difficulty in real time based on behavioral telemetry and temporal trends.
 
 ---
 
@@ -25,35 +25,35 @@ ANFIS-based adaptive difficulty system using K-Means clustering, fuzzy soft memb
 - **Soft Membership**: Inverse-distance weighting to centroids
 
 ### ANFIS Inputs (6 features)
-1. `soft_combat` — fuzzy membership to combat archetype
-2. `soft_collect` — fuzzy membership to collection archetype
-3. `soft_explore` — fuzzy membership to exploration archetype
-4. `delta_combat` — Δ soft_combat (window-to-window change)
-5. `delta_collect` — Δ soft_collect
-6. `delta_explore` — Δ soft_explore
+1. `soft_combat` - fuzzy membership to combat archetype
+2. `soft_collect` - fuzzy membership to collection archetype
+3. `soft_explore` - fuzzy membership to exploration archetype
+4. `delta_combat` - change in soft_combat (window-to-window)
+5. `delta_collect` - change in soft_collect
+6. `delta_explore` - change in soft_explore
 
 ### Target Generation (Option B, v2.2.1)
-- **Formula**: `T = 1.0 + 0.22×(soft_combat−0.5) + 0.18×(soft_collect−0.5) + 0.15×(soft_explore−0.5) + 0.55×Δcombat + 0.40×Δcollect + 0.35×Δexplore − 0.25×death_rate`
+- **Formula**: `T = 1.0 + 0.22*(soft_combat-0.5) + 0.18*(soft_collect-0.5) + 0.15*(soft_explore-0.5) + 0.55*delta_combat + 0.40*delta_collect + 0.35*delta_explore - 0.25*death_rate`
 - **Clipped to**: [0.6, 1.4]
-- **Display calibration**: `display = clamp(1.0 + (raw − mlp_neutral) × 2.0, 0.6, 1.4)` where `mlp_neutral = 0.932006`
+- **Display calibration**: `display = clamp(1.0 + (raw - mlp_neutral) * 2.0, 0.6, 1.4)` where `mlp_neutral = 0.932006`
 
 ---
 
 ## Experimental Validation
 
 ### A/B Testing
-- **Experiment A** (Uniform MinMax): Selected — won 5/8 metrics (Silhouette, DB Index, CH Score, Target CV, Collection %)
+- **Experiment A** (Uniform MinMax): Selected - won 5/8 metrics (Silhouette, DB Index, CH Score, Target CV, Collection %)
 - **Experiment B** (Feature-aware preprocessing): Rejected
 
 ### Grid Search Optimization
-- **Configurations tested**: 108 (4 K values × 3 outlier levels × 3 normalizations × 3 feature sets)
-- **Best overall**: K=2, Silhouette=0.4166 — rejected (incompatible with 3-archetype design)
-- **Best K=3**: Silhouette=0.3764 — not significant improvement over baseline
+- **Configurations tested**: 108 (4 K values x 3 outlier levels x 3 normalizations x 3 feature sets)
+- **Best overall**: K=2, Silhouette=0.4166 - rejected (incompatible with 3-archetype design)
+- **Best K=3**: Silhouette=0.3764 - not a significant improvement over baseline
 - **Conclusion**: Baseline already near-optimal; no configuration change warranted
 
 ### Delta Signal Analysis
-- **Δexplore ↔ Δtarget**: r = 0.808
-- **Δcombat ↔ Δtarget**: r = −0.471
+- **delta_explore to delta_target**: r = 0.808
+- **delta_combat to delta_target**: r = -0.471
 - **Feature weighting**: No improvement (rejected)
 - **Decision**: Add delta signals as ANFIS inputs
 
@@ -88,9 +88,9 @@ jupyter notebook
 ```
 
 Expected outputs:
-- `data/processed/5_clustered_telemetry.csv` — soft membership + deltas
-- `data/processed/6_anfis_dataset.csv` — 6-feature input vectors
-- `anfis-demo-ui/models/anfis_mlp_weights.json` — trained weights + mlp_neutral
+- `data/processed/5_clustered_telemetry.csv` - soft membership + deltas
+- `data/processed/6_anfis_dataset.csv` - 6-feature input vectors
+- `anfis-demo-ui/models/anfis_mlp_weights.json` - trained weights + mlp_neutral
 
 ---
 
@@ -106,7 +106,7 @@ Expected outputs:
 - Mean Entropy: 1.4053
 
 ### MLP Surrogate (v2.2.1)
-- Architecture: 6→16→8→1 (ReLU hidden, Linear output)
+- Architecture: 6->16->8->1 (ReLU hidden, Linear output)
 - Test R²: 0.9264 | Test MAE: 0.0127
 - Convergence: 21 iterations (LBFGS, max_iter=500)
 - mlp_neutral: 0.932006 | AMPLIFICATION: 2.0
@@ -115,7 +115,7 @@ Expected outputs:
 - Range: [0.60, 1.107] | Mean: 0.902 | Std: 0.074
 
 ### Responsiveness
-- Δexplore → Δtarget: r = 0.808
+- delta_explore to delta_target: r = 0.808
 
 ---
 
@@ -126,18 +126,18 @@ Expected outputs:
 | Preprocessing | Uniform MinMaxScaler | A/B test: wins 5/8 metrics |
 | Clustering | K=3, K-Means, soft IDW | Grid search: near-optimal; K=4 collapses |
 | ANFIS input | 6D (3 soft + 3 delta) | Delta r=0.808 correlation with target |
-| MLP architecture | 6→16→8→1 | 5-fold CV: smallest with R²>0.90 |
-| Output calibration | Neutral-centred | Balanced player guaranteed → display=1.0 |
+| MLP architecture | 6->16->8->1 | 5-fold CV: smallest with R²>0.90 |
+| Output calibration | Neutral-centred | Balanced player guaranteed -> display=1.0 |
 | Safety clamp | [0.6, 1.4] | Calibration study: M=1.5 felt unfair |
-| Session timeout | 90s | Tolerates loading screens (3× window cadence) |
+| Session timeout | 90s | Tolerates loading screens (3x window cadence) |
 
-**Open to tuning**: derived feature formulas, per-parameter sensitivity weights (0.20–0.35), session timeout.
+**Open to tuning**: derived feature formulas, per-parameter sensitivity weights (0.20-0.35), session timeout.
 
 ---
 
 ## Documentation
 
-- `CHANGELOG.md` — version history with rationale per change
-- `thesis_documentation/11_Complete_Development_Journey.md` — full decisions and challenges log
-- `thesis_documentation/10_Training_Bias_Fix_and_Calibration.md` — calibration design decision
-- `thesis_documentation/FINAL_EVALUATION_REPORT.md` — model evaluation with addenda
+- `CHANGELOG.md` - version history with rationale per change
+- `thesis_documentation/11_Complete_Development_Journey.md` - full decisions and challenges log
+- `thesis_documentation/10_Training_Bias_Fix_and_Calibration.md` - calibration design decision
+- `thesis_documentation/FINAL_EVALUATION_REPORT.md` - model evaluation with addenda
