@@ -1,10 +1,13 @@
 // ------------------------------------------------------------------
-// POST /api/pipeline  — Legacy compatibility shim
+// POST /api/pipeline/adapt  — Runtime Inference Endpoint
 // ------------------------------------------------------------------
-// The canonical inference endpoint is now POST /api/pipeline/adapt.
-// This file forwards requests there to avoid breaking existing callers
-// during the transition period.
-// New integrations should target /api/pipeline/adapt directly.
+// Contract:
+//   Request  → { userId, telemetry: TelemetryFeatures, reset?: boolean }
+//   Response → { target_multiplier, adapted_parameters, ... PipelineOutput }
+//
+// Distinct from the telemetry ingestion backend (POST /api/unreal/telemetry),
+// which only stores raw gameplay data.  This endpoint runs the full ANFIS
+// pipeline and returns the adapted PCG parameters for the current window.
 // ------------------------------------------------------------------
 
 import { ANFISPipeline } from '@/lib/engine';
@@ -16,19 +19,19 @@ import centroids from '@/models/cluster_centroids.json';
 import manifest from '@/models/deployment_manifest.json';
 import scalerParams from '@/models/scaler_params.json';
 
-// Pipeline is loaded once at startup and reused across requests.
+// Singleton: the pipeline is loaded once and reused across requests.
 let pipelineInstance: ANFISPipeline | null = null;
 
 function getPipeline() {
   if (pipelineInstance) return pipelineInstance;
 
   try {
-    console.log('[/api/pipeline] Initializing ANFIS pipeline...');
+    console.log('[/api/pipeline/adapt] Initializing ANFIS Pipeline...');
     pipelineInstance = new ANFISPipeline(scalerParams, centroids, mlpWeights, manifest);
-    console.log('[/api/pipeline] Pipeline ready.');
+    console.log('[/api/pipeline/adapt] Pipeline online.');
     return pipelineInstance;
   } catch (error) {
-    console.error('[/api/pipeline] Initialization failed:', error);
+    console.error('[/api/pipeline/adapt] CRITICAL: Initialization failed', error);
     throw error;
   }
 }
@@ -39,11 +42,11 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { userId, telemetry, reset } = body;
 
-    console.log('[/api/pipeline] Incoming request for user:', userId);
+    console.log('[/api/pipeline/adapt] Incoming request for user:', userId);
 
     const validationError = validatePayload(telemetry, userId);
     if (validationError) {
-      console.error('[/api/pipeline] Validation error:', validationError);
+      console.error('[/api/pipeline/adapt] Validation failed:', validationError);
       return NextResponse.json({ error: validationError }, { status: 400 });
     }
 
@@ -60,19 +63,23 @@ export async function POST(request: NextRequest) {
 
     const result = pipeline.process(internalTelemetry);
 
-    console.log('[/api/pipeline] target_multiplier:', result.target_multiplier);
+    console.log('[/api/pipeline/adapt] target_multiplier:', result.target_multiplier,
+      '| clamped:', result.validation?.multiplier_clamped);
 
     return NextResponse.json(result);
 
   } catch (error) {
-    console.error('[/api/pipeline] Runtime error:', error);
+    console.error('[/api/pipeline/adapt] Runtime error:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Internal server error' },
+      { error: error instanceof Error ? error.message : 'Unknown internal error' },
       { status: 500 }
     );
   }
 }
 
+// ------------------------------------------------------------------
+// HELPER: Payload validation
+// ------------------------------------------------------------------
 const REQUIRED_TELEMETRY_FIELDS = [
   'enemiesHit',
   'damageDone',
