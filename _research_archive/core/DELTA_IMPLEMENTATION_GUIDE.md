@@ -6,7 +6,7 @@
 
 ---
 
-## ✅ Completed
+## [done] Completed
 
 1. Experimentation phase CLOSED
 2. Baseline preprocessing FROZEN
@@ -16,9 +16,9 @@
 
 ---
 
-## 🔄 Delta Integration Steps
+##  Delta Integration Steps
 
-### Step 1: Verify `05_Clustering.ipynb` ✅
+### Step 1: Verify `05_Clustering.ipynb` [done]
 
 **Checked**: Soft membership computation verified
 - Uses inverse distance method
@@ -78,12 +78,12 @@ input_features = ['soft_combat', 'soft_collect', 'soft_explore',
 
 ---
 
-## ⏹️ STOP Criteria
+##  STOP Criteria
 
 Stop when:
-✅ Training finishes without regression  
-✅ Target reacts faster to changes (validate with correlation)  
-✅ No clustering metrics worsen  
+[done] Training finishes without regression  
+[done] Target reacts faster to changes (validate with correlation)  
+[done] No clustering metrics worsen  
 
 After validation: **NO MORE TUNING**
 
@@ -95,4 +95,4 @@ After validation: **NO MORE TUNING**
 2. Run notebooks 01-08 sequentially
 3. Validate metrics
 4. Document final system state
-5. **FREEZE** 🔒
+5. **FREEZE** 

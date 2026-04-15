@@ -3,7 +3,7 @@ import { PipelineStep } from '@/lib/types';
 export const INITIAL_PIPELINE_STEPS: PipelineStep[] = [
     { id: '1', name: 'Load Input Data', description: 'Parse and validate telemetry JSON', input: null, output: null, status: 'pending' },
     { id: '2', name: 'Normalize Features', description: 'Scale features to [0, 1] range (v2.2: 12 features)', input: null, output: null, status: 'pending' },
-    { id: '3', name: 'Activity Scoring', description: 'Average active features → archetype scores (v2.2)', input: null, output: null, status: 'pending' },
+    { id: '3', name: 'Activity Scoring', description: 'Average active features -> archetype scores (v2.2)', input: null, output: null, status: 'pending' },
     { id: '4', name: 'Soft Membership', description: 'K-Means IDW clustering (3 archetypes)', input: null, output: null, status: 'pending' },
     { id: '5', name: 'Adaptation Analysis', description: 'Compare before/after values', input: null, output: null, status: 'pending' },
     { id: '6', name: 'Confidence Calculation', description: 'Compute confidence metrics', input: null, output: null, status: 'pending' },

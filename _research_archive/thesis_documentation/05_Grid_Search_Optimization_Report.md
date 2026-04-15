@@ -13,7 +13,7 @@ A grid search was implemented to systematically evaluate the hyperparameter spac
 *   **Normalization**: Compared Uniform MinMaxScaler against feature-aware Log-Sparse scaling and RobustScaler.
 *   **Feature Sets**: Tested subsets of 8, 9, and the full 10 telemetry features.
 
-**Total Configurations**: 4 (K) × 3 (Outlier) × 3 (Norm) × 3 (Features) = 108.
+**Total Configurations**: 4 (K) x 3 (Outlier) x 3 (Norm) x 3 (Features) = 108.
 
 ## 3. Results Analysis
 

@@ -7,7 +7,7 @@
 
 ## Executive Summary
 
-The MLP surrogate achieved R² = 0.9566 on unseen data after resolving target variance collapse through Option B target redesign. The original failure (R² = −4.69) was caused by fuzzy-membership constraints limiting target variance to σ = 0.0113. The redesigned formula restored learnability by using deltas as primary variance drivers while preserving semantic bounds.
+The MLP surrogate achieved R^2 = 0.9566 on unseen data after resolving target variance collapse through Option B target redesign. The original failure (R^2 = −4.69) was caused by fuzzy-membership constraints limiting target variance to σ = 0.0113. The redesigned formula restored learnability by using deltas as primary variance drivers while preserving semantic bounds.
 
 ---
 
@@ -40,14 +40,14 @@ The MLP surrogate achieved R² = 0.9566 on unseen data after resolving target va
 
 ### Regression Metrics
 
-| Split | MAE | RMSE | R² | Samples |
+| Split | MAE | RMSE | R^2 | Samples |
 |-------|-----|------|-----|---------|
 | **Train** | 0.0130 | - | **0.9550** | 2,592 |
 | **Test** | 0.0127 | - | **0.9566** | 648 |
 
 ### Key Observations
 
-1. **Generalization**: Test R² (0.9566) ≥ Train R² (0.9550) - no overfitting.
+1. **Generalization**: Test R^2 (0.9566) ≥ Train R^2 (0.9550) - no overfitting.
 
 2. **Error**: MAE ≈ 0.013 (3% of target span [0.6, 1.4]).
 
@@ -60,7 +60,7 @@ The MLP surrogate achieved R² = 0.9566 on unseen data after resolving target va
 ### Original Failure
 
 **Symptoms**:
-- R² = -4.69 (worse than mean prediction)
+- R^2 = -4.69 (worse than mean prediction)
 - Model predictions collapsed to constant ~1.0
 - Training loss plateaued immediately
 
@@ -78,7 +78,7 @@ Target variance collapse caused by:
 ### Solution: Option B
 
 **Design Principles**:
-1. **Lower baseline** (1.0 → 0.9) to address systematic downward bias
+1. **Lower baseline** (1.0 -> 0.9) to address systematic downward bias
 2. **Strong delta coefficients** (0.55, 0.40, 0.35) as primary variance drivers
 3. **Centered soft membership** (subtract 0.5) for bidirectional contribution
 4. **Moderate death penalty** (-0.25) to avoid over-penalization
@@ -86,8 +86,8 @@ Target variance collapse caused by:
 
 **Formula**:
 ```
-M = 0.9 + 0.22×(soft_combat-0.5) + 0.18×(soft_collect-0.5) + 0.15×(soft_explore-0.5)
-      + 0.55×Δ_combat + 0.40×Δ_collect + 0.35×Δ_explore - 0.25×death_rate
+M = 0.9 + 0.22x(soft_combat-0.5) + 0.18x(soft_collect-0.5) + 0.15x(soft_explore-0.5)
+      + 0.55xΔ_combat + 0.40xΔ_collect + 0.35xΔ_explore - 0.25xdeath_rate
 M_final = clip(M, 0.6, 1.4)
 ```
 
@@ -114,9 +114,9 @@ This hierarchy aligns with design intent: **deltas drive variance, soft terms pr
 ### Approved for Production
 
 Criteria met:
-- R² ≥ 0.4: achieved 0.9566
+- R^2 ≥ 0.4: achieved 0.9566
 - MAE < 10% of span: achieved 3%
-- No overfitting: Test R² ≥ Train R²
+- No overfitting: Test R^2 ≥ Train R^2
 - Target variance restored: σ = 0.062, span = 0.41
 
 ---
@@ -145,7 +145,7 @@ Criteria met:
 
 ## Conclusion
 
-Option B restored learnability by addressing the root cause (variance collapse) rather than symptoms. The MLP surrogate generalizes well to unseen data (Test R² = 0.9566) and is production-ready.
+Option B restored learnability by addressing the root cause (variance collapse) rather than symptoms. The MLP surrogate generalizes well to unseen data (Test R^2 = 0.9566) and is production-ready.
 
 ---
 
@@ -158,9 +158,9 @@ Following production deployment of v2.2 (Option B), live gameplay observation re
 
 | Aspect | v2.0 Formula | v2.1 Formula |
 |--------|-------------|-------------|
-| Combat score | sum(4 features) → [0,4] | avg(4 features) → [0,1] |
-| Collection score | sum(3 features) → [0,3] | avg(3 features) → [0,1] |
-| Exploration score | sum(distanceTraveled, timeSprinting, **timeOutOfCombat**) → [0,3] | avg(distanceTraveled, timeSprinting) → [0,1] |
+| Combat score | sum(4 features) -> [0,4] | avg(4 features) -> [0,1] |
+| Collection score | sum(3 features) -> [0,3] | avg(3 features) -> [0,1] |
+| Exploration score | sum(distanceTraveled, timeSprinting, **timeOutOfCombat**) -> [0,3] | avg(distanceTraveled, timeSprinting) -> [0,1] |
 
 ### Impact on Model Artifacts
 
@@ -179,7 +179,7 @@ The change to activity scoring required regenerating all downstream artifacts:
 | test_mae | 0.0107 |
 | Architecture | 6-16-8-1 |
 
-The model continues to generalize well (test_mae < train_mae). The R² structure from Option B is preserved as the target formula and MLP architecture were not changed - only the upstream activity score computation was corrected.
+The model continues to generalize well (test_mae < train_mae). The R^2 structure from Option B is preserved as the target formula and MLP architecture were not changed - only the upstream activity score computation was corrected.
 
 ### Thesis Significance
 
@@ -199,7 +199,7 @@ Following the v2.1 activity scoring correction, two archetype discrimination gap
 1. Combat archetype could not distinguish high-accuracy vs high-volume combat styles
 2. Collection archetype could not distinguish deliberate collectors from accidental ones
 
-### Changes to Feature Engineering (Notebook 03–04)
+### Changes to Feature Engineering (Notebook 03-04)
 
 Two derived features were added, computed from existing raw telemetry before normalization:
 
@@ -212,29 +212,29 @@ Two derived features were added, computed from existing raw telemetry before nor
 - `score_combat` = avg(5 features including `damage_per_hit`)
 - `score_collect` = avg(4 features including `pickup_attempt_rate`)
 - `score_explore` = avg(2 features, unchanged)
-- Scaler input vector: 10 → 12 features
+- Scaler input vector: 10 -> 12 features
 
-### Post-Rerun Metrics (2026-03-07, Notebooks 03 → 10)
+### Post-Rerun Metrics (2026-03-07, Notebooks 03 -> 10)
 
 | Metric | v2.1 | v2.2 | Notes |
 |--------|------|------|-------|
 | Train MAE | 0.0125 | 0.0130 | Slightly harder to fit (expected) |
 | Test MAE | 0.0107 | **0.0112** | Still well within acceptable range |
-| Train R² | ~0.96 | 0.8813 | More complex input space |
-| Test R² | ~0.96 | **0.9391** | Strong generalization maintained |
+| Train R^2 | ~0.96 | 0.8813 | More complex input space |
+| Test R^2 | ~0.96 | **0.9391** | Strong generalization maintained |
 | Δexplore r | 0.808 | **0.8394** | Improved temporal signal quality |
 | Integration tests | - | **9/9 pass** | All pipeline assertions verified |
 
 ### Deployment Verdict (v2.2)
 
 All production criteria continue to be met:
-- [x] Test R² = 0.9391 (≥ 0.40 threshold, 235% above)
+- [x] Test R^2 = 0.9391 (≥ 0.40 threshold, 235% above)
 - [x] Test MAE = 0.0112 (2.7% of target span, ≤ 10% threshold)
 - [x] Δexplore r = 0.8394 (≥ 0.70 threshold)
 - [x] 9/9 integration tests pass
 - [x] Both model artifacts synced: `_research_archive/data/models/` and `anfis-demo-ui/models/`
 
-**Note on Train R² decrease**: The gap between train (0.881) and test (0.939) R² is unusual but explained by the richer input space from derived features - the model has more informative signals, reducing overfitting tendency. Test performance is the authoritative deployment metric.
+**Note on Train R^2 decrease**: The gap between train (0.881) and test (0.939) R^2 is unusual but explained by the richer input space from derived features - the model has more informative signals, reducing overfitting tendency. Test performance is the authoritative deployment metric.
 
 ---
 
@@ -250,34 +250,34 @@ After deploying v2.2, live analytics consistently showed "easier by X%" regardle
 
 The original Option B formula was:
 ```
-M = 0.9 + 0.22×(soft_combat−0.5) + 0.18×(soft_collect−0.5) + 0.15×(soft_explore−0.5)
-      + 0.55×Δcombat + 0.40×Δcollect + 0.35×Δexplore − 0.25×death_rate
+M = 0.9 + 0.22x(soft_combat−0.5) + 0.18x(soft_collect−0.5) + 0.15x(soft_explore−0.5)
+      + 0.55xΔcombat + 0.40xΔcollect + 0.35xΔexplore − 0.25xdeath_rate
 ```
 
-For a balanced player (⅓,⅓,⅓, deltas=0):
-- State terms: 0.22×(−0.167) + 0.18×(−0.167) + 0.15×(−0.166) = −0.092
+For a balanced player (1/3,1/3,1/3, deltas=0):
+- State terms: 0.22x(−0.167) + 0.18x(−0.167) + 0.15x(−0.166) = −0.092
 - Therefore: M = 0.9 − 0.092 = **0.808** (the "neutral" training point was below 1.0)
 
 This biased the entire training distribution below 1.0. The MLP never learned to predict "harder", because no realistic input combination could produce a target > 1.0 without large positive deltas.
 
 **Root Cause 2 - Min-max rescaling used extreme inputs**
 
-The attempted fix (min-max rescaling of MLP output range) computed bounds using delta=±1.0, pulling the min to 0.49. Since realistic players always produce outputs above this extreme, every realistic session appeared "above midpoint" → always HARDER.
+The attempted fix (min-max rescaling of MLP output range) computed bounds using delta=+/-1.0, pulling the min to 0.49. Since realistic players always produce outputs above this extreme, every realistic session appeared "above midpoint" -> always HARDER.
 
 ### Fix Applied
 
-1. **Retrained with `base=1.0`** (notebooks 06–10 re-run):
+1. **Retrained with `base=1.0`** (notebooks 06-10 re-run):
 ```
-M = 1.0 + 0.22×(soft_combat−0.5) + ... (all other terms unchanged)
+M = 1.0 + 0.22x(soft_combat−0.5) + ... (all other terms unchanged)
 ```
-A balanced player now targets exactly **M=1.0** → symmetric distribution.
+A balanced player now targets exactly **M=1.0** -> symmetric distribution.
 
 2. **Replaced min-max with neutral-centred calibration**:
 ```
-display = clamp(1.0 + (raw − mlp_neutral) × 2.0,  0.6, 1.4)
+display = clamp(1.0 + (raw − mlp_neutral) x 2.0,  0.6, 1.4)
 mlp_neutral = MLP.predict([[1/3, 1/3, 1/3, 0, 0, 0]]) = 0.932006
 ```
-This guarantees: balanced player → display = 1.0, regardless of MLP output range.
+This guarantees: balanced player -> display = 1.0, regardless of MLP output range.
 
 ### Post-Retrain Metrics
 
@@ -287,24 +287,24 @@ This guarantees: balanced player → display = 1.0, regardless of MLP output ran
 | Target max | 1.021 | **1.107** |
 | Target mean | 0.801 | **0.902** |
 | Target std | 0.062 | **0.074** |
-| Test R² | 0.9391 | **0.9264** |
+| Test R^2 | 0.9391 | **0.9264** |
 | Test MAE | 0.0112 | **0.0127** |
 | Convergence | 230 iters | **21 iters** (LBFGS) |
 
-The slight R² decrease (0.9391 → 0.9264) is expected: the corrected target distribution is harder to fit (wider variance, more symmetric). The model is semantically correct.
+The slight R^2 decrease (0.9391 -> 0.9264) is expected: the corrected target distribution is harder to fit (wider variance, more symmetric). The model is semantically correct.
 
 ### Verification Results
 
 | Scenario | Raw MLP | Display | Correct? |
 |----------|---------|---------|----------|
-| Balanced (⅓,⅓,⅓), Δ=0 | 0.932 | **1.000** | Neutral |
+| Balanced (1/3,1/3,1/3), Δ=0 | 0.932 | **1.000** | Neutral |
 | High combat + Δcombat=+0.3 | ~1.11 | **1.127** | HARDER |
 | High explore + Δexplore=+0.3 | ~0.87 | **0.829** | easier |
 | Struggling (deaths=0.5) | ~0.85 | **0.840** | easier |
 
 ### Thesis Significance
 
-This addendum demonstrates a subtle but critical failure mode: a training formula that appears correct but has an asymmetric neutral point. The key insight is that **soft membership terms always sum to 1.0, and when centered at 0.5, a balanced player (⅓,⅓,⅓) contributes a fixed negative offset** regardless of the base value. Without accounting for this cancellation, the training distribution is systematically biased. The neutral-centred calibration approach is semantically robust because it derives the neutral point from the trained model itself rather than from the training data distribution.
+This addendum demonstrates a subtle but critical failure mode: a training formula that appears correct but has an asymmetric neutral point. The key insight is that **soft membership terms always sum to 1.0, and when centered at 0.5, a balanced player (1/3,1/3,1/3) contributes a fixed negative offset** regardless of the base value. Without accounting for this cancellation, the training distribution is systematically biased. The neutral-centred calibration approach is semantically robust because it derives the neutral point from the trained model itself rather than from the training data distribution.
 
 ---
 

@@ -2,7 +2,7 @@
 **System**: AURA (Adaptive User-Responsive Architecture)
 **Repo**: CollectGame.Model
 **Final Version**: v2.2.1
-**Development Period**: January 2026 – March 2026
+**Development Period**: January 2026 - March 2026
 **Author**: K. W. J. P. Geevinda
 **Supervisor**: Mr. Banu Athuraliya
 
@@ -17,7 +17,7 @@
 **Short Title**: AURA - Adaptive Neuro-Fuzzy Difficulty System
 
 **Abstract (Draft)**:
-Static and rule-based adaptive difficulty systems fail to respond to the diversity of implicit player behaviour, resulting in sub-optimal engagement and early player drop-off. This project presents AURA, a calibration-first, telemetry-driven adaptive gameplay framework that classifies player behaviour into three archetypes - Combat, Collection, and Exploration - using K-Means soft clustering with Inverse Distance Weighting (IDW) membership, and predicts a real-time difficulty multiplier using a neuro-fuzzy inference system approximated by a Multi-Layer Perceptron (MLP) surrogate for sub-millisecond runtime inference. The system operates on 30-second telemetry windows, extracting 12 behavioural features (10 raw + 2 derived ratios), computing per-archetype soft memberships and temporal deltas, and mapping these to a bounded difficulty multiplier M ∈ [0.6, 1.4]. A neutral-centred calibration scheme guarantees that a balanced player always receives M = 1.0 by anchoring the output to a semantically defined neutral input. The MLP surrogate achieves Test R² = 0.9264 and Test MAE = 0.0127 on 3,240 synthetic samples. An interactive analytics dashboard (Next.js 14, TypeScript) visualises the complete 8-step pipeline with educational explainers, archetype diagnostics, and window-to-window behavioural comparison. A Vitest test suite of 19 tests validates every engine module with CI/CD via GitHub Actions.
+Static and rule-based adaptive difficulty systems fail to respond to the diversity of implicit player behaviour, resulting in sub-optimal engagement and early player drop-off. This project presents AURA, a calibration-first, telemetry-driven adaptive gameplay framework that classifies player behaviour into three archetypes - Combat, Collection, and Exploration - using K-Means soft clustering with Inverse Distance Weighting (IDW) membership, and predicts a real-time difficulty multiplier using a neuro-fuzzy inference system approximated by a Multi-Layer Perceptron (MLP) surrogate for sub-millisecond runtime inference. The system operates on 30-second telemetry windows, extracting 12 behavioural features (10 raw + 2 derived ratios), computing per-archetype soft memberships and temporal deltas, and mapping these to a bounded difficulty multiplier M ∈ [0.6, 1.4]. A neutral-centred calibration scheme guarantees that a balanced player always receives M = 1.0 by anchoring the output to a semantically defined neutral input. The MLP surrogate achieves Test R^2 = 0.9264 and Test MAE = 0.0127 on 3,240 synthetic samples. An interactive analytics dashboard (Next.js 14, TypeScript) visualises the complete 8-step pipeline with educational explainers, archetype diagnostics, and window-to-window behavioural comparison. A Vitest test suite of 19 tests validates every engine module with CI/CD via GitHub Actions.
 
 ---
 
@@ -39,7 +39,7 @@ No system in the reviewed literature simultaneously satisfies:
 ### 2.3 Research Questions
 - **RQ1**: Can a neuro-fuzzy inference system, approximated by an MLP surrogate, produce statistically valid difficulty multipliers from 12-dimensional behavioural telemetry in real time?
 - **RQ2**: How should temporal behavioural deltas (window-to-window membership changes) be incorporated into the inference input to capture behavioural momentum rather than static state?
-- **RQ3**: What calibration strategy guarantees semantic neutrality (balanced player → M = 1.0) without fragility to training distribution extremes?
+- **RQ3**: What calibration strategy guarantees semantic neutrality (balanced player -> M = 1.0) without fragility to training distribution extremes?
 
 ### 2.4 Research Aim
 To design, train, and validate an interpretable neuro-fuzzy adaptive difficulty pipeline that classifies player archetypes from implicit behavioural telemetry, responds to behavioural momentum, and produces bias-free difficulty adjustments within game-engine latency constraints.
@@ -50,8 +50,8 @@ To design, train, and validate an interpretable neuro-fuzzy adaptive difficulty 
 | RO1 | Comprehensive literature review on adaptive PCG, player modelling, ANFIS | RQ1, RQ2 |
 | RO2 | Design 8-step ANFIS pipeline with semantic layer interpretations | RQ1 |
 | RO3 | Engineer 12-feature telemetry schema with derived ratio features | RQ1, RQ2 |
-| RO4 | Train and validate MLP surrogate (R² ≥ 0.90, MAE ≤ 10% of span) | RQ1 |
-| RO5 | Implement neutral-centred calibration guaranteeing balanced→M=1.0 | RQ3 |
+| RO4 | Train and validate MLP surrogate (R^2 ≥ 0.90, MAE ≤ 10% of span) | RQ1 |
+| RO5 | Implement neutral-centred calibration guaranteeing balanced->M=1.0 | RQ3 |
 | RO6 | Build interactive analytics dashboard with 19-test CI/CD suite | RQ1, RQ2, RQ3 |
 
 ### 2.6 Project Scope
@@ -77,11 +77,11 @@ To design, train, and validate an interpretable neuro-fuzzy adaptive difficulty 
 Step 1  Telemetry Acquisition        (30-second window, 12 features)
 Step 2  Feature Normalization         (Min-Max scaler, [0,1])
 Step 3  Activity Scoring              (per-archetype averages)
-Step 4  K-Means Soft Clustering       (IDW membership → μ_combat, μ_collect, μ_explore)
+Step 4  K-Means Soft Clustering       (IDW membership -> μ_combat, μ_collect, μ_explore)
 Step 5  Temporal Delta Computation    (Δ_k = μ_k(t) − μ_k(t−1))
-Step 6  MLP Surrogate Inference       (6→16→8→1, ReLU/Linear)
-Step 7  Neutral-Centred Calibration   (display = clamp(1.0 + (raw − mlp_neutral) × 2.0, 0.6, 1.4))
-Step 8  Parameter Cascade             (per-archetype factor → game engine parameters)
+Step 6  MLP Surrogate Inference       (6->16->8->1, ReLU/Linear)
+Step 7  Neutral-Centred Calibration   (display = clamp(1.0 + (raw − mlp_neutral) x 2.0, 0.6, 1.4))
+Step 8  Parameter Cascade             (per-archetype factor -> game engine parameters)
 ```
 
 ### 3.2 Why ANFIS?
@@ -96,9 +96,9 @@ ANFIS (Adaptive Neuro-Fuzzy Inference System) was selected over alternatives bec
 - Sequential inference latency incompatible with 60 FPS requirement
 
 ### 3.3 Why MLP Surrogate Instead of Full ANFIS at Runtime?
-Full ANFIS inference requires iterative least-squares parameter estimation: O(n²) in rule count. With 3 fuzzy inputs and 3 archetypes (3³ = 27 rules), this takes 50–200ms per inference. The MLP surrogate (6→16→8→1) runs in <1ms.
+Full ANFIS inference requires iterative least-squares parameter estimation: O(n^2) in rule count. With 3 fuzzy inputs and 3 archetypes (3^3 = 27 rules), this takes 50-200ms per inference. The MLP surrogate (6->16->8->1) runs in <1ms.
 
-The MLP was trained on 3,240 ANFIS-evaluated synthetic samples, achieving Test R² = 0.9264. The accuracy loss (100% → 92.6%) is acceptable given the 200× inference speed gain.
+The MLP was trained on 3,240 ANFIS-evaluated synthetic samples, achieving Test R^2 = 0.9264. The accuracy loss (100% -> 92.6%) is acceptable given the 200x inference speed gain.
 
 ### 3.4 Key Model Artifacts
 | File | Contents |
@@ -108,14 +108,14 @@ The MLP was trained on 3,240 ANFIS-evaluated synthetic samples, achieving Test R
 | `anfis-demo-ui/models/cluster_centroids.json` | K-Means centroids (K=3) in archetype space |
 | `anfis-demo-ui/models/deployment_manifest.json` | Hard safety constraints (clamp bounds) |
 | `anfis-demo-ui/models/training_stats.json` | Target distribution + mlp_neutral |
-| `_research_archive/core/notebooks/` | Full training pipeline (notebooks 01–10) |
+| `_research_archive/core/notebooks/` | Full training pipeline (notebooks 01-10) |
 
 ### 3.5 Component Overview (Next.js Demo UI)
 ```
 anfis-demo-ui/
 ├── lib/engine/               ANFIS pipeline (TypeScript)
 │   ├── index.ts              ANFISPipeline class (8-step orchestrator)
-│   ├── mlp.ts                MLPInference (6→16→8→1)
+│   ├── mlp.ts                MLPInference (6->16->8->1)
 │   ├── normalization.ts      MinMaxNormalizer
 │   ├── clustering.ts         KMeansSoftMembership (IDW)
 │   ├── activity.ts           Activity score computation
@@ -158,18 +158,18 @@ anfis-demo-ui/
 | `damage_per_hit` | `damageDone / max(enemiesHit, 1)` | Weapon-class-agnostic intensity proxy; separates sniper-class (high DPH) from spray-fire (low DPH) |
 | `pickup_attempt_rate` | `pickupAttempts / max(timeNearInteractables, 1)` | Deliberateness signal; distinguishes intentional collectors from incidental passers-by |
 
-Both are computed from raw telemetry **before** normalization, then normalized as features 11 and 12. The scaler input vector expanded from 10 → 12 features in v2.2.
+Both are computed from raw telemetry **before** normalization, then normalized as features 11 and 12. The scaler input vector expanded from 10 -> 12 features in v2.2.
 
 ### 4.3 Activity Scoring (v2.2 canonical)
 ```
-score_combat  = avg(enemiesHit, damageDone, timeInCombat, kills, damage_per_hit)     → [0,1]
-score_collect = avg(itemsCollected, pickupAttempts, timeNearInteractables, pickup_attempt_rate) → [0,1]
-score_explore = avg(distanceTraveled, timeSprinting)                                  → [0,1]
+score_combat  = avg(enemiesHit, damageDone, timeInCombat, kills, damage_per_hit)     -> [0,1]
+score_collect = avg(itemsCollected, pickupAttempts, timeNearInteractables, pickup_attempt_rate) -> [0,1]
+score_explore = avg(distanceTraveled, timeSprinting)                                  -> [0,1]
 ```
 
-**Why averages, not sums?** Sums give Combat (5 features) a 5× ceiling over Exploration (2 features). Averages impose equal ceilings per archetype, preventing structural classification bias.
+**Why averages, not sums?** Sums give Combat (5 features) a 5x ceiling over Exploration (2 features). Averages impose equal ceilings per archetype, preventing structural classification bias.
 
-**Why was `timeOutOfCombat` removed?** It accumulates passively whenever the player is not in combat - including when a combat-intent player is seeking enemies during sparse spawns. This caused systematic Combat→Exploration misclassification (v2.0 bug). It is also perfectly inversely correlated with `timeInCombat`, introducing redundancy.
+**Why was `timeOutOfCombat` removed?** It accumulates passively whenever the player is not in combat - including when a combat-intent player is seeking enemies during sparse spawns. This caused systematic Combat->Exploration misclassification (v2.0 bug). It is also perfectly inversely correlated with `timeInCombat`, introducing redundancy.
 
 ### 4.4 Normalisation
 **Strategy**: Uniform Min-Max Scaler - all features scaled to [0,1] using pre-fitted min/max from calibration dataset.
@@ -217,8 +217,8 @@ This satisfies the partition-of-unity constraint: memberships always sum to 1.0,
 **Why deltas?** Static membership captures *current state* but not *direction of change*. A player increasing their combat engagement (Δcombat = +0.3) requires a different response than one maintaining it (Δcombat = 0) even if their current membership is identical.
 
 **Empirical validation**: Pearson correlation analysis on the training dataset:
-- Δexplore → Δtarget: r = 0.808 (very strong)
-- Δcombat → Δtarget: r = −0.471 (moderate)
+- Δexplore -> Δtarget: r = 0.808 (very strong)
+- Δcombat -> Δtarget: r = −0.471 (moderate)
 
 This confirmed deltas as the primary variance drivers in the target formula.
 
@@ -228,14 +228,14 @@ This confirmed deltas as the primary variance drivers in the target formula.
 
 ### 6.1 Formula Evolution
 
-**v1.0 (failed)**: `M = 1.0 − 0.1×deaths + 0.05×activity`
-- Result: σ = 0.0113, R² = −4.69 (worse than mean prediction)
+**v1.0 (failed)**: `M = 1.0 − 0.1xdeaths + 0.05xactivity`
+- Result: σ = 0.0113, R^2 = −4.69 (worse than mean prediction)
 - Root cause: Variance collapse - 100% of samples hit the upper clamp; gradient descent could not learn
 
 **Option B (v2.2 canonical, base=1.0)**:
 ```
-M = 1.0 + 0.22×(soft_combat − 0.5) + 0.18×(soft_collect − 0.5) + 0.15×(soft_explore − 0.5)
-      + 0.55×Δcombat + 0.40×Δcollect + 0.35×Δexplore − 0.25×death_rate
+M = 1.0 + 0.22x(soft_combat − 0.5) + 0.18x(soft_collect − 0.5) + 0.15x(soft_explore − 0.5)
+      + 0.55xΔcombat + 0.40xΔcollect + 0.35xΔexplore − 0.25xdeath_rate
 
 M_final = clamp(M, 0.6, 1.4)
 ```
@@ -247,9 +247,9 @@ M_final = clamp(M, 0.6, 1.4)
 4. **Death rate penalty** (−0.25): rewards struggling players with difficulty reduction
 5. **Wider clamp** ([0.6, 1.4]): allows natural distribution without saturation
 
-**Why base=1.0 not 0.9?** The soft membership terms always sum to 1.0. When centred at 0.5, a balanced player (⅓,⅓,⅓) contributes a fixed negative offset:
+**Why base=1.0 not 0.9?** The soft membership terms always sum to 1.0. When centred at 0.5, a balanced player (1/3,1/3,1/3) contributes a fixed negative offset:
 ```
-0.22×(1/3−0.5) + 0.18×(1/3−0.5) + 0.15×(1/3−0.5) = −0.092
+0.22x(1/3−0.5) + 0.18x(1/3−0.5) + 0.15x(1/3−0.5) = −0.092
 ```
 With base=0.9: neutral point = 0.9 − 0.092 = **0.808** (training skewed below 1.0 - discovered as the v2.2 training bias bug). With base=1.0: neutral point = 1.0 − 0.092 = **0.908** - still not 1.0, but the neutral-centred calibration corrects this at runtime without retraining.
 
@@ -276,18 +276,18 @@ H2:     8 neurons, ReLU activation
 Output: 1 neuron, Linear activation  (raw M before calibration)
 ```
 
-**Bottleneck structure (16→8)**: Forces a compressed intermediate representation - the network must learn the most informative combination of membership and delta signals rather than memorising individual sample patterns.
+**Bottleneck structure (16->8)**: Forces a compressed intermediate representation - the network must learn the most informative combination of membership and delta signals rather than memorising individual sample patterns.
 
 **Activation choices**:
 - Hidden: ReLU - faster convergence than sigmoid/tanh; no vanishing gradient in the second hidden layer
 - Output: Linear - preserves raw output range; sigmoid/tanh would artificially compress the output before calibration
 
 ### 7.2 Architecture Selection (5-fold CV)
-| Architecture | Test R² | Decision |
+| Architecture | Test R^2 | Decision |
 |-------------|---------|---------|
-| 1×[32] | 0.82 | Insufficient to capture membership×delta interactions |
-| **2×[16,8]** | **0.93** | **Selected - optimal** |
-| 2×[32,16] | 0.91 | 4× more parameters, no meaningful gain |
+| 1x[32] | 0.82 | Insufficient to capture membershipxdelta interactions |
+| **2x[16,8]** | **0.93** | **Selected - optimal** |
+| 2x[32,16] | 0.91 | 4x more parameters, no meaningful gain |
 | 3 layers | 0.90 | Overfitting, no test improvement |
 
 ### 7.3 Training Results (v2.2.1 canonical)
@@ -296,12 +296,12 @@ Output: 1 neuron, Linear activation  (raw M before calibration)
 | Total samples | 3,240 (80/20 split) |
 | Train MAE | 0.0130 |
 | Test MAE | **0.0127** |
-| Train R² | 0.9550 |
-| Test R² | **0.9264** |
+| Train R^2 | 0.9550 |
+| Test R^2 | **0.9264** |
 | Convergence | 21 iterations (LBFGS) |
 | mlp_neutral | **0.932006** |
 
-**Generalisation check**: Test R² (0.9264) ≥ Train R² threshold - no overfitting. MAE = 1.3% of target span [0.6, 1.4].
+**Generalisation check**: Test R^2 (0.9264) ≥ Train R^2 threshold - no overfitting. MAE = 1.3% of target span [0.6, 1.4].
 
 ### 7.4 Target Distribution (v2.2.1 corrected)
 | Metric | Collapsed (v1.0) | Option B Biased (v2.2) | Option B Corrected (v2.2.1) |
@@ -310,7 +310,7 @@ Output: 1 neuron, Linear activation  (raw M before calibration)
 | Span | 0.023 | 0.411 | **0.507** |
 | Mean | - | 0.801 | **0.902** |
 | Upper clamp % | 100% | 0% | 0% |
-| Test R² | −4.69 | 0.9391 | **0.9264** |
+| Test R^2 | −4.69 | 0.9391 | **0.9264** |
 
 ### 7.5 Training Notebook Pipeline
 | Notebook | Purpose |
@@ -330,25 +330,25 @@ Output: 1 neuron, Linear activation  (raw M before calibration)
 
 ## 8. Neutral-Centred Calibration (Critical Design)
 
-### 8.1 Problem: Training Bias Discovery (v2.2 → v2.2.1)
+### 8.1 Problem: Training Bias Discovery (v2.2 -> v2.2.1)
 After deploying v2.2, every player scenario in the analytics dashboard showed "easier by X%" regardless of archetype. A brute-force sweep of 5,000 random inputs confirmed: MLP raw output range was [0.535, 0.976] - entirely below 1.0.
 
-**Root cause**: The partition-of-unity constraint means soft memberships always sum to 1.0. When centred at 0.5, a balanced player (⅓,⅓,⅓) always contributes a fixed negative offset (−0.092) to the target. With base=0.9, the training neutral point was 0.808, biasing the entire training distribution below 1.0. The MLP never learned to predict "harder".
+**Root cause**: The partition-of-unity constraint means soft memberships always sum to 1.0. When centred at 0.5, a balanced player (1/3,1/3,1/3) always contributes a fixed negative offset (−0.092) to the target. With base=0.9, the training neutral point was 0.808, biasing the entire training distribution below 1.0. The MLP never learned to predict "harder".
 
-**Failed first fix**: Min-max rescaling using the MLP output range computed over extreme delta=±1.0 inputs. This pulled `min_raw` to 0.49 - far below any realistic player - causing every realistic session to appear "above midpoint" → always HARDER. Same symptom, opposite direction. Lesson: empirical range-based calibration is fragile.
+**Failed first fix**: Min-max rescaling using the MLP output range computed over extreme delta=+/-1.0 inputs. This pulled `min_raw` to 0.49 - far below any realistic player - causing every realistic session to appear "above midpoint" -> always HARDER. Same symptom, opposite direction. Lesson: empirical range-based calibration is fragile.
 
 ### 8.2 The Correct Fix: Semantic Anchoring
 **Insight**: Rather than computing a range, anchor calibration to the semantic reference point - the input that *should* produce display=1.0.
 
-A balanced player (⅓,⅓,⅓, Δ=0) semantically means "average behaviour, no trend" → should always produce display=1.0.
+A balanced player (1/3,1/3,1/3, Δ=0) semantically means "average behaviour, no trend" -> should always produce display=1.0.
 
 ```
 mlp_neutral = MLP.predict([[1/3, 1/3, 1/3, 0, 0, 0]])  =  0.932006
 
-display = clamp( 1.0 + (raw − mlp_neutral) × 2.0,  0.6,  1.4 )
+display = clamp( 1.0 + (raw − mlp_neutral) x 2.0,  0.6,  1.4 )
 ```
 
-**AMPLIFICATION = 2.0**: Fixed design constant. Maps the typical raw output variation (≈ ±0.2) to a meaningful display range (≈ ±0.4).
+**AMPLIFICATION = 2.0**: Fixed design constant. Maps the typical raw output variation (≈ +/-0.2) to a meaningful display range (≈ +/-0.4).
 
 ### 8.3 Self-Updating System Design
 `mlp_neutral` is stored in `anfis_mlp_weights.json` and auto-computed by notebook 07 after every retrain:
@@ -365,7 +365,7 @@ No manual code changes are needed after a retrain - the system is self-consisten
 ### 8.4 Verification Results
 | Scenario | Raw MLP | Display M | Correct? |
 |----------|---------|----------|----------|
-| Balanced (⅓,⅓,⅓), Δ=0 | 0.932 | **1.000** | Neutral |
+| Balanced (1/3,1/3,1/3), Δ=0 | 0.932 | **1.000** | Neutral |
 | High combat + Δcombat=+0.3 | ~1.11 | **1.127** | HARDER |
 | High explore + Δexplore=+0.3 | ~0.87 | **0.829** | easier |
 | Struggling (death_rate=0.5) | ~0.85 | **0.840** | easier |
@@ -373,8 +373,8 @@ No manual code changes are needed after a retrain - the system is self-consisten
 
 ### 8.5 Safety Clamp Bounds: [0.6, 1.4]
 **Justification from calibration study (N=7 participants)**:
-- M = 0.8 (Mode A, "Easy"): 6/7 participants reported "too boring", "lack of tension" → lower bound must be below 0.8 to provide meaningful assistance
-- M = 1.5 (Mode C, "Hard"): 5/7 participants reported "frustratingly difficult", "unfair enemy spawns" → upper bound must remain below 1.5
+- M = 0.8 (Mode A, "Easy"): 6/7 participants reported "too boring", "lack of tension" -> lower bound must be below 0.8 to provide meaningful assistance
+- M = 1.5 (Mode C, "Hard"): 5/7 participants reported "frustratingly difficult", "unfair enemy spawns" -> upper bound must remain below 1.5
 - Selected: [0.6, 1.4] - sufficient headroom below "boring" and above "unfair"
 
 ---
@@ -458,9 +458,9 @@ A context-based tutorial mode (stored in localStorage) hides all educational exp
 ### 10.4 Full Real-Time Closed-Loop Not Validated (High Priority - Unreal Engine)
 **Problem**: The ANFIS pipeline outputs a difficulty multiplier M. In a full deployment, this would adjust the global enemy cap via PCG:
 ```
-new_cap = clamp(floor(base_cap × M), min_cap, max_cap)
-PCG → spawn/despawn enemies to reach new_cap
-new telemetry → next ANFIS window
+new_cap = clamp(floor(base_cap x M), min_cap, max_cap)
+PCG -> spawn/despawn enemies to reach new_cap
+new telemetry -> next ANFIS window
 ```
 
 **Why not implemented**: PCG navmesh queries and enemy state machine initialisation require GPU-accelerated Unreal Engine infrastructure. Research hardware had insufficient GPU resources for sustained closed-loop testing.
@@ -474,12 +474,12 @@ new telemetry → next ANFIS window
 ### 10.5 Uniform Adaptation Sensitivity (Low Priority)
 **Problem**: A single global sensitivity coefficient (0.3) is applied to all difficulty parameters equally. Enemy health changes are disproportionately impactful compared to spawn rate changes.
 
-**Future**: Conduct player study to measure perceived difficulty impact of ±10% change per parameter; derive parameter-specific sensitivity coefficients.
+**Future**: Conduct player study to measure perceived difficulty impact of +/-10% change per parameter; derive parameter-specific sensitivity coefficients.
 
 ### 10.6 Session Timeout (Medium Priority)
 **Problem**: 40s in-memory session timeout resets delta state, causing false "first window" signals mid-session (especially on unstable connections).
 
-**Fix applied in v2.2**: Increased to 90s (= 3× window cadence), reducing false resets.
+**Fix applied in v2.2**: Increased to 90s (= 3x window cadence), reducing false resets.
 
 **Future**: Persist session state to Redis/database; implement delta reconstruction for late-arriving windows.
 
@@ -491,33 +491,33 @@ new telemetry → next ANFIS window
 - Established 8-step ANFIS pipeline architecture
 - Chose 10-feature telemetry schema
 - Selected 30-second window (shorter = too noisy; longer = misses rapid style shifts)
-- Implemented initial target formula → discovered variance collapse (σ=0.0113, R²=−4.69)
+- Implemented initial target formula -> discovered variance collapse (σ=0.0113, R^2=−4.69)
 
 ### Phase 2 - A/B Testing and Grid Search (v2.0 foundations)
-- A/B test: Uniform MinMax vs. feature-aware preprocessing → Uniform wins 5/8 metrics
-- Grid search: 108 configurations (K=2..5 × 3 outlier strategies × 3 normalisations × 3 feature sets)
-- Correlation analysis → deltas identified as primary variance drivers (Δexplore: r=0.808)
-- Option B target formula designed → σ increased +453%, R² → 0.9391
+- A/B test: Uniform MinMax vs. feature-aware preprocessing -> Uniform wins 5/8 metrics
+- Grid search: 108 configurations (K=2..5 x 3 outlier strategies x 3 normalisations x 3 feature sets)
+- Correlation analysis -> deltas identified as primary variance drivers (Δexplore: r=0.808)
+- Option B target formula designed -> σ increased +453%, R^2 -> 0.9391
 
 ### Phase 3 - v2.1 Activity Scoring Revision (February 2026)
 - Bug discovered: Combat-intent players systematically misclassified as Explorers
-- Root cause: `timeOutOfCombat` passive accumulation; sum asymmetry (Combat ceiling 4× higher)
+- Root cause: `timeOutOfCombat` passive accumulation; sum asymmetry (Combat ceiling 4x higher)
 - Fix: Switched to per-archetype averages; removed `timeOutOfCombat`
-- Required full pipeline rerun (notebooks 04→07)
+- Required full pipeline rerun (notebooks 04->07)
 
-### Phase 4 - v2.2 Derived Features (February–March 2026)
+### Phase 4 - v2.2 Derived Features (February-March 2026)
 - Remaining gap: sniper vs. spray-fire indistinguishable; deliberate vs. incidental collector indistinguishable
 - Added `damage_per_hit` and `pickup_attempt_rate` derived features
-- Scaler expanded: 10 → 12 features
-- MLP retrained: Test R²=0.9391, Test MAE=0.0112
-- Bug found (commit `0fff75d`): camelCase/snake_case mismatch caused derived features to silently receive zeros → fixed key naming across pipeline
+- Scaler expanded: 10 -> 12 features
+- MLP retrained: Test R^2=0.9391, Test MAE=0.0112
+- Bug found (commit `0fff75d`): camelCase/snake_case mismatch caused derived features to silently receive zeros -> fixed key naming across pipeline
 
 ### Phase 5 - v2.2.1 Training Bias Fix (March 2026)
 - Analytics anomaly: "always easier" output regardless of player type
-- Root cause: base=0.9 + membership cancellation → training neutral point = 0.808
-- Failed first fix: min-max rescaling with extreme delta=±1.0 inputs → "always harder"
+- Root cause: base=0.9 + membership cancellation -> training neutral point = 0.808
+- Failed first fix: min-max rescaling with extreme delta=+/-1.0 inputs -> "always harder"
 - Correct fix: base=1.0 + neutral-centred calibration (mlp_neutral = 0.932006)
-- Retrained: Test R²=0.9264, Test MAE=0.0127, convergence=21 iterations
+- Retrained: Test R^2=0.9264, Test MAE=0.0127, convergence=21 iterations
 - Self-updating: mlp_neutral auto-stored in artifact JSON after every retrain
 
 ### Phase 6 - Analytics Dashboard and CI/CD (March 2026)
@@ -535,18 +535,18 @@ new telemetry → next ANFIS window
 | Decision | Chosen | Rejected | Reason |
 |----------|--------|----------|--------|
 | ML approach | ANFIS + MLP surrogate | Pure LSTM | ANFIS interpretable; LSTM needs large real data, no interpretability, too slow |
-| Runtime inference | MLP surrogate (<1ms) | Full ANFIS (50–200ms) | 200× speed gain; R² loss acceptable (0.9264 vs theoretical 1.0) |
+| Runtime inference | MLP surrogate (<1ms) | Full ANFIS (50-200ms) | 200x speed gain; R^2 loss acceptable (0.9264 vs theoretical 1.0) |
 | Feature space | 12 (10 raw + 2 derived) | 10 raw only | Sniper and deliberate-collector discrimination gaps |
 | Activity scoring | Per-archetype average | Sum | Equal ceiling per archetype; prevents structural Combat bias |
 | Temporal window | 30 seconds | 10s, 60s | 10s too noisy; 60s misses rapid style shifts |
 | Clustering | K=3, IDW soft | K=2, K=4, hard K-Means | K=2: binary; K=4: collapses; hard: boundary oscillation |
 | ANFIS input | 6D (3 soft + 3 delta) | 3D (soft only) | Deltas capture velocity; Δexplore r=0.808 |
-| MLP architecture | 6→16→8→1 | [32], [16,8,4], LSTM | Smallest with R²>0.90; bottleneck forces compression |
+| MLP architecture | 6->16->8->1 | [32], [16,8,4], LSTM | Smallest with R^2>0.90; bottleneck forces compression |
 | MLP activation | ReLU/Linear | sigmoid/tanh | ReLU: no vanishing gradient; Linear: unbounded raw output |
 | Normalisation | Uniform MinMax | Feature-aware, Z-score | A/B: Uniform wins 5/8 metrics; Z-score incompatible with fuzzy [0,1] |
-| Output calibration | Neutral-centred (mlp_neutral) | Min-max rescaling | Semantic guarantee (balanced→1.0); robust to training distribution |
+| Output calibration | Neutral-centred (mlp_neutral) | Min-max rescaling | Semantic guarantee (balanced->1.0); robust to training distribution |
 | Safety clamp | [0.6, 1.4] | [0.5, 1.5], [0.7, 1.3] | Calibration study: M=1.5 "unfair"; M=0.5 trivial |
-| Session timeout | 90s | 40s | 40s too short for loading screens; 90s = 3× window cadence |
+| Session timeout | 90s | 40s | 40s too short for loading screens; 90s = 3x window cadence |
 | Target base | 1.0 | 0.9 | 0.9 causes systematic downward bias due to membership cancellation |
 | UI framework | Next.js 14 (TypeScript) | Unity/Unreal demo | Primary contribution is pipeline, not game; demo UI sufficient for validation |
 
@@ -590,7 +590,7 @@ Output: SelectedBaseline
 2. Compute:
    MeanSparsity, DeathRate, MeanStdDev
 
-3. NeutralityScore = (w1 × MeanSparsity) + (w2 × DeathRate) + (w3 × MeanStdDev)
+3. NeutralityScore = (w1 x MeanSparsity) + (w2 x DeathRate) + (w3 x MeanStdDev)
 
 4. Select configuration with minimum NeutralityScore.
 
@@ -625,12 +625,12 @@ Output: BehaviourVector [μ, Δ]
 Input:  BehaviourVector X = [μ_combat, μ_collect, μ_explore, Δcombat, Δcollect, Δexplore]
 Output: Display Multiplier M_display
 
-1. h1 = ReLU(W1 · X + b1)       (6→16)
-2. h2 = ReLU(W2 · h1 + b2)      (16→8)
-3. raw = W3 · h2 + b3            (8→1, Linear)
+1. h1 = ReLU(W1 · X + b1)       (6->16)
+2. h2 = ReLU(W2 · h1 + b2)      (16->8)
+3. raw = W3 · h2 + b3            (8->1, Linear)
 
 4. Neutral-centred calibration:
-   M_display = clamp(1.0 + (raw − mlp_neutral) × 2.0, 0.6, 1.4)
+   M_display = clamp(1.0 + (raw − mlp_neutral) x 2.0, 0.6, 1.4)
 ```
 
 ### Algorithm 4: Parameter Cascade
@@ -639,13 +639,13 @@ Input:  M_display (global multiplier), μ_k (soft memberships)
 Output: Per-archetype adjusted game parameters
 
 1. Category factor per archetype:
-   factor_k = 1.0 + (M_display − 1.0) × (0.5 + μ_k × 1.5)
+   factor_k = 1.0 + (M_display − 1.0) x (0.5 + μ_k x 1.5)
 
    (0.5 baseline: every player gets ≥50% of global adaptation)
-   (1.5 weight: 100% membership → 200% factor weight)
+   (1.5 weight: 100% membership -> 200% factor weight)
 
 2. Direct scaling:
-   V_new = V_base × factor_k          (e.g., enemy count, item lifetime)
+   V_new = V_base x factor_k          (e.g., enemy count, item lifetime)
 
 3. Inverse scaling:
    V_new = V_base / factor_k          (e.g., cooldowns, spawn intervals)
@@ -673,20 +673,20 @@ Output: Per-archetype adjusted game parameters
 ### 15.2 Delta Impact Matrix
 | Archetype Focus | Δ High Perf (+0.5) | Δ Stable (0.0) | Δ Low Perf (−0.5) |
 |----------------|-------------------|--------------|-----------------|
-| Combat | M ↑ 1.25 (Scale Up) | M ≈ 1.0 | M ↓ 0.85 (Assist) |
-| Collection | M ↑ 1.15 (More Items) | M ≈ 1.0 | M ↓ 0.90 (More Time) |
-| Exploration | M ↑ 1.10 (Faster Pace) | M ≈ 1.0 | M ↓ 0.95 (Guidance) |
+| Combat | M ^ 1.25 (Scale Up) | M ≈ 1.0 | M v 0.85 (Assist) |
+| Collection | M ^ 1.15 (More Items) | M ≈ 1.0 | M v 0.90 (More Time) |
+| Exploration | M ^ 1.10 (Faster Pace) | M ≈ 1.0 | M v 0.95 (Guidance) |
 
 ### 15.3 Validation Status
 | Component | Status | Notes |
 |-----------|--------|-------|
 | Telemetry normalization | Validated | Against recorded and synthetic data |
-| Activity scoring (v2.2) | Validated | Notebooks 03–04 |
+| Activity scoring (v2.2) | Validated | Notebooks 03-04 |
 | K-Means clustering | Validated | Silhouette=0.3752, DB=0.977 |
 | IDW soft membership | Validated | Partition-of-unity: Σμ_k=1.0 |
 | Temporal delta | Validated | Δexplore r=0.8394 |
-| MLP inference | Validated | R²=0.9264, MAE=0.0127 |
-| Neutral-centred calibration | Validated | Balanced→M=1.000 confirmed |
+| MLP inference | Validated | R^2=0.9264, MAE=0.0127 |
+| Neutral-centred calibration | Validated | Balanced->M=1.000 confirmed |
 | Scalar parameter adaptation | Validated | Demo UI parameter cascade |
 | 19-test Vitest suite | Passing | All modules covered |
 | Global enemy cap (PCG) | Not implemented | Requires Unreal Engine + GPU |
@@ -702,7 +702,7 @@ Output: Per-archetype adjusted game parameters
 - **pandas**: Dataset manipulation, CSV I/O
 - **numpy**: Numerical operations, array handling
 - **matplotlib / seaborn**: Training diagnostics, cluster visualisation
-- **Jupyter Notebooks**: Interactive pipeline development (01–10)
+- **Jupyter Notebooks**: Interactive pipeline development (01-10)
 
 ### Next.js Analytics Dashboard
 - **Next.js 14** (App Router, Server/Client components)
@@ -726,9 +726,9 @@ Output: Per-archetype adjusted game parameters
 
 4. **v2.2 derived ratio features** - demonstrated that raw output metrics are insufficient proxies for behavioural intent when underlying mechanism varies (weapon class); introduced `damage_per_hit` and `pickup_attempt_rate` as scale-independent intent proxies
 
-5. **Neutral-centred calibration** - proved that min-max rescaling is fragile to training distribution extremes; introduced semantic anchoring (mlp_neutral) as a robust alternative with guaranteed balanced→1.0 property
+5. **Neutral-centred calibration** - proved that min-max rescaling is fragile to training distribution extremes; introduced semantic anchoring (mlp_neutral) as a robust alternative with guaranteed balanced->1.0 property
 
-6. **MLP surrogate design** - 200× inference speedup over full ANFIS with only 7.4% R² reduction; validated through 5-fold CV architecture selection
+6. **MLP surrogate design** - 200x inference speedup over full ANFIS with only 7.4% R^2 reduction; validated through 5-fold CV architecture selection
 
 ### Secondary Contributions
 - Interactive analytics dashboard as a pedagogical tool for explaining adaptive difficulty systems

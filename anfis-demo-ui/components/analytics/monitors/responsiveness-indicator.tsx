@@ -82,7 +82,7 @@ export function ResponsivenessIndicator({ currentRound, session }: Responsivenes
              Rolling Correlation (Pearson)
              <HelpfulTooltip 
                title="Pearson Correlation Coefficient"
-               formula="r = Σ((x - x̄)(y - ȳ)) / √(Σ(x - x̄)²Σ(y - ȳ)²)"
+               formula="r = Σ((x - x̄)(y - ȳ)) / √(Σ(x - x̄)^2Σ(y - ȳ)^2)"
                description="Calculated over a rolling widow of the last 20 rounds."
              />
           </span>

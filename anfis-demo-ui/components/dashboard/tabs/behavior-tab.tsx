@@ -33,7 +33,7 @@ export function BehaviorTab() {
 
   return (
     <div className="h-full flex flex-col p-4 sm:p-5 space-y-4 w-full animate-fade-in">
-      {/* System Context Banner — tutorial mode only */}
+      {/* System Context Banner -- tutorial mode only */}
       {tutorialMode && (
         <div className="p-4 mb-6 rounded-xl border border-primary/20 bg-primary/5 backdrop-blur-sm flex items-start gap-4 shadow-2xl relative overflow-hidden">
           <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-16 -mt-16" />

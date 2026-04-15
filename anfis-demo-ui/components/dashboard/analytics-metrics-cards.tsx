@@ -43,7 +43,7 @@ function MetricsLegend() {
       <p className="text-[9px] uppercase tracking-widest font-bold text-slate-600 shrink-0">Archetype match scores</p>
       <div className="flex items-center gap-2 ml-auto flex-wrap">
         <LegendItem color="bg-green-500/60" label="HIGH > 50%" />
-        <LegendItem color="bg-blue-500/60" label="MED 30–50%" />
+        <LegendItem color="bg-blue-500/60" label="MED 30-50%" />
         <LegendItem color="bg-slate-600/60" label="LOW < 30%" />
       </div>
     </div>
@@ -87,8 +87,8 @@ function ArchetypeCard({ cat }: { cat: BehaviorCategory }) {
           }
           title="Match Level (HIGH / MED / LOW)"
           description="Shows how strongly this player's behaviour matches this archetype's pattern this window."
-          calculation="HIGH = membership > 50%\nMED  = 30% – 50%\nLOW  = below 30%"
-          interpretation="HIGH Combat = player is primarily fighting. LOW does not mean zero combat — just that other styles dominate this window."
+          calculation="HIGH = membership > 50%\nMED  = 30% - 50%\nLOW  = below 30%"
+          interpretation="HIGH Combat = player is primarily fighting. LOW does not mean zero combat -- just that other styles dominate this window."
         />
       </div>
 
@@ -100,7 +100,7 @@ function ArchetypeCard({ cat }: { cat: BehaviorCategory }) {
         <span className="text-sm text-slate-500 font-mono leading-none">%</span>
       </div>
       <p className="text-[9px] text-slate-500 mb-3 leading-tight">
-        Archetype match — how closely this player fits the {cat.category.toLowerCase()} pattern
+        Archetype match -- how closely this player fits the {cat.category.toLowerCase()} pattern
       </p>
 
       {/* Row 3: Activity + Confidence with hover-help */}
@@ -121,9 +121,9 @@ function ArchetypeCard({ cat }: { cat: BehaviorCategory }) {
               "Combat:       avg(enemiesHit, damageDone, kills, timeInCombat, damagePerHit)\n" +
               "Collection:   avg(itemsCollected, pickupAttempts, timeNearInteractables, pickupAttemptRate)\n" +
               "Exploration:  avg(distanceTraveled, timeSprinting)\n\n" +
-              "Each signal is normalised [0,1] before averaging. Result × 100 = Activity %."
+              "Each signal is normalised [0,1] before averaging. Result x 100 = Activity %."
             }
-            interpretation="High % = player was busy with these actions. Activity is a raw average — it differs from the Membership % which measures how well the pattern matches the cluster centroid."
+            interpretation="High % = player was busy with these actions. Activity is a raw average -- it differs from the Membership % which measures how well the pattern matches the cluster centroid."
           />
           <span className="font-mono text-slate-200 font-bold">{cat.activityPercentage}%</span>
         </div>
@@ -140,13 +140,13 @@ function ArchetypeCard({ cat }: { cat: BehaviorCategory }) {
               </span>
             }
             title="Classification Confidence"
-            description="A signal quality score (0–100%) showing how clearly and reliably the AI classified this archetype. This is NOT a probability — it reflects signal strength and separation from other archetypes."
+            description="A signal quality score (0-100%) showing how clearly and reliably the AI classified this archetype. This is NOT a probability -- it reflects signal strength and separation from other archetypes."
             calculation={
-              "confidence = 0.5 × activity_score\n" +
-              "           + 0.5 × (this_membership − next_highest_membership)\n" +
+              "confidence = 0.5 x activity_score\n" +
+              "           + 0.5 x (this_membership − next_highest_membership)\n" +
               "Clamped to [0, 1]."
             }
-            interpretation={"90%+ (green) = strong, unambiguous signal.\n60–89% = moderate — other archetypes also present.\nBelow 60% = mixed signal — player may be transitioning styles."}
+            interpretation={"90%+ (green) = strong, unambiguous signal.\n60-89% = moderate -- other archetypes also present.\nBelow 60% = mixed signal -- player may be transitioning styles."}
           />
           <span className={cn('font-mono font-bold', confGood ? 'text-green-400' : 'text-amber-400')}>
             {(cat.confidence * 100).toFixed(0)}%
@@ -177,7 +177,7 @@ export function AnalyticsMetricsCards() {
         ))}
       </div>
       <p className="text-[9px] text-slate-700 mt-2 text-center leading-relaxed">
-        Large % = archetype match · Activity = raw action share · Conf = classification reliability — click labels for details
+        Large % = archetype match · Activity = raw action share · Conf = classification reliability -- click labels for details
       </p>
     </div>
   );

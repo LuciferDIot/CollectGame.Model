@@ -37,7 +37,7 @@ export class ANFISPipeline {
     this.mlp = new MLPInference(mlpWeights);
     this.sessionManager = new PipelineSessionManager();
     this.manifest = manifest;
-    // MLP output for balanced (⅓,⅓,⅓) no-delta input — semantic neutral point.
+    // MLP output for balanced (1/3,1/3,1/3) no-delta input -- semantic neutral point.
     // Auto-recomputed by notebook 07 after each retrain; stored in anfis_mlp_weights.json.
     this.mlpNeutral = mlpWeights.mlp_neutral ?? 0.932;
   }
@@ -52,7 +52,7 @@ export class ANFISPipeline {
     // Step 2: Normalize (Min-Max, 12 features including 2 derived)
     const normalized = this.step2_NormalizeFeatures(telemetry.features);
 
-    // Step 3: Activity scores (per-archetype averages → equal ceiling)
+    // Step 3: Activity scores (per-archetype averages -> equal ceiling)
     const activityScores = this.step3_CalculateActivityScores(normalized);
 
     // Step 4: Soft membership via IDW (K=3)
@@ -65,7 +65,7 @@ export class ANFISPipeline {
 
     const deltas = this.step5_ComputeDeltas(telemetry.userId, softMembership, timestamp);
 
-    // Step 6: MLP forward pass (6→16→8→1)
+    // Step 6: MLP forward pass (6->16->8->1)
     const { anfisInput, mlpResult } = this.step6_InferenceEngine(softMembership, deltas);
 
     // Step 7: Neutral-centred calibration + parameter adaptation
@@ -163,16 +163,16 @@ export class ANFISPipeline {
 
   /**
    * Neutral-centred calibration:
-   *   display = clamp(1.0 + (raw − mlp_neutral) × AMPLIFICATION, 0.6, 1.4)
+   *   display = clamp(1.0 + (raw − mlp_neutral) x AMPLIFICATION, 0.6, 1.4)
    *
-   * mlp_neutral is the MLP's raw output for the balanced (⅓,⅓,⅓,0,0,0) input —
+   * mlp_neutral is the MLP's raw output for the balanced (1/3,1/3,1/3,0,0,0) input --
    * the semantic definition of "no change needed". This ensures a balanced player
    * always maps to exactly 1.0 regardless of how the training distribution shifts
    * between retrains.
    *
-   * AMPLIFICATION = 2.0: a raw deviation of ±0.4 from neutral (achievable by
-   * moderate archetype + delta combinations) spans ±0.8 of the display range,
-   * reaching the 0.6–1.4 extremes.
+   * AMPLIFICATION = 2.0: a raw deviation of +/-0.4 from neutral (achievable by
+   * moderate archetype + delta combinations) spans +/-0.8 of the display range,
+   * reaching the 0.6-1.4 extremes.
    */
   private computeTargetMultiplier(rawOutput: number): { targetMultiplier: number; multiplierClamped: boolean } {
     const [minM, maxM] = this.manifest.hard_constraints.target_multiplier_range;

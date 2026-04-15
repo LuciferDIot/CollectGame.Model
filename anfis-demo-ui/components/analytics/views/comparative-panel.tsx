@@ -72,7 +72,7 @@ export function ComparativePanel() {
               <tr className="border-b">
                 <td className="p-4 font-medium flex items-center gap-2">
                   <HelpfulTooltip 
-                    trigger={<span className="cursor-pointer hover:underline decoration-dotted underline-offset-4">Test R² Score</span>}
+                    trigger={<span className="cursor-pointer hover:underline decoration-dotted underline-offset-4">Test R^2 Score</span>}
                     title="Model Fit Accuracy"
                     description="The ability of the ANFIS model to replicate the target logic."
                     interpretation="Option B maintains professional-grade accuracy (>0.95) despite the vastly more complex target curve."

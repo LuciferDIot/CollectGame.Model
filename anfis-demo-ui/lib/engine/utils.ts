@@ -30,7 +30,7 @@ import { Deltas, PipelineOutput, SoftMembership } from './types';
  * CATEGORY 1: MAPPING HELPERS
  * ============================================================================
  * These convert between different data format conventions used across
- * the pipeline (snake_case backend ↔ camelCase frontend).
+ * the pipeline (snake_case backend <-> camelCase frontend).
  * ============================================================================
  */
 
@@ -290,16 +290,16 @@ export function calculateDeltaVector(current: SoftMembership, previous: SoftMemb
  * MLP receives a valid (no-change) signal rather than NaN, which would
  * silently corrupt all downstream computations.
  *
- * **Example — first window (no prior state)**:
+ * **Example -- first window (no prior state)**:
  * ```typescript
- * computeDelta(0.75, undefined)  // → 0  (safe default)
- * computeDelta(0.75, NaN)        // → 0  (safe default)
+ * computeDelta(0.75, undefined)  // -> 0  (safe default)
+ * computeDelta(0.75, NaN)        // -> 0  (safe default)
  * ```
  *
- * **Example — active session**:
+ * **Example -- active session**:
  * ```typescript
- * computeDelta(0.75, 0.60)       // → 0.15
- * computeDelta(0.15, 0.25)       // → -0.10
+ * computeDelta(0.75, 0.60)       // -> 0.15
+ * computeDelta(0.15, 0.25)       // -> -0.10
  * ```
  *
  * Used internally by `calculateDeltaVector` and wherever a single-axis
@@ -484,9 +484,9 @@ export function getTopRules(rulesFired: PipelineOutput['inference']['rulesFired'
  * ```
  * 
  * **When does clamping happen?**
- * - AI suggests 2.0x difficulty → clamped to 1.4x maximum
- * - AI suggests negative health → clamped to minimum
- * - AI suggests 1000 enemies → clamped to capacity limit
+ * - AI suggests 2.0x difficulty -> clamped to 1.4x maximum
+ * - AI suggests negative health -> clamped to minimum
+ * - AI suggests 1000 enemies -> clamped to capacity limit
  * 
  * @param validation - Validation results from pipeline
  * @returns 'OPTIMAL' if perfect, 'CLAMPED' if constrained
@@ -524,7 +524,7 @@ export function determineOptimizationStatus(validation: PipelineOutput['validati
  * 
  * === Testing Strategy ===
  * 
- * Each function is pure (same input → same output):
+ * Each function is pure (same input -> same output):
  * ```typescript
  * test('calculateDeltaVector', () => {
  *   const current = { soft_combat: 0.7, ... };

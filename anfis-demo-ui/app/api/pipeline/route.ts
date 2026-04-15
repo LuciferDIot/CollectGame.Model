@@ -1,5 +1,5 @@
 // ------------------------------------------------------------------
-// POST /api/pipeline  — Legacy compatibility shim
+// POST /api/pipeline  -- Legacy compatibility shim
 // ------------------------------------------------------------------
 // The canonical inference endpoint is now POST /api/pipeline/adapt.
 // This file forwards requests there to avoid breaking existing callers

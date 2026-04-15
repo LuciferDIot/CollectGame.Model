@@ -1,9 +1,9 @@
 // ------------------------------------------------------------------
-// POST /api/pipeline/adapt  — Runtime Inference Endpoint
+// POST /api/pipeline/adapt  -- Runtime Inference Endpoint
 // ------------------------------------------------------------------
 // Contract:
-//   Request  → { userId, telemetry: TelemetryFeatures, reset?: boolean }
-//   Response → { target_multiplier, adapted_parameters, ... PipelineOutput }
+//   Request  -> { userId, telemetry: TelemetryFeatures, reset?: boolean }
+//   Response -> { target_multiplier, adapted_parameters, ... PipelineOutput }
 //
 // Distinct from the telemetry ingestion backend (POST /api/unreal/telemetry),
 // which only stores raw gameplay data.  This endpoint runs the full ANFIS

@@ -73,7 +73,7 @@ export function SessionSummary({ session }: SessionSummaryProps) {
                 <HelpfulTooltip 
                   title="Adaptation Variance (Standard Deviation)" 
                   description="Standard deviation of the multiplier history. Measures how dynamic the difficulty is." 
-                  calculation="SQRT( SUM( (x - μ)² ) / N )"
+                  calculation="SQRT( SUM( (x - μ)^2 ) / N )"
                   interpretation="High variance means the AI is actively searching for your skill ceiling. Low variance implies a stable but potentially boring experience."
                 />
              </div>

@@ -1,7 +1,7 @@
 ﻿# Thesis Source Document - CollectGame.Telemetry Repository
 **System**: AURA (Adaptive User-Responsive Architecture)
 **Repo**: CollectGame.Telemetry
-**Role**: Real-time telemetry collection backend (game → database)
+**Role**: Real-time telemetry collection backend (game -> database)
 **Stack**: Node.js + Express + TypeScript + MongoDB
 **Deployment**: Render (https://telemetry-collection.onrender.com)
 **Author**: K. W. J. P. Geevinda
@@ -16,11 +16,11 @@ The Telemetry backend is the **data ingestion layer** of AURA. It sits between t
 
 ```
 Unreal Engine Game Client
-    ↓  (HTTP POST every 30 seconds)
-CollectGame.Telemetry Backend   ← [THIS REPO]
-    ↓  (MongoDB storage)
+    v  (HTTP POST every 30 seconds)
+CollectGame.Telemetry Backend   <-- [THIS REPO]
+    v  (MongoDB storage)
 CollectGame.CalibrationAnalysis  (reads CSVs exported from MongoDB)
-    ↓
+    v
 CollectGame.Model               (ANFIS training + demo UI)
 ```
 
@@ -41,11 +41,11 @@ CollectGame.Model               (ANFIS training + demo UI)
 The backend was refactored from a monolithic controller pattern to MVC + SOLID principles:
 
 ```
-Routes        → HTTP endpoint definitions
-Controllers   → Request parsing and response formatting
-Services      → Business logic (TelemetryService, NotificationService)
-Repositories  → Database access (LeaderboardRepository, TelemetryRepository)
-Models        → MongoDB schemas (Mongoose)
+Routes        -> HTTP endpoint definitions
+Controllers   -> Request parsing and response formatting
+Services      -> Business logic (TelemetryService, NotificationService)
+Repositories  -> Database access (LeaderboardRepository, TelemetryRepository)
+Models        -> MongoDB schemas (Mongoose)
 ```
 
 This separation was introduced in commit `fef2c74` ("MVC and SOLID principles added") after early prototypes placed all logic directly in route handlers.
@@ -61,12 +61,12 @@ This separation was introduced in commit `fef2c74` ("MVC and SOLID principles ad
 
 ### 2.3 Middleware Stack
 ```
-CORS            → Allows cross-origin requests from game client
-logRequestStart → Logs incoming request method + URL
-JSON parser     → Parses request bodies
-logRequestBody  → Logs parsed body for debugging
-Rate limiter    → 1000 req / 15 min per IP (Render/load-balancer aware)
-errorHandler    → Centralised error formatting + MongoDB error log
+CORS            -> Allows cross-origin requests from game client
+logRequestStart -> Logs incoming request method + URL
+JSON parser     -> Parses request bodies
+logRequestBody  -> Logs parsed body for debugging
+Rate limiter    -> 1000 req / 15 min per IP (Render/load-balancer aware)
+errorHandler    -> Centralised error formatting + MongoDB error log
 ```
 
 ### 2.4 Database: MongoDB (Mongoose)
@@ -224,9 +224,9 @@ POST /api/unreal/telemetry?limit=6
 ```
 
 **Processing pipeline** (in `TelemetryService.processUnrealTelemetry`):
-1. Validate payload structure (missing userId/telemetry/performance → 400 error)
-2. Fetch previous leaderboard stats (for rank comparison → notification generation)
-3. Transform Unreal payload → `InternalTelemetryData` (camelCase → snake_case)
+1. Validate payload structure (missing userId/telemetry/performance -> 400 error)
+2. Fetch previous leaderboard stats (for rank comparison -> notification generation)
+3. Transform Unreal payload -> `InternalTelemetryData` (camelCase -> snake_case)
 4. Save telemetry to MongoDB
 5. Update global rank for all users (sorted by kills, bulk write)
 6. Fetch updated stats post-save
@@ -284,7 +284,7 @@ GET /api/leaderboard?metric=kills&limit=10
 
 ### 4.7 Health Check
 ```
-GET /healthz → 200 OK
+GET /healthz -> 200 OK
 ```
 Used by Render's health monitoring system to detect server crashes and trigger automatic restarts.
 
@@ -304,7 +304,7 @@ Achievement notifications are generated automatically on each telemetry submissi
 | `MILESTONE` | Cumulative thresholds (100 kills, 500 items, etc.) |
 | `COMPARATIVE` | K/D ratio, accuracy, damage comparisons vs. other players |
 
-### 5.2 Priority System (1–10)
+### 5.2 Priority System (1-10)
 | Priority | Example |
 |----------|---------|
 | 10 | Rank #1 globally |
@@ -312,7 +312,7 @@ Achievement notifications are generated automatically on each telemetry submissi
 | 8 | Top 10, Category champion |
 | 7 | Rank improvement ≥10 positions |
 | 6 | Top 25, time-based achievement |
-| 5–1 | Progressively lower-significance milestones |
+| 5-1 | Progressively lower-significance milestones |
 
 ### 5.3 Notification Delivery
 - Stored in MongoDB per user with read/unread state

@@ -17,7 +17,7 @@
 
 ---
 
-## 🔌 API Endpoints Reference
+##  API Endpoints Reference
 
 > This section documents **every** backend endpoint with exact request/response JSON. All values shown are realistic demo values.
 
@@ -401,7 +401,7 @@ Or with a specific error message:
 
 ---
 
-#### 🔄 Reset Session Example
+####  Reset Session Example
 
 To clear session memory for a user before processing (resets delta tracking):
 
@@ -493,13 +493,13 @@ To clear session memory for a user before processing (resets delta tracking):
 
 ```
 Player Plays Game
-      ↓
+      v
 Game Sends Data (kills, deaths, items collected)
-      ↓
+      v
 Our AI Brain Analyzes It
-      ↓
+      v
 We Send Back Adjustments (make enemies 20% harder, give more health pickups)
-      ↓
+      v
 Game Becomes Perfectly Tuned!
 ```
 
@@ -566,10 +566,10 @@ This is the "HEAD CHEF" that manages the entire process:
 
 ```typescript
 // 4 Main Tasks:
-1. fetchSimulationResults()  → Get AI recommendations
-2. mapBackendToUI()          → Translate for display
-3. mapBackendToRoundAnalytics() → Calculate statistics
-4. reconstructPipelineSteps() → Build processing history
+1. fetchSimulationResults()  -> Get AI recommendations
+2. mapBackendToUI()          -> Translate for display
+3. mapBackendToRoundAnalytics() -> Calculate statistics
+4. reconstructPipelineSteps() -> Build processing history
 ```
 
 **Real-World Analogy:**
@@ -657,9 +657,9 @@ This is where the MAGIC happens! The AI processes data through 8 carefully desig
 
 ---
 
-## 🔮 The 8-Step ANFIS Pipeline
+##  The 8-Step ANFIS Pipeline
 
-**Location:** `lib/engine/index.ts` → Class `ANFISPipeline`
+**Location:** `lib/engine/index.ts` -> Class `ANFISPipeline`
 
 This is the "BRAIN" of our system. Each step does one specific job:
 
@@ -712,9 +712,9 @@ AFTER:  DamagePerHit = 0.82 (High normalized value)
 
 **Formula (v2.2):**
 ```
-score_combat  = avg(enemiesHit, damageDone, timeInCombat, kills, damagePerHit)      → [0, 1]
-score_collect = avg(itemsCollected, pickupAttempts, timeNearInteractables, pickupAttemptRate) → [0, 1]
-score_explore = avg(distanceTraveled, timeSprinting)                               → [0, 1]
+score_combat  = avg(enemiesHit, damageDone, timeInCombat, kills, damagePerHit)      -> [0, 1]
+score_collect = avg(itemsCollected, pickupAttempts, timeNearInteractables, pickupAttemptRate) -> [0, 1]
+score_explore = avg(distanceTraveled, timeSprinting)                               -> [0, 1]
 
 pct_combat  = score_combat  / (score_combat + score_collect + score_explore)
 pct_collect = score_collect / (score_combat + score_collect + score_explore)
@@ -852,9 +852,9 @@ Difficulty Multiplier: 1.15 (increase difficulty by 15%)
 
 **The Translation:**
 ```
-  Enemy Health: (Base × Multiplier) × Sensitivity [S=0.20]
-  Enemy Damage: (Base × Multiplier) × Sensitivity [S=0.25]
-  Spawn Rate:   (Base × Multiplier) × Sensitivity [S=0.35]
+  Enemy Health: (Base x Multiplier) x Sensitivity [S=0.20]
+  Enemy Damage: (Base x Multiplier) x Sensitivity [S=0.25]
+  Spawn Rate:   (Base x Multiplier) x Sensitivity [S=0.35]
 ```
 
 **The Safety & Sensitivity (v2.2):**
@@ -899,7 +899,7 @@ Difficulty Multiplier: 1.15 (increase difficulty by 15%)
 ```
 lib/
 ├── engine/
-│   ├── index.ts                 ★ MAIN ORCHESTRATOR (ANFISPipeline class)
+│   ├── index.ts                 * MAIN ORCHESTRATOR (ANFISPipeline class)
 │   │                               - Coordinates all 8 steps
 │   │                               - Entry point for AI processing
 │   │
@@ -910,18 +910,18 @@ lib/
 │   ├── adaptation.ts               Step 7: Parameter Scaling
 │   │
 │   └── services/
-│       ├── index.ts             ★ SERVICE COORDINATOR
+│       ├── index.ts             * SERVICE COORDINATOR
 │       │                           - Bundles all services together
 │       │
-│       ├── simulation-fetcher.ts ★ API REQUEST HANDLER
+│       ├── simulation-fetcher.ts * API REQUEST HANDLER
 │       │                           - Sends HTTP requests
 │       │                           - Handles responses/errors
 │       │
-│       ├── simulation-mapper.ts    Data translator (AI → UI)
+│       ├── simulation-mapper.ts    Data translator (AI -> UI)
 │       └── pipeline-reconstructor.ts  Timeline builder
 │
 ├── session/
-│   ├── pipeline-logic.ts        ★ HEAD CHEF (executePipelineLogic)
+│   ├── pipeline-logic.ts        * HEAD CHEF (executePipelineLogic)
 │   │                              - Coordinates entire flow
 │   │                              - Manages 4 main tasks
 │   │
@@ -938,7 +938,7 @@ lib/
 app/
 └── api/
     └── pipeline/
-        └── route.ts             ★ API GATEWAY
+        └── route.ts             * API GATEWAY
                                    - Receives HTTP requests
                                    - Routes to pipeline
                                    - Returns responses
@@ -976,21 +976,21 @@ Farther = Lower membership score
 **Visual Example:**
 ```
 Imagine three circles (archetypes) on a map:
-  🔴 Combat zone
-  🔵 Collection zone
-  🟢 Exploration zone
+   Combat zone
+   Collection zone
+   Exploration zone
 
 Your player is a dot:
-  📍 You're here
+   You're here
 
 We measure how close you are to each circle
 ```
 
 **Result:**
 ```
-You're closest to Combat → 70% Combat
-Somewhat close to Collection → 20% Collection
-Far from Exploration → 10% Exploration
+You're closest to Combat -> 70% Combat
+Somewhat close to Collection -> 20% Collection
+Far from Exploration -> 10% Exploration
 ```
 
 ### Algorithm 2: Neural Surrogate (MLP Inference)
@@ -1019,7 +1019,7 @@ Now it can predict instantly!
 ```
 Traditional ANFIS: 100ms per prediction
 Neural Network: 2ms per prediction
-50× FASTER!
+50x FASTER!
 ```
 
 ### Algorithm 3: Delta Variance (Temporal Tracking)
@@ -1138,7 +1138,7 @@ With Delta:
 
 ---
 
-## 🛡️ Error Handling & Safety
+##  Error Handling & Safety
 
 ### Safety Mechanisms
 
@@ -1152,7 +1152,7 @@ Checks:
   Values in reasonable range?
   
 If Failed:
-  → Reject request with clear error message
+  -> Reject request with clear error message
 ```
 
 #### 2. Multiplier Clamping
@@ -1160,27 +1160,27 @@ If Failed:
 
 ```typescript
 Hard Limits:
-  Minimum: 0.6× (40% easier)
-  Maximum: 1.4× (40% harder)
+  Minimum: 0.6x (40% easier)
+  Maximum: 1.4x (40% harder)
   
-If AI Suggests: 2.0×
-  → Clamp to: 1.4×
-  → Mark as "clamped: true"
-  → Log warning for review
+If AI Suggests: 2.0x
+  -> Clamp to: 1.4x
+  -> Mark as "clamped: true"
+  -> Log warning for review
 ```
 
 #### 3. Graceful Degradation
 
 ```typescript
 If Network Fails:
-  → Return cached last-known-good values
-  → Show warning to user
-  → Log error for debugging
+  -> Return cached last-known-good values
+  -> Show warning to user
+  -> Log error for debugging
 
 If Processing Fails:
-  → Return multiplier = 1.0 (no change)
-  → Safely continue game with current settings
-  → Alert developer
+  -> Return multiplier = 1.0 (no change)
+  -> Safely continue game with current settings
+  -> Alert developer
 ```
 
 ### Error Messages (User-Friendly)

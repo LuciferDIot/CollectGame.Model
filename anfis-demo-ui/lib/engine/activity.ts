@@ -11,7 +11,7 @@ import type { ActivityScores, NormalizedFeatures } from './types';
  * for any player with moderate activity across all categories.
  *
  * timeOutOfCombat is excluded from the Exploration score. It accumulates passively
- * whenever a player is not in combat — including combat-intent players waiting for
+ * whenever a player is not in combat -- including combat-intent players waiting for
  * enemies to spawn on a sparse map. It is also the arithmetic complement of
  * timeInCombat (they sum to session duration), making the two features redundant
  * and inversely correlated. Exploration uses only active movement signals.

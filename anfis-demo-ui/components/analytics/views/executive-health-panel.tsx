@@ -24,7 +24,7 @@ export function ExecutiveHealthPanel() {
       {
           id: 'model_r2',
           label: "Model Confidence",
-          subLabel: "R² Validity",
+          subLabel: "R^2 Validity",
           status: (r2Score > 0.8 ? 'success' : 'warning') as 'success' | 'warning',
           value: `${(r2Score * 100).toFixed(0)}%`,
           detail: `MAE: ${maeTest.toFixed(4)}`

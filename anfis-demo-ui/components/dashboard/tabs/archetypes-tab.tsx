@@ -37,7 +37,7 @@ export function ArchetypesTab() {
           <div>
             <p className="text-xs font-semibold text-cyan-300 mb-0.5">What is this tab?</p>
             <p className="text-[11px] text-slate-400 leading-relaxed">
-              This shows <span className="text-slate-300">which player archetype the AI matched most</span> — Combat, Collection, or Exploration.
+              This shows <span className="text-slate-300">which player archetype the AI matched most</span> -- Combat, Collection, or Exploration.
               The radar chart visualises all three scores at once. A higher percentage means the player more closely fits that archetype.
             </p>
           </div>
@@ -131,7 +131,7 @@ export function ArchetypesTab() {
         </div>
       </div>
 
-      {/* Archetype Comparison — tutorial only */}
+      {/* Archetype Comparison -- tutorial only */}
       {tutorialMode && <ArchetypeComparisonTable />}
 
       <MetricDetailModal
@@ -153,7 +153,7 @@ const ARCHETYPE_DATA = [
     color: 'border-rose-500/30 bg-rose-950/10',
     titleColor: 'text-rose-400',
     barColor: 'bg-rose-500',
-    emoji: '⚔️',
+    emoji: '',
     description: 'Fights enemies. High kills, hits, and damage.',
     signals: ['enemiesHit', 'damageDone', 'timeInCombat', 'kills', 'damagePerHit (derived)'],
     paramEffect: 'More enemies, tougher enemies, lower player HP/damage',
@@ -164,7 +164,7 @@ const ARCHETYPE_DATA = [
     color: 'border-amber-500/30 bg-amber-950/10',
     titleColor: 'text-amber-400',
     barColor: 'bg-amber-500',
-    emoji: '🎒',
+    emoji: '',
     description: 'Gathers items. High pickups and time near loot.',
     signals: ['itemsCollected', 'pickupAttempts', 'timeNearInteractables', 'pickupAttemptRate (derived)'],
     paramEffect: 'More collectibles, faster respawns, longer loot lifetime',
@@ -175,7 +175,7 @@ const ARCHETYPE_DATA = [
     color: 'border-sky-500/30 bg-sky-950/10',
     titleColor: 'text-sky-400',
     barColor: 'bg-sky-500',
-    emoji: '🗺️',
+    emoji: '',
     description: 'Covers the map. High distance and sprint time.',
     signals: ['distanceTraveled', 'timeSprinting'],
     paramEffect: 'Better stamina regen, shorter dash cooldown',
@@ -188,9 +188,9 @@ function ArchetypeComparisonTable() {
     <div className="rounded-xl border border-slate-700/40 bg-slate-900/20 overflow-hidden">
       <div className="px-4 py-3 border-b border-slate-700/30 flex items-start justify-between gap-4">
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Archetype reference — how the AI tells them apart</p>
+          <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Archetype reference -- how the AI tells them apart</p>
           <p className="text-[11px] text-slate-500 mt-1">
-            Memberships are <span className="text-slate-400">not exclusive</span> — a player can be 60% Combat + 30% Explorer + 10% Collector at the same time.
+            Memberships are <span className="text-slate-400">not exclusive</span> -- a player can be 60% Combat + 30% Explorer + 10% Collector at the same time.
             All three always sum to 100%. The AI uses <span className="text-slate-400">K-Means soft clustering</span>: distance to each pre-trained centroid
             determines how strongly you match each archetype.
           </p>

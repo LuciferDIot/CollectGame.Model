@@ -40,7 +40,7 @@ Each archetype score is computed as the **per-archetype average** of its normali
 | **Collection** | ItemsCollected, PickupAttempts, TimeNearInteractables, **PickupAttemptRate** | $\text{score\_collect} = \text{avg}(4\text{ features})$ |
 | **Exploration** | DistanceTraveled, TimeSprinting | $\text{score\_explore} = \text{avg}(2\text{ features})$ |
 
-> **Why averages, not sums?** (v2.1 fix): Sums gave Combat a 4× ceiling over a 1-feature Exploration category. Averages guarantee a fair [0,1] ceiling per archetype.
+> **Why averages, not sums?** (v2.1 fix): Sums gave Combat a 4x ceiling over a 1-feature Exploration category. Averages guarantee a fair [0,1] ceiling per archetype.
 > **Why remove `timeOutOfCombat`?** (v2.1 fix): It accumulated *passively* for any player not fighting, mis-classifying attacker-intent players as Explorers on sparse-spawn maps.
 > **Why `DamagePerHit` and `PickupAttemptRate`?** (v2.2 addition): Sniper-style players deal high damage with few hits - without this, they were under-represented in Combat scoring. `PickupAttemptRate` distinguishes deliberate Collectors from incidental Explorers who pass near items without picking them up.
 
@@ -64,13 +64,13 @@ This "Behavioral Velocity" is critical for detecting rapid playstyle shifts (e.g
 A trained Multi-Layer Perceptron (MLP) predicts a raw difficulty score, which is then mapped to the display multiplier via **neutral-centred calibration**.
 
 *   **Inputs**: $[\mu_{\text{c}}, \mu_{\text{l}}, \mu_{\text{e}}, \Delta_{\text{c}}, \Delta_{\text{l}}, \Delta_{\text{e}}]$ (6 dimensions)
-*   **Architecture**: 6 → Dense(16, ReLU) → Dense(8, ReLU) → Dense(1, Linear)
-*   **Weights**: Loaded from `anfis_mlp_weights.json` (Test R²=0.9264, MAE=0.0127)
+*   **Architecture**: 6 -> Dense(16, ReLU) -> Dense(8, ReLU) -> Dense(1, Linear)
+*   **Weights**: Loaded from `anfis_mlp_weights.json` (Test R^2=0.9264, MAE=0.0127)
 *   **Calibration** (neutral-centred):
 
 $$M_{\text{display}} = \text{clamp}\!\left(1.0 + (\text{raw} - \text{mlp\_neutral}) \times 2.0,\ 0.6,\ 1.4\right)$$
 
-where $\text{mlp\_neutral} = 0.932006$ = MLP output for a balanced (⅓,⅓,⅓) no-delta player.
+where $\text{mlp\_neutral} = 0.932006$ = MLP output for a balanced (1/3,1/3,1/3) no-delta player.
 
 > **Why neutral-centred?** A balanced player must semantically map to display=1.0 (no change). Min-max rescaling was sensitive to extreme training inputs and broke this guarantee. Neutral-centred calibration enforces it by construction. `mlp_neutral` is auto-recomputed and saved by notebook 07 after each retrain - no code changes needed.
 

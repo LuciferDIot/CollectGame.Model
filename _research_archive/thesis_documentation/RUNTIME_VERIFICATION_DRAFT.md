@@ -22,7 +22,7 @@ Comparing the deployed "Option B" model against the original baseline reveals si
 | :--- | :--- | :--- | :--- | :--- |
 | **Target Std Deviation** ($\sigma$) | $0.011$ | **$0.062$** | **+453%** | System effectively utilizes the full dynamic range. |
 | **Effective Signal Span** | $0.023$ | **$0.411$** | **+1711%** | Correction magnitude is clinically significant. |
-| **Clamp Saturation Rate** | $100\%$ | **$< 5\%$** | **Safe** | Model operates within linear bounds (0.6–1.4) without hitting safety limits. |
+| **Clamp Saturation Rate** | $100\%$ | **$< 5\%$** | **Safe** | Model operates within linear bounds (0.6-1.4) without hitting safety limits. |
 | **Behavioral Correlation** | $\approx 0.05$ | **$0.81$** | **Strong** | Output is causally driven by player actions, not noise. |
 
 ### 6.4.3 Distribution Consistency Analysis

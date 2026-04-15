@@ -42,10 +42,10 @@ jupyter notebook
 ```
 CollectGame.Model/
 ├── data/
-│   ├── telemetry_phase_2.users.csv          ← Must exist
-│   ├── telemetry_phase_2.telemetries.csv    ← Must exist
-│   ├── telemetry_phase_2.deathevents.csv    ← Must exist
-│   └── processed/                            ← Created automatically
+│   ├── telemetry_phase_2.users.csv          <-- Must exist
+│   ├── telemetry_phase_2.telemetries.csv    <-- Must exist
+│   ├── telemetry_phase_2.deathevents.csv    <-- Must exist
+│   └── processed/                            <-- Created automatically
 │       ├── merged_telemetry.csv
 │       ├── 2_gameplay_summary.csv
 │       ├── 3_normalized_telemetry.csv
@@ -54,7 +54,7 @@ CollectGame.Model/
 │       ├── 6_anfis_dataset.csv
 │       └── viz_*.png
 └── core/
-    └── notebooks/ ← Run from here
+    └── notebooks/ <-- Run from here
 ```
 
 ---
@@ -82,7 +82,7 @@ pip install pandas numpy matplotlib seaborn scikit-learn jupyterlab
 ```
 
 ### Notebook won't execute
-**Solution**: Restart kernel and run cells in order (Kernel → Restart & Clear Output)
+**Solution**: Restart kernel and run cells in order (Kernel -> Restart & Clear Output)
 
 ---
 

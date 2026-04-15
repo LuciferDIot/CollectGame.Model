@@ -71,7 +71,7 @@ StaminaDrain = clamp(5 * 1.2 * 1.06, 2, 10)
 
 These bounds guarantee numerical stability and prevent edge-case failures.
 
-### 4.1. Combat Parameters → `soft_combat` (A_c)
+### 4.1. Combat Parameters -> `soft_combat` (A_c)
 
 Combat-heavy players face tougher enemies. Explorers avoid combat spikes.
 
@@ -85,7 +85,7 @@ Combat-heavy players face tougher enemies. Explorers avoid combat spikes.
 | **AI Detect (After)** | 2200 | `2200 * M * A_c` | **[1200, 3500]** |
 | **AI MaxWalkSpeed** | 450 | `450 * M * A_c` | **[300, 700]** |
 
-### 4.2. Exploration Parameters → `soft_explore` (A_e)
+### 4.2. Exploration Parameters -> `soft_explore` (A_e)
 
 Heavy explorers feel traversal pressure. Combat players keep mobility viable.
 
@@ -95,7 +95,7 @@ Heavy explorers feel traversal pressure. Combat players keep mobility viable.
 | **Stamina Damage** (Cost) | 5 | `5 * M * A_e` | **[2, 10]** |
 | **Dash Cooldown** | 3s | `3 * M * A_e` | **[1.5, 5] sec** |
 
-### 4.3. Collection Parameters → `soft_collect` (A_l)
+### 4.3. Collection Parameters -> `soft_collect` (A_l)
 
 Collectors get meaningful scarcity. Combat/exploration doesn't starve economy.
 
@@ -192,10 +192,10 @@ void AEnemySpawner::Tick(float DeltaTime)
 float FMath::FInterpTo(float Current, float Target, float DeltaTime, float InterpSpeed);
 ```
 
-*   `InterpSpeed = 0.5` → ~2-3 second transition
+*   `InterpSpeed = 0.5` -> ~2-3 second transition
 *   Applies exponential smoothing automatically
 
-## 7. Correctness Guarantee (Telemetry → Adaptation)
+## 7. Correctness Guarantee (Telemetry -> Adaptation)
 
 This architecture ensures behavioral consistency:
 

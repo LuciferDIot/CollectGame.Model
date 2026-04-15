@@ -169,9 +169,9 @@ export interface MLPWeights {
   };
   version: string;
   status: string;
-  /** Empirical [min, max] of the MLP's raw output — stored for documentation. */
+  /** Empirical [min, max] of the MLP's raw output -- stored for documentation. */
   output_range?: number[];
-  /** MLP output for balanced (0.33,0.33,0.33) no-delta input — the semantic neutral point.
+  /** MLP output for balanced (0.33,0.33,0.33) no-delta input -- the semantic neutral point.
    *  Recomputed and stored automatically by notebook 07 after each retrain. */
   mlp_neutral?: number;
 }
@@ -203,7 +203,7 @@ export type { PipelineState } from '@/lib/types';
  *
  * Persisted for every runtime adaptation decision.  Captures the full context
  * of what was applied, whether any safety clamps fired, and whether the session
- * state was freshly reset — enabling post-hoc evaluation of the bounded,
+ * state was freshly reset -- enabling post-hoc evaluation of the bounded,
  * forward-only adaptation guarantee stated in the thesis.
  *
  * Storage suggestion: append to a rolling JSONL file per userId, or insert
@@ -222,7 +222,7 @@ export interface AdaptationAuditRecord {
   /**
    * True when the raw MLP output + calibration fell outside [0.6, 1.4]
    * and had to be clamped.  Non-zero clamp rate indicates the model is
-   * consistently hitting its safety boundary — worth monitoring.
+   * consistently hitting its safety boundary -- worth monitoring.
    */
   wasClamped: boolean;
   /**

@@ -13,7 +13,7 @@
  * 3. We send back the final result (serve the meal)
  * 
  * === THE BIG PICTURE ===
- * Player Game Data → Our System → Adjusted Difficulty Settings
+ * Player Game Data -> Our System -> Adjusted Difficulty Settings
  * 
  * === WHY DO WE NEED THIS? ===
  * Games need to be "just right" - not too hard, not too easy.
@@ -79,10 +79,10 @@ export interface SimulationExecutionResult {
  * STEP 4: History Reconstruction (Show the Journey)
  * ------------------------------------------------
  * We create a visual timeline showing all the steps:
- * 1. ✓ Received player data
- * 2. ✓ Normalized features
- * 3. ✓ Identified play style
- * 4. ✓ Calculated adjustments
+ * 1. [done] Received player data
+ * 2. [done] Normalized features
+ * 3. [done] Identified play style
+ * 4. [done] Calculated adjustments
  * etc.
  * 
  * === PARAMETERS EXPLAINED ===
@@ -112,13 +112,13 @@ export const executePipelineLogic = async (
       // We give them: symptoms (player behavior)
       // They give us: prescription (difficulty adjustments)
       
-      console.log('🚀 STEP 1: Sending data to AI Brain...');
+      console.log(' STEP 1: Sending data to AI Brain...');
       const backendResult = await runSimulationService.fetchSimulationResults(
           telemetry as any, 
           deathEvents as any, 
           userId
       );
-      console.log('✅ STEP 1 Complete: AI analyzed player behavior');
+      console.log('[done] STEP 1 Complete: AI analyzed player behavior');
       
       // ========================================
       // STEP 2: MAP TO UI STATE
@@ -126,9 +126,9 @@ export const executePipelineLogic = async (
       // Like translating a doctor's prescription into plain English
       // "Take 2 pills" instead of "500mg BID"
       
-      console.log('🔄 STEP 2: Translating AI response for display...');
+      console.log(' STEP 2: Translating AI response for display...');
       const mappedState = runSimulationService.mapBackendToUI(backendResult);
-      console.log('✅ STEP 2 Complete: Data ready for UI visualization');
+      console.log('[done] STEP 2 Complete: Data ready for UI visualization');
 
       // ========================================
       // STEP 3: ROUND ANALYTICS
@@ -136,14 +136,14 @@ export const executePipelineLogic = async (
       // Like keeping a score card of the game
       // Track: Round number, performance, trends
       
-      console.log('📊 STEP 3: Calculating session statistics...');
+      console.log(' STEP 3: Calculating session statistics...');
       const nextRoundNumber = (lastRound?.roundNumber || 0) + 1;
       const roundAnalytics = runSimulationService.mapBackendToRoundAnalytics(
           backendResult, 
           telemetry as any, 
           nextRoundNumber
       );
-      console.log(`✅ STEP 3 Complete: Round ${nextRoundNumber} analytics calculated`);
+      console.log(`[done] STEP 3 Complete: Round ${nextRoundNumber} analytics calculated`);
 
       // ========================================
       // STEP 4: HISTORY RECONSTRUCTION
@@ -151,7 +151,7 @@ export const executePipelineLogic = async (
       // Like creating a timeline of events
       // Shows each step we took and what we found
       
-      console.log('📝 STEP 4: Building processing timeline...');
+      console.log(' STEP 4: Building processing timeline...');
       const initialSteps = INITIAL_PIPELINE_STEPS; 
       const completedSteps = runSimulationService.reconstructPipelineSteps(
           initialSteps, 
@@ -159,12 +159,12 @@ export const executePipelineLogic = async (
           mappedState, 
           lastRound
       );
-      console.log('✅ STEP 4 Complete: Timeline ready for display');
+      console.log('[done] STEP 4 Complete: Timeline ready for display');
 
       // ========================================
       // RETURN: THE COMPLETE PACKAGE
       // ========================================
-      // Everything wrapped up in a nice bow 🎁
+      // Everything wrapped up in a nice bow 
       
       return { 
           backendResult,    // Raw AI output
@@ -206,7 +206,7 @@ export const constructFinalState = (
     const { mappedState, completedSteps, backendResult } = result;
     const pipelineProcessTime = backendResult?.performance_timings?.total ?? 0;
 
-    console.log(`⏱️ Total execution time: ${executionTime.toFixed(2)}ms (pipeline: ${pipelineProcessTime.toFixed(3)}ms)`);
+    console.log(` Total execution time: ${executionTime.toFixed(2)}ms (pipeline: ${pipelineProcessTime.toFixed(3)}ms)`);
 
     return buildFinalStateObject(
         prevState,
@@ -223,22 +223,22 @@ export const constructFinalState = (
  * ============================================================================
  * 
  * 1. USER PLAYS GAME
- *    ↓
+ *    v
  * 2. GAME SENDS DATA TO US (telemetry, deaths, userId)
- *    ↓
+ *    v
  * 3. executePipelineLogic() PROCESSES:
- *    a. Send to AI Brain → Get recommendations
+ *    a. Send to AI Brain -> Get recommendations
  *    b. Translate to UI-friendly format
  *    c. Calculate statistics
  *    d. Build timeline
- *    ↓
+ *    v
  * 4. constructFinalState() PACKAGES EVERYTHING
- *    ↓
+ *    v
  * 5. UI DISPLAYS RESULTS TO DEVELOPER/PLAYER
- *    ↓
+ *    v
  * 6. GAME APPLIES DIFFICULTY ADJUSTMENTS
- *    ↓
- * 7. PLAYER ENJOYS PERFECTLY-TUNED EXPERIENCE! 🎮
+ *    v
+ * 7. PLAYER ENJOYS PERFECTLY-TUNED EXPERIENCE! 
  * 
  * ============================================================================
  */

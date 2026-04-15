@@ -11,13 +11,13 @@ import type {
  *
  * These replace the previous uniform 0.3. Each value reflects how perceptible
  * a change in that parameter is to a player. Higher = player notices smaller
- * deltas → system makes subtler adjustments before the player feels it.
+ * deltas -> system makes subtler adjustments before the player feels it.
  *
  * Rationale:
- *   ENEMY_HEALTH  0.20 — health only manifests as time-to-kill; subtle at small deltas
- *   ENEMY_DAMAGE  0.25 — damage spike is felt immediately on being hit; moderate
- *   SPAWN_RATE    0.35 — more enemies on screen is immediately obvious
- *   SPAWN_DELAY   0.30 — faster respawns are noticed within 1–2 encounters
+ *   ENEMY_HEALTH  0.20 -- health only manifests as time-to-kill; subtle at small deltas
+ *   ENEMY_DAMAGE  0.25 -- damage spike is felt immediately on being hit; moderate
+ *   SPAWN_RATE    0.35 -- more enemies on screen is immediately obvious
+ *   SPAWN_DELAY   0.30 -- faster respawns are noticed within 1-2 encounters
  *
  * Parameters not listed here (collectible_*, stamina_*, player_*, dash_cooldown)
  * retain 0.3 as a neutral default pending dedicated gameplay tuning data.

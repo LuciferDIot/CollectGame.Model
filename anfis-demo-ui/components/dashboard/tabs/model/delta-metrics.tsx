@@ -28,7 +28,7 @@ export function DeltaMetrics() {
                       {deltaValue > 0 ? '+' : ''}{deltaValue.toFixed(3)}
                     </span>
                     <span className={`text-xs ${deltaValue > 0 ? 'text-green-400' : deltaValue < 0 ? 'text-red-400' : 'text-slate-500'}`}>
-                      {deltaValue > 0 ? '↑' : deltaValue < 0 ? '↓' : '−'}
+                      {deltaValue > 0 ? '^' : deltaValue < 0 ? 'v' : '−'}
                     </span>
                   </div>
                   {type === 'explore' && (

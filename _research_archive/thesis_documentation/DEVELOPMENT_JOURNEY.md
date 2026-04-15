@@ -10,14 +10,14 @@
 
 | Phase | Duration | Outcome |
 |-------|----------|---------|
-| **Phase 1**: Problem Discovery | Initial | R² = -4.69 (catastrophic failure) |
+| **Phase 1**: Problem Discovery | Initial | R^2 = -4.69 (catastrophic failure) |
 | **Phase 2**: Root Cause Analysis | Diagnostic | Identified variance collapse (σ=0.011) |
 | **Phase 3**: Design Iterations | Experimental | Tested multiple target formulations |
-| **Phase 4**: Canonical Solution | Final | Option B validated (R²=0.9566) |
+| **Phase 4**: Canonical Solution | Final | Option B validated (R^2=0.9566) |
 | **Phase 5**: Production Architecture | Implementation | Client-side Inference & Analytics Dashboard |
 | **Phase 6**: Git & Documentation | Cleanup | Established traceability |
 | **Phase 7**: v2.1 Activity Scoring Revision | Post-Production Fix | Corrected archetype bias (test_mae=0.0107) |
-| **Phase 8**: v2.2 Derived Features | Enhancement | damage_per_hit + pickup_attempt_rate (R²=0.9391) |
+| **Phase 8**: v2.2 Derived Features | Enhancement | damage_per_hit + pickup_attempt_rate (R^2=0.9391) |
 
 ---
 
@@ -26,20 +26,20 @@
 ### Initial State (Pre-Investigation)
 
 **System Components**:
-- Fuzzy clustering (FCM) → 3 archetypes (Combat, Collect, Explore)
-- Soft membership calculation → behavioral context
-- Delta features → behavioral change signals
-- MLP surrogate → predicts difficulty multiplier
+- Fuzzy clustering (FCM) -> 3 archetypes (Combat, Collect, Explore)
+- Soft membership calculation -> behavioral context
+- Delta features -> behavioral change signals
+- MLP surrogate -> predicts difficulty multiplier
 
 **Training Results**:
 ```
-Train R²: -4.6900
-Test R²:  -4.9233
+Train R^2: -4.6900
+Test R^2:  -4.9233
 MAE:      0.000618
 ```
 
 **Symptoms**:
-- R² worse than predicting the mean
+- R^2 worse than predicting the mean
 - Model predictions collapsed to constant (~1.0)
 - Training loss plateaued immediately
 - No learning gradient
@@ -63,15 +63,15 @@ target_multiplier statistics:
 - Min:  1.0000
 - Max:  1.0227
 - Mean: 1.0101
-- Std:  0.0113  # ← CRITICAL
-- Span: 0.0227  # ← CRITICAL
+- Std:  0.0113  # <-- CRITICAL
+- Span: 0.0227  # <-- CRITICAL
 ```
 
 ### Key Discovery: Variance Collapse
 
 **Mathematical Reality**:
 ```
-σ = 0.0113  →  99.7% of data within ±0.034 of mean
+σ = 0.0113  ->  99.7% of data within +/-0.034 of mean
 Effective range: [0.98, 1.04]
 Clamp saturation: 100% at upper bound (1.5)
 ```
@@ -91,7 +91,7 @@ df['target_multiplier'] = df['target_multiplier'].clip(0.5, 1.5)
 **Problems Identified**:
 1. **Single weak feature** (death_count only)
 2. **High baseline** (1.0) with only negative adjustments
-3. **Subtraction-only** formula → limited range
+3. **Subtraction-only** formula -> limited range
 4. **Tight clamp** catching all variance
 
 ### Diagnosis Confirmed
@@ -122,7 +122,7 @@ df['target_multiplier'] = df['target_multiplier'].clip(0.5, 1.5)
 
 **Formula**:
 ```python
-M = 1.0 + 0.3×soft_combat + 0.25×soft_collect + 0.2×soft_explore - 0.4×death_rate
+M = 1.0 + 0.3xsoft_combat + 0.25xsoft_collect + 0.2xsoft_explore - 0.4xdeath_rate
 M = clip(M, 0.6, 1.4)
 ```
 
@@ -138,9 +138,9 @@ M = clip(M, 0.6, 1.4)
 
 **Formula**:
 ```python
-M = 1.0 + 0.15×soft_combat + 0.12×soft_collect + 0.10×soft_explore
-      + 0.50×Δ_combat + 0.35×Δ_collect + 0.30×Δ_explore
-      - 0.20×death_rate
+M = 1.0 + 0.15xsoft_combat + 0.12xsoft_collect + 0.10xsoft_explore
+      + 0.50xΔ_combat + 0.35xΔ_collect + 0.30xΔ_explore
+      - 0.20xdeath_rate
 M = clip(M, 0.6, 1.4)
 ```
 
@@ -152,7 +152,7 @@ M = clip(M, 0.6, 1.4)
 
 ### Iteration 4: Option B v2.0 - Lowered Base
 
-**Adjustment**: BASE 1.0 → 0.9 to address upward bias
+**Adjustment**: BASE 1.0 -> 0.9 to address upward bias
 
 **Results**:
 - Mean: 0.92 (better)
@@ -185,9 +185,9 @@ death_rate = deaths / (deaths.quantile(0.95) + 1.0)
 death_rate = death_rate.clip(0, 1)
 
 # Canonical target
-M = 0.9 + 0.22×combat_c + 0.18×collect_c + 0.15×explore_c
-      + 0.55×Δ_combat + 0.40×Δ_collect + 0.35×Δ_explore
-      - 0.25×death_rate
+M = 0.9 + 0.22xcombat_c + 0.18xcollect_c + 0.15xexplore_c
+      + 0.55xΔ_combat + 0.40xΔ_collect + 0.35xΔ_explore
+      - 0.25xdeath_rate
 
 M_final = clip(M, 0.6, 1.4)
 ```
@@ -218,7 +218,7 @@ Clamp_high: 0.0%
 **Notebook Updates**:
 1. `06_ANFIS_Preparation.ipynb`: Replace target calculation cell with canonical formula
 2. Re-execute pipeline 01-06 to regenerate dataset
-3. `07_ANFIS_Training.ipynb`: Add R² computation and full weight export
+3. `07_ANFIS_Training.ipynb`: Add R^2 computation and full weight export
 4. Execute training
 
 **Execution Method**:
@@ -233,8 +233,8 @@ jupyter nbconvert --to notebook --execute --inplace core/notebooks/07_ANFIS_Trai
 =====================================
 FINAL METRICS - OPTION B v2.2
 =====================================
-Train R²:  0.9550
-Test R²:   0.9566  (exceeds train → no overfitting)
+Train R^2:  0.9550
+Test R^2:   0.9566  (exceeds train -> no overfitting)
 Train MAE: 0.0130  (3% of target span)
 Test MAE:  0.0127
 Iterations: 230
@@ -242,7 +242,7 @@ Iterations: 230
 ```
 
 **Performance Improvement**:
-- R²: -4.69 → 0.9566 (+1,036% relative to absolute value)
+- R^2: -4.69 -> 0.9566 (+1,036% relative to absolute value)
 - Model transitioned from "worse than mean" to "near-perfect fit"
 - **No architectural changes** - same MLP (16-8-1)
 
@@ -288,7 +288,7 @@ Expected feature importance hierarchy (by coefficient):
 ```bash
 git add .gitignore
 git add core/notebooks/*.ipynb
-git commit -m "Add all Jupyter notebooks - Option B canonical (v2.2) achieves R²=0.96"
+git commit -m "Add all Jupyter notebooks - Option B canonical (v2.2) achieves R^2=0.96"
 ```
 
 **Result**: 
@@ -335,8 +335,8 @@ Even correct implementations need:
 
 ### Empirical
 
-1. **Quantitative Validation**: 5.5x variance increase, 18x span increase, R²=0.96
-2. **No Overfitting**: Test R² > Train R² confirms generalization
+1. **Quantitative Validation**: 5.5x variance increase, 18x span increase, R^2=0.96
+2. **No Overfitting**: Test R^2 > Train R^2 confirms generalization
 3. **Deployment-Ready**: MAE=0.013 within acceptable bounds for adaptive control
 
 ### Reproducibility
@@ -362,7 +362,7 @@ Even correct implementations need:
 **Metrics**:
 - Target std: 0.0625
 - Target span: 0.4113
-- Test R²: 0.9391 (v2.2, 2026-03-07)
+- Test R^2: 0.9391 (v2.2, 2026-03-07)
 - MAE: 0.0112 (v2.2, 2026-03-07)
 
 **Deployment Verdict**: APPROVED FOR PRODUCTION
@@ -376,7 +376,7 @@ Even correct implementations need:
 ## Phase 5: Production Architecture (The "Dashboard" Pivot)
 
 ### Design Challenge: The "Black Box" Problem
-**Issue:** Even with a high R² (0.95), the system is opaque. A Thesis Defense requires *visual proof* that adaptation is happening logically.
+**Issue:** Even with a high R^2 (0.95), the system is opaque. A Thesis Defense requires *visual proof* that adaptation is happening logically.
 **Solution:** Build a Real-time Analytics Dashboard.
 
 ### Architectural Decisions
@@ -405,13 +405,13 @@ Even correct implementations need:
 
 ## Recommended Thesis Framing
 
-> *"The initial ANFIS surrogate failed to generalize (R² = -4.69) due to target variance collapse caused by fuzzy-membership constraints. Through systematic diagnosis, we identified that the target variable had σ = 0.0113, insufficient for gradient-based learning. We redesigned the target function to maximize variance while preserving semantic and safety bounds, using behavioral deltas as primary variance drivers. The canonical formula (Option B v2.2) increased target variance by 5.5× and achieved R² = 0.9391 on unseen data after incorporating derived features, confirming that the limitation was statistical rather than architectural. This demonstrates the critical importance of signal design in constrained learning environments."*
+> *"The initial ANFIS surrogate failed to generalize (R^2 = -4.69) due to target variance collapse caused by fuzzy-membership constraints. Through systematic diagnosis, we identified that the target variable had σ = 0.0113, insufficient for gradient-based learning. We redesigned the target function to maximize variance while preserving semantic and safety bounds, using behavioral deltas as primary variance drivers. The canonical formula (Option B v2.2) increased target variance by 5.5x and achieved R^2 = 0.9391 on unseen data after incorporating derived features, confirming that the limitation was statistical rather than architectural. This demonstrates the critical importance of signal design in constrained learning environments."*
 
 ---
 
 ## Appendix: Design Evolution
 
-| Version | BASE | Soft Coefs | Delta Coefs | Death | Std | Span | R² | Status |
+| Version | BASE | Soft Coefs | Delta Coefs | Death | Std | Span | R^2 | Status |
 |---------|------|------------|-------------|-------|-----|------|----|----|
 | Original | 1.0 | - | - | -0.1 | 0.011 | 0.023 | -4.69 | Failed |
 | Option A | 1.0 | 0.3/0.25/0.2 | - | -0.4 | 0.020 | - | - | Insufficient |
@@ -446,7 +446,7 @@ The v2.0 `score_explore` formula included `timeOutOfCombat`:
 score_explore_v2 = sum(distanceTraveled, timeSprinting, timeOutOfCombat)
 ```
 
-`timeOutOfCombat` is a **passive signal** - it increases automatically whenever the player is not in combat, regardless of intent or action. On a map with 3–5 enemies at spawn time:
+`timeOutOfCombat` is a **passive signal** - it increases automatically whenever the player is not in combat, regardless of intent or action. On a map with 3-5 enemies at spawn time:
 - Player walks toward spawn area: `timeOutOfCombat` accumulates continuously
 - Player reaches area, no enemies yet: `timeOutOfCombat` still accumulates
 - Player begins searching adjacent zone: `timeOutOfCombat` still accumulates
@@ -461,7 +461,7 @@ A second issue was identified simultaneously: sum-based scoring gave Combat (4 f
 **Option considered**: Keep sums but remove `timeOutOfCombat`.
 **Problem**: Still leaves feature count asymmetry (Combat 4, others 3 and 2).
 
-**Decision taken**: Switch to per-archetype **averages** (sum ÷ feature count).
+**Decision taken**: Switch to per-archetype **averages** (sum / feature count).
 **Rationale**: Each archetype ceiling becomes 1.0 regardless of feature count. A player maximising all features in any archetype gets score = 1.0, making comparisons truly fair.
 
 **Accepted limitation**: Feature count still affects confidence - an archetype with 4 well-designed features is more robustly measured than one with 2. This is documented rather than hidden.
@@ -487,7 +487,7 @@ This demonstrates a key research principle: **structural bias from feature engin
 
 ### Outcome
 
-Notebooks 04 → 05 → 06 → 07 rerun on 2026-03-06:
+Notebooks 04 -> 05 -> 06 -> 07 rerun on 2026-03-06:
 - New centroids: Combat pct_combat=0.511, Collection pct_collect=0.347, Exploration pct_explore=0.849
 - New model metrics: test_mae=0.0107, train_mae=0.0125
 - System correctly classifies combat-seeking players during low-spawn phases
@@ -520,27 +520,27 @@ pickup_attempt_rate = pickupAttempts / max(timeNearInteractables, 1)
 
 **Feature integration into activity scoring (v2.2)**:
 ```python
-score_combat  = df[['enemiesHit','damageDone','timeInCombat','kills','damage_per_hit']].mean(axis=1)    # ÷5
-score_collect = df[['itemsCollected','pickupAttempts','timeNearInteractables','pickup_attempt_rate']].mean(axis=1)  # ÷4
-score_explore = df[['distanceTraveled','timeSprinting']].mean(axis=1)                                    # ÷2 (unchanged)
+score_combat  = df[['enemiesHit','damageDone','timeInCombat','kills','damage_per_hit']].mean(axis=1)    # /5
+score_collect = df[['itemsCollected','pickupAttempts','timeNearInteractables','pickup_attempt_rate']].mean(axis=1)  # /4
+score_explore = df[['distanceTraveled','timeSprinting']].mean(axis=1)                                    # /2 (unchanged)
 ```
 
 ### Why No New Data Was Needed
 
 Both derived features are computed from existing raw columns already in the 30-second telemetry window:
-- `damage_per_hit` = `damageDone` ÷ `enemiesHit` (both already collected)
-- `pickup_attempt_rate` = `pickupAttempts` ÷ `timeNearInteractables` (both already collected)
+- `damage_per_hit` = `damageDone` / `enemiesHit` (both already collected)
+- `pickup_attempt_rate` = `pickupAttempts` / `timeNearInteractables` (both already collected)
 
 This is a second illustration of the principle demonstrated in Phase 7: **known limitations can sometimes be resolved through derived feature engineering without additional data collection**.
 
 ### Pipeline Impact
 
-The scaler input vector expanded from 10 → 12 features. All downstream notebooks required rerunning:
+The scaler input vector expanded from 10 -> 12 features. All downstream notebooks required rerunning:
 
 | Notebook | Change |
 |----------|--------|
 | `03_Normalization.ipynb` | Computes derived features, expands scaler to 12 features |
-| `04_Activity_Contributions.ipynb` | Updated combat (÷5) and collect (÷4) averaging |
+| `04_Activity_Contributions.ipynb` | Updated combat (/5) and collect (/4) averaging |
 | `05_Clustering.ipynb` | Re-clusters on new activity scores |
 | `06_ANFIS_Preparation.ipynb` | New soft membership and delta values |
 | `07_ANFIS_Training.ipynb` | Retrains MLP on updated inputs |
@@ -556,24 +556,24 @@ During the rerun, two bugs were identified and resolved:
 
 ### Outcome
 
-Notebooks 03 → 10 rerun on 2026-03-07 (9/9 integration assertions pass):
+Notebooks 03 -> 10 rerun on 2026-03-07 (9/9 integration assertions pass):
 
 ```
 =====================================
 FINAL METRICS - v2.2 (Derived Features)
 =====================================
-Train R²:  0.8813
-Test R²:   0.9391
+Train R^2:  0.8813
+Test R^2:   0.9391
 Train MAE: 0.0130
 Test MAE:  0.0112
-Δexplore r = 0.8394  (↑ from 0.808)
+Δexplore r = 0.8394  (^ from 0.808)
 Iterations: 23
 Samples: 3,240
 =====================================
 ```
 
-**Notes on R² shift from v2.1 → v2.2**:
-- Train R² decreased (0.8813 vs ~0.96) while Test R² improved generalization gap
+**Notes on R^2 shift from v2.1 -> v2.2**:
+- Train R^2 decreased (0.8813 vs ~0.96) while Test R^2 improved generalization gap
 - This reflects a more complex and informative input space - harder for the model to overfit
 - Test MAE (0.0112) is lower than v2.1 test_mae (0.0107 was pre-v2.2 rerun; note the upstream changes to clustering affect all downstream values)
 - All deployment constraints remain: target multiplier clipped to [0.6, 1.4], output range [0.5, 1.5] in runtime

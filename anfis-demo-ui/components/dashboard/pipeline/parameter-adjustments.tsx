@@ -19,7 +19,7 @@ function ParameterAdjustmentRow({ delta, idx }: { delta: any; idx: number }) {
             </div>
             <div className="flex items-center gap-3">
                 <span className="text-[10px] text-muted-foreground/60 font-mono">
-                    {delta.before?.toFixed(3)} → {delta.after?.toFixed(3)}
+                    {delta.before?.toFixed(3)} -> {delta.after?.toFixed(3)}
                 </span>
                 <span className={`text-xs font-mono font-bold ${changeClass} min-w-[60px] text-right`}>
                     {change > 0 && '+'}{change?.toFixed(1)}%

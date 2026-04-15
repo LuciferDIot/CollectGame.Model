@@ -107,7 +107,7 @@ Expected outputs:
 
 ### MLP Surrogate (v2.2.1)
 - Architecture: 6->16->8->1 (ReLU hidden, Linear output)
-- Test R²: 0.9264 | Test MAE: 0.0127
+- Test R^2: 0.9264 | Test MAE: 0.0127
 - Convergence: 21 iterations (LBFGS, max_iter=500)
 - mlp_neutral: 0.932006 | AMPLIFICATION: 2.0
 
@@ -126,7 +126,7 @@ Expected outputs:
 | Preprocessing | Uniform MinMaxScaler | A/B test: wins 5/8 metrics |
 | Clustering | K=3, K-Means, soft IDW | Grid search: near-optimal; K=4 collapses |
 | ANFIS input | 6D (3 soft + 3 delta) | Delta r=0.808 correlation with target |
-| MLP architecture | 6->16->8->1 | 5-fold CV: smallest with R²>0.90 |
+| MLP architecture | 6->16->8->1 | 5-fold CV: smallest with R^2>0.90 |
 | Output calibration | Neutral-centred | Balanced player guaranteed -> display=1.0 |
 | Safety clamp | [0.6, 1.4] | Calibration study: M=1.5 felt unfair |
 | Session timeout | 90s | Tolerates loading screens (3x window cadence) |

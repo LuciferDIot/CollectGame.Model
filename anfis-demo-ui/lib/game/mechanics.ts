@@ -181,7 +181,7 @@ export function getArchetypeInfluence(
     // STEP 4: FIND DOMINANT ARCHETYPE
     // ========================================
     // Check which archetype has a non-zero weight
-    // Priority: Combat → Exploration → Collection
+    // Priority: Combat -> Exploration -> Collection
     // (Only one archetype can influence each parameter)
 
     /**
@@ -298,13 +298,13 @@ export function calculateComponentSum(values: (number | undefined | null)[]): nu
  * Normal division:
  * ```typescript
  * 5 / 0  // ERROR: Division by zero!
- * // Program crashes 💥
+ * // Program crashes 
  * ```
  * 
  * This function:
  * ```typescript
  * calculatePercentage(5, 0)  // Returns: 0.3333
- * // Program continues safely ✅
+ * // Program continues safely [done]
  * ```
  * 
  * === WHY RETURN 0.3333 INSTEAD OF 0? ===
@@ -317,9 +317,9 @@ export function calculateComponentSum(values: (number | undefined | null)[]): nu
  * Problem: We need to return SOMETHING for all three categories
  * 
  * Options:
- * 1. Return [0, 0, 0] → Breaks "must sum to 100%" rule
- * 2. Return [100%, 0, 0] → Unfairly favors combat
- * 3. Return [33%, 33%, 33%] → Fair default! ✅
+ * 1. Return [0, 0, 0] -> Breaks "must sum to 100%" rule
+ * 2. Return [100%, 0, 0] -> Unfairly favors combat
+ * 3. Return [33%, 33%, 33%] -> Fair default! [done]
  * 
  * By returning 0.3333 (33.33%), all three categories get equal weight
  * when we have no data.
@@ -331,7 +331,7 @@ export function calculateComponentSum(values: (number | undefined | null)[]): nu
  * calculatePercentage(0.75, 1.35)
  * // Returns: 0.556 (55.6%)
  * 
- * // Calculation: 0.75 ÷ 1.35 = 0.556
+ * // Calculation: 0.75 / 1.35 = 0.556
  * ```
  * 
  * Example 2: Zero Total (Edge Case)
@@ -356,7 +356,7 @@ export function calculateComponentSum(values: (number | undefined | null)[]): nu
  * pct_explore = calculatePercentage(1.2, 4.5)   // 0.267 (26.7%)
  * 
  * // Verify they sum to 100%:
- * 0.556 + 0.178 + 0.267 = 1.001 ≈ 1.0 ✅
+ * 0.556 + 0.178 + 0.267 = 1.001 ≈ 1.0 [done]
  * ```
  * 
  * === WHY NOT JUST `part / total`? ===
@@ -391,10 +391,10 @@ export function calculateComponentSum(values: (number | undefined | null)[]): nu
  *    - Acceptable for our use case
  * 
  * 3. **Edge Cases Handled**
- *    - ✅ total = 0: Returns 0.3333
- *    - ✅ part = 0: Returns 0.0
- *    - ✅ part > total: Returns value > 1.0 (valid!)
- *    - ✅ negative values: Works correctly
+ *    - [done] total = 0: Returns 0.3333
+ *    - [done] part = 0: Returns 0.0
+ *    - [done] part > total: Returns value > 1.0 (valid!)
+ *    - [done] negative values: Works correctly
  * 
  * ============================================================================
  */
@@ -409,7 +409,7 @@ export function calculatePercentage(part: number, total: number): number {
     // ========================================
     // NORMAL CASE: CALCULATE PERCENTAGE
     // ========================================
-    // Standard division: part ÷ total
+    // Standard division: part / total
     return part / total;
 }
 
@@ -444,7 +444,7 @@ export function calculatePercentage(part: number, total: number): number {
  * // Use influence to scale difficulty adjustments
  * ```
  * 
- * Result: Perfectly tuned difficulty based on player behavior! 🎮
+ * Result: Perfectly tuned difficulty based on player behavior! 
  * 
  * ============================================================================
  */

@@ -113,25 +113,25 @@ interface UserSessionState {
  *   Current: Combat 50%
  *   Memory: None (new user)
  *   Delta: 0 (nothing to compare to)
- *   → Save: Combat 50%
+ *   -> Save: Combat 50%
  * 
  * Time 0:05 - Second session
  *   Current: Combat 70%
  *   Memory: Combat 50%
  *   Delta: +20% (getting more aggressive!)
- *   → Save: Combat 70%
+ *   -> Save: Combat 70%
  * 
  * Time 0:10 - Third session
  *   Current: Combat 75%
  *   Memory: Combat 70%
  *   Delta: +5% (still increasing, but slower)
- *   → Save: Combat 75%
+ *   -> Save: Combat 75%
  * 
  * Time 1:00 - Fourth session (50 min later - TIMEOUT!)
  *   Current: Combat 60%
  *   Memory: Combat 75% (but timestamp is 50 min ago)
  *   Delta: 0 (too old, treat as new session)
- *   → Save: Combat 60%
+ *   -> Save: Combat 60%
  * ```
  * 
  * ============================================================================
@@ -168,7 +168,7 @@ export class PipelineSessionManager {
      *
      * Why 90 seconds? (changed from 40s in v2.2)
      * - Window cadence is 30s. A 40s timeout was only 1.33 windows of buffer.
-     * - 90s = 3× the window cadence, tolerating:
+     * - 90s = 3x the window cadence, tolerating:
      *     • Network delays and retries
      *     • In-game loading screens and cutscenes
      *     • Short pauses (phone, bathroom, etc.)
@@ -254,7 +254,7 @@ export class PipelineSessionManager {
      * // Memory: { soft: {0.60, 0.25, 0.15}, timestamp: 100_seconds_ago }
      *
      * Result: {
-     *   delta_combat: 0,    // Reset — session > 90s = fresh start
+     *   delta_combat: 0,    // Reset -- session > 90s = fresh start
      *   delta_collect: 0,
      *   delta_explore: 0
      * }
@@ -510,9 +510,9 @@ export class PipelineSessionManager {
  * 
  * === WHY 90 SECOND TIMEOUT? ===
  *
- * Updated from 40s → 90s in v2.2 based on the following rationale:
+ * Updated from 40s -> 90s in v2.2 based on the following rationale:
  * - Window cadence is 30s. A 40s timeout = only 1.33 windows of buffer.
- * - 90s = 3× the window cadence, tolerating:
+ * - 90s = 3x the window cadence, tolerating:
  *     • Network delays and retries
  *     • In-game loading screens and cutscenes
  *     • Short pauses (phone calls, AFK moments)
