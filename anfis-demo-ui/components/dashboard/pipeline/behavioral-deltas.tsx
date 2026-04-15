@@ -16,7 +16,7 @@ function BehavioralDeltaRow({ category, delta, previousValue }: {
             </div>
             <div className="flex items-center gap-3">
                 <span className="text-[10px] text-muted-foreground/60 font-mono">
-                    {previousValue.toFixed(3)} -> {currentValue.toFixed(3)}
+                    {previousValue.toFixed(3)} {"->"} {currentValue.toFixed(3)}
                 </span>
                 <span className={`text-xs font-mono font-bold ${changeClass} min-w-[60px] text-right`}>
                     {delta > 0 && '+'}{delta?.toFixed(3)}

@@ -203,8 +203,8 @@ function PlainEnglishSummary({
           <CalcSection step="4" title="Surrogate model (MLP) output" color="text-emerald-400">
             Inputs: [combat={categories.find(c => c.category === 'Combat')?.softMembership.toFixed(3) ?? '--'},
             collect={categories.find(c => c.category === 'Collection')?.softMembership.toFixed(3) ?? '--'},
-            explore={categories.find(c => c.category === 'Exploration')?.softMembership.toFixed(3) ?? '--'}{hasPrev ? ', Δcombat, Δcollect, Δexplore' : ', Δx3=0'}] ->
-            MLP forward pass -> raw output -> clamped to [0.6, 1.4] ->{' '}
+            explore={categories.find(c => c.category === 'Exploration')?.softMembership.toFixed(3) ?? '--'}{hasPrev ? ', Δcombat, Δcollect, Δexplore' : ', Δx3=0'}] {"->"}
+            MLP forward pass {"->"} raw output {"->"} clamped to [0.6, 1.4] {"->"} {' '}
             <span className={`font-mono font-bold ${multColor}`}>{mult.toFixed(3)}x</span>.
             {prevMult != null && <span className="block mt-1 text-slate-500">Previous multiplier was {prevMult.toFixed(3)}x. Change: {mult > prevMult ? '+' : ''}{((mult - prevMult) * 100).toFixed(1)} percentage points.</span>}
           </CalcSection>

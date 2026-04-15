@@ -287,7 +287,7 @@ function ParameterRow({ name, base, final, format = "0.00", dark, onClick }: any
         <div className="font-mono text-[11px] text-slate-500 flex items-center gap-2">
           <span className="opacity-60">Base:</span>
           <span className="text-slate-400">{base.toFixed(2)}</span>
-          <span className="text-slate-600">-></span>
+          <span className="text-slate-600">{"->"}</span>
           <span className="opacity-60">Final:</span>
           <span className="text-slate-200 font-bold bg-white/5 px-1.5 rounded">{final.toFixed(2)}</span>
         </div>
@@ -392,7 +392,7 @@ function WindowComparison({
                 <p className="text-[11px] text-slate-500 leading-snug truncate">{label}</p>
               </div>
               <div className="text-right shrink-0">
-                <p className="text-[10px] text-slate-600 font-mono">{prev ? (prev.softMembership * 100).toFixed(0) : '--'}% -> {(cat.softMembership * 100).toFixed(0)}%</p>
+                <p className="text-[10px] text-slate-600 font-mono">{prev ? (prev.softMembership * 100).toFixed(0) : '--'}% {"->"} {(cat.softMembership * 100).toFixed(0)}%</p>
               </div>
             </div>
           );

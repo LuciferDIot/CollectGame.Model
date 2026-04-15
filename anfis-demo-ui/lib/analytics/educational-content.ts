@@ -20,7 +20,7 @@ export const METRIC_EXPLANATIONS: Record<string, EducationalContent> = {
 
   'model_mae': {
     title: 'Mean Absolute Error (Test)',
-    what: 'The average absolute difference between the model's predicted multiplier and the target multiplier.',
+    what: "The average absolute difference between the model's predicted multiplier and the target multiplier.",
     why: 'Even with high R^2, large absolute errors can cause noticeable difficulty spikes. This value should remain small relative to the multiplier span.',
     computed: 'Mean of |Predicted − Target| over the test dataset.',
     reading: 'Good: < 0.05. Warning: > 0.15 (Potential gameplay instability).',

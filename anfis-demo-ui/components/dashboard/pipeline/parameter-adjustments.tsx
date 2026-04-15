@@ -2,11 +2,11 @@
  * Display a single parameter adjustment row
  */
 function ParameterAdjustmentRow({ delta, idx }: { delta: any; idx: number }) {
-    const change = delta.change !== undefined 
-        ? delta.change 
+    const change = delta.change !== undefined
+        ? delta.change
         : ((delta.after - delta.before) / delta.before) * 100;
     const changeClass = change > 0 ? 'text-emerald-400' : change < 0 ? 'text-rose-400' : 'text-muted-foreground';
-    
+
     return (
         <div className="flex items-center justify-between bg-card/20 p-2.5 rounded border border-border/15">
             <div className="flex-1">
@@ -19,7 +19,7 @@ function ParameterAdjustmentRow({ delta, idx }: { delta: any; idx: number }) {
             </div>
             <div className="flex items-center gap-3">
                 <span className="text-[10px] text-muted-foreground/60 font-mono">
-                    {delta.before?.toFixed(3)} -> {delta.after?.toFixed(3)}
+                    {delta.before?.toFixed(3)} &rarr; {delta.after?.toFixed(3)}
                 </span>
                 <span className={`text-xs font-mono font-bold ${changeClass} min-w-[60px] text-right`}>
                     {change > 0 && '+'}{change?.toFixed(1)}%

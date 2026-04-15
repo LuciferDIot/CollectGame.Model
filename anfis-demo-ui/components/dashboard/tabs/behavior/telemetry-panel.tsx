@@ -60,7 +60,7 @@ export function TelemetryPanel({ features, onMetricSelect }: TelemetryPanelProps
           </div>
           <p className="text-[11px] text-slate-500 leading-relaxed pt-1">
             <span className="text-slate-400 font-medium">Formula:</span> normalized = (raw − min) / (max − min).
-            Example: 10 kills with a range of 0 - 50 -> (10 − 0) / 50 = <span className="text-blue-400 font-mono">0.200</span>.
+            Example: 10 kills with a range of 0 - 50 {"->"} (10 − 0) / 50 = <span className="text-blue-400 font-mono">0.200</span>.
             Click any row to learn what that feature means.
           </p>
         </div>
