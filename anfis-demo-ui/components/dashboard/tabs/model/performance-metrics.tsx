@@ -44,7 +44,7 @@ export function PerformanceMetrics() {
           <>
             <Card className="bg-slate-800/50 border-slate-700">
               <div className="p-4">
-                <span className="text-xs text-slate-400">R² Score</span>
+                <span className="text-xs text-slate-400">R^2 Score</span>
                 <p className="text-2xl font-bold text-green-400 mt-1 font-mono">
                   {pipelineState.modelMetrics.r2Score.toFixed(3)}
                 </p>

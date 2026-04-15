@@ -59,12 +59,12 @@ export function ClampMonitor({
   const getHealthMessage = () => {
     const total = clampPercentage.total;
     if (total === 0)
-      return '✓ Perfect: No clamp saturation detected - Option B variance is sufficient';
+      return '[done] Perfect: No clamp saturation detected - Option B variance is sufficient';
     if (total <= 5)
-      return '✓ Healthy: Minimal clamping within acceptable bounds';
+      return '[done] Healthy: Minimal clamping within acceptable bounds';
     if (total <= 15)
-      return '⚠ Warning: Moderate clamping detected - monitor for trends';
-    return '⚠ Critical: High clamp saturation - variance may be insufficient';
+      return '[warn] Warning: Moderate clamping detected - monitor for trends';
+    return '[warn] Critical: High clamp saturation - variance may be insufficient';
   };
 
   return (

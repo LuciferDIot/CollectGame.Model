@@ -30,7 +30,7 @@ import { Deltas, PipelineOutput, SoftMembership } from './types';
  * CATEGORY 1: MAPPING HELPERS
  * ============================================================================
  * These convert between different data format conventions used across
- * the pipeline (snake_case backend ↔ camelCase frontend).
+ * the pipeline (snake_case backend <-> camelCase frontend).
  * ============================================================================
  */
 
@@ -280,6 +280,41 @@ export function calculateDeltaVector(current: SoftMembership, previous: SoftMemb
 }
 
 /**
+ * === FUNCTION: computeDelta() ===
+ *
+ * Safe scalar delta with explicit fallback for missing previous state.
+ *
+ * **Why needed?**
+ * When a session resets or a user is seen for the first time, `previous`
+ * may be `undefined` or `NaN`.  Returning 0 in those cases ensures the
+ * MLP receives a valid (no-change) signal rather than NaN, which would
+ * silently corrupt all downstream computations.
+ *
+ * **Example -- first window (no prior state)**:
+ * ```typescript
+ * computeDelta(0.75, undefined)  // -> 0  (safe default)
+ * computeDelta(0.75, NaN)        // -> 0  (safe default)
+ * ```
+ *
+ * **Example -- active session**:
+ * ```typescript
+ * computeDelta(0.75, 0.60)       // -> 0.15
+ * computeDelta(0.15, 0.25)       // -> -0.10
+ * ```
+ *
+ * Used internally by `calculateDeltaVector` and wherever a single-axis
+ * delta must be computed with guarded access to previous state.
+ *
+ * @param current  - Current membership value for one axis
+ * @param previous - Previous membership value (may be undefined / NaN)
+ * @returns current − previous, or 0 when previous is absent/invalid
+ */
+export function computeDelta(current: number, previous?: number): number {
+    if (previous === undefined || Number.isNaN(previous)) return 0;
+    return current - previous;
+}
+
+/**
  * ============================================================================
  * CATEGORY 4: SESSION LOGIC
  * ============================================================================
@@ -449,9 +484,9 @@ export function getTopRules(rulesFired: PipelineOutput['inference']['rulesFired'
  * ```
  * 
  * **When does clamping happen?**
- * - AI suggests 2.0x difficulty → clamped to 1.4x maximum
- * - AI suggests negative health → clamped to minimum
- * - AI suggests 1000 enemies → clamped to capacity limit
+ * - AI suggests 2.0x difficulty -> clamped to 1.4x maximum
+ * - AI suggests negative health -> clamped to minimum
+ * - AI suggests 1000 enemies -> clamped to capacity limit
  * 
  * @param validation - Validation results from pipeline
  * @returns 'OPTIMAL' if perfect, 'CLAMPED' if constrained
@@ -489,7 +524,7 @@ export function determineOptimizationStatus(validation: PipelineOutput['validati
  * 
  * === Testing Strategy ===
  * 
- * Each function is pure (same input → same output):
+ * Each function is pure (same input -> same output):
  * ```typescript
  * test('calculateDeltaVector', () => {
  *   const current = { soft_combat: 0.7, ... };

@@ -16,17 +16,17 @@ The CalibrationAnalysis repo implements the **pre-adaptation calibration phase**
 ```
 [THIS REPO]
 Telemetry (30s windows, from game)
-    ↓
-Calibration Dataset Construction   ← CollectGame.CalibrationAnalysis
-    ↓
+    v
+Calibration Dataset Construction   <-- CollectGame.CalibrationAnalysis
+    v
 Normalisation
-    ↓
+    v
 Behavioural Clustering
-    ↓
+    v
 Percentages + Temporal Deltas
-    ↓
-ANFIS Reasoning Layer              ← CollectGame.Model
-    ↓
+    v
+ANFIS Reasoning Layer              <-- CollectGame.Model
+    v
 Real-Time Procedural Content Adaptation
 ```
 
@@ -117,8 +117,8 @@ This aligns each death with the window that contains it (telemetry timestamps ma
 
 **Neutrality Score formula**:
 ```
-NeutralityScore = (w1 × MeanSparsity) + (w2 × DeathRate) + (w3 × MeanStdDev)
-                = (1.0 × MeanSparsity) + (100.0 × DeathRate) + (0.1 × MeanStdDev)
+NeutralityScore = (w1 x MeanSparsity) + (w2 x DeathRate) + (w3 x MeanStdDev)
+                = (1.0 x MeanSparsity) + (100.0 x DeathRate) + (0.1 x MeanStdDev)
 ```
 
 **Weights rationale**:
@@ -130,14 +130,14 @@ NeutralityScore = (w1 × MeanSparsity) + (w2 × DeathRate) + (w3 × MeanStdDev)
 
 **PCG parameter derivation**: Initial game parameters are derived from the means of the selected mode's telemetry. These become the `base_*` values in the ANFIS adaptation cascade.
 
-**Transition declaration**: Explicitly declares end of calibration → beginning of adaptive training phase. From this point, all future telemetry is used for adaptive model training, not calibration refinement.
+**Transition declaration**: Explicitly declares end of calibration -> beginning of adaptive training phase. From this point, all future telemetry is used for adaptive model training, not calibration refinement.
 
 ### Notebook 04 - Survey Analysis (`04_survey_analysis.ipynb`)
 **Purpose**: Aggregate participant questionnaire responses to establish subjective mode rankings.
 
 **Processing steps**:
-- Likert scale transformation: text ratings (e.g., "5 (Very fair)") → numeric values
-- Categorical value mapping: "Balanced" → 3, etc. (semantic mapping)
+- Likert scale transformation: text ratings (e.g., "5 (Very fair)") -> numeric values
+- Categorical value mapping: "Balanced" -> 3, etc. (semantic mapping)
 - Median computation over mean (small sample n=7; median more robust to outliers)
 - Vote aggregation: most balanced / too easy / too difficult / would play longer per mode
 
@@ -178,7 +178,7 @@ NeutralityScore = (w1 × MeanSparsity) + (w2 × DeathRate) + (w3 × MeanStdDev)
 
 | Mode | Mean Sparsity | Death Rate (per window) | Mean Std Dev | Neutrality Score |
 |------|--------------|------------------------|-------------|-----------------|
-| **1 (Selected)** | **48.15%** | **0.0556** | **305.09** | **84.21** ← Lowest |
+| **1 (Selected)** | **48.15%** | **0.0556** | **305.09** | **84.21** <-- Lowest |
 | 2 | 43.89% | 0.1103 | 310.79 | 86.00 |
 | 3 | 50.31% | 0.2258 | 335.93 | 106.48 |
 

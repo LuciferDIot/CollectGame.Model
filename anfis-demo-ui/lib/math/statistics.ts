@@ -105,18 +105,18 @@ export function calculateMean(values: number[]): number {
  * **Low Standard Deviation**:
  * - Values are clustered close to mean
  * - Consistent, predictable behavior
- * - Example: [10, 11, 10, 9, 10] → std = 0.71
+ * - Example: [10, 11, 10, 9, 10] -> std = 0.71
  * 
  * **High Standard Deviation**:
  * - Values are widely scattered
  * - Inconsistent, erratic behavior  
- * - Example: [5, 20, 2, 18, 5] → std = 8.43
+ * - Example: [5, 20, 2, 18, 5] -> std = 8.43
  * 
  * === THE FORMULA ===
  * 
  * Sample Standard Deviation (what we use):
  * ```
- * variance = Σ(xᵢ - mean)² / (n - 1)
+ * variance = Σ(xᵢ - mean)^2 / (n - 1)
  * std = √variance
  * ```
  * 
@@ -136,11 +136,11 @@ export function calculateMean(values: number[]): number {
  * 
  * Step 2: Calculate squared differences from mean
  * ```
- * (10 - 13)² = (-3)² = 9
- * (15 - 13)² = (2)² = 4
- * (12 - 13)² = (-1)² = 1
- * (8 - 13)² = (-5)² = 25
- * (20 - 13)² = (7)² = 49
+ * (10 - 13)^2 = (-3)^2 = 9
+ * (15 - 13)^2 = (2)^2 = 4
+ * (12 - 13)^2 = (-1)^2 = 1
+ * (8 - 13)^2 = (-5)^2 = 25
+ * (20 - 13)^2 = (7)^2 = 49
  * ```
  * 
  * Step 3: Sum squared differences
@@ -159,7 +159,7 @@ export function calculateMean(values: number[]): number {
  * ```
  * 
  * Interpretation:
- * "Player damage varies by about ±4.69 from the average of 13"
+ * "Player damage varies by about +/-4.69 from the average of 13"
  * 
  * === MORE EXAMPLES ===
  * 
@@ -226,13 +226,13 @@ export function calculateStandardDeviation(values: number[]): number {
  * 
  * Regular sum:
  * ```
- * [-5, +3, -2, +4] → sum = 0
+ * [-5, +3, -2, +4] -> sum = 0
  * // Positive and negative cancel out!
  * ```
  * 
  * Absolute sum:
  * ```
- * [-5, +3, -2, +4] → |sum| = 5 + 3 + 2 + 4 = 14
+ * [-5, +3, -2, +4] -> |sum| = 5 + 3 + 2 + 4 = 14
  * // Total magnitude of change!
  * ```
  * 
@@ -302,17 +302,17 @@ export function calculateAbsoluteSum(values: number[]): number {
  * 
  * 2D (X, Y):
  * ```
- * distance = √[(x₁-x₂)² + (y₁-y₂)²]
+ * distance = √[(x₁-x₂)^2 + (y₁-y₂)^2]
  * ```
  * 
  * 3D (X, Y, Z):
  * ```
- * distance = √[(x₁-x₂)² + (y₁-y₂)² + (z₁-z₂)²]
+ * distance = √[(x₁-x₂)^2 + (y₁-y₂)^2 + (z₁-z₂)^2]
  * ```
  * 
  * N-D (generalized):
  * ```
- * distance = √[Σ(aᵢ - bᵢ)²]
+ * distance = √[Σ(aᵢ - bᵢ)^2]
  * ```
  * 
  * === WHY "EUCLIDEAN"? ===
@@ -336,9 +336,9 @@ export function calculateAbsoluteSum(values: number[]): number {
  * 
  * Step 2: Square each difference
  * ```
- * (Δcombat)² = (-0.2)² = 0.04
- * (Δcollect)² = (0.2)² = 0.04
- * (Δexplore)² = (0.0)² = 0.00
+ * (Δcombat)^2 = (-0.2)^2 = 0.04
+ * (Δcollect)^2 = (0.2)^2 = 0.04
+ * (Δexplore)^2 = (0.0)^2 = 0.00
  * ```
  * 
  * Step 3: Sum squared differences
@@ -393,7 +393,7 @@ export function calculateAbsoluteSum(values: number[]): number {
  *   playerVector,
  *   combatCentroid
  * );
- * // Small distance → High combat membership
+ * // Small distance -> High combat membership
  * ```
  * 
  * @param point1 - First point as array [x, y, z, ...]

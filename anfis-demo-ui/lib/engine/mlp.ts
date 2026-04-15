@@ -1,15 +1,15 @@
 import type { ANFISInput, MLPWeights } from './types';
 
 /**
- * MLP surrogate for ANFIS inference (architecture: 6 → 16 → 8 → 1).
+ * MLP surrogate for ANFIS inference (architecture: 6 -> 16 -> 8 -> 1).
  *
- * The full ANFIS rule evaluation is O(n²) in rule count and too slow for
+ * The full ANFIS rule evaluation is O(n^2) in rule count and too slow for
  * real-time use. The MLP is trained offline on ANFIS-generated targets and
  * performs the same mapping via fast matrix multiplication (<1ms per call).
  *
  * Activation: ReLU for hidden layers, Linear for output.
  * Training: sklearn LBFGS, converged in 21 iterations (v2.2.1).
- * Metrics: Test R² = 0.9264, Test MAE = 0.0127.
+ * Metrics: Test R^2 = 0.9264, Test MAE = 0.0127.
  */
 export class MLPInference {
   private weights: number[][][];

@@ -31,7 +31,7 @@ After deploying v2.2, analytics showed the pipeline almost exclusively outputtin
 ### New Training Metrics (post-retrain)
 | Metric | Before (biased) | After (corrected) |
 |--------|-----------------|-------------------|
-| Test R² | 0.9391 | **0.9264** |
+| Test R^2 | 0.9391 | **0.9264** |
 | Test MAE | 0.0112 | **0.0127** |
 | Target min | 0.609 | **0.600** |
 | Target max | 1.021 | **1.107** |
@@ -77,7 +77,7 @@ Introduced two derived features to improve archetype discrimination, replaced th
 - `data/processed/5_clustered_telemetry.csv`
 - `data/processed/6_anfis_dataset.csv`
 - `data/models/scaler_params.json` (12 features)
-- `data/models/anfis_mlp_weights.json` (Test R²: 0.9264, MAE: 0.0127 - post training-bias fix)
+- `data/models/anfis_mlp_weights.json` (Test R^2: 0.9264, MAE: 0.0127 - post training-bias fix)
 - `anfis-demo-ui/models/` (all synced including `mlp_neutral: 0.932006`)
 
 ### Engine Fix

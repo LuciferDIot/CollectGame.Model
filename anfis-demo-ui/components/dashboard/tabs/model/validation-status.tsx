@@ -22,7 +22,7 @@ export function ValidationStatus() {
                     check.status === 'warning' ? 'bg-amber-500/20 text-amber-400' :
                     'bg-red-500/20 text-red-400'
                   }`}>
-                    {check.status === 'pass' ? '✓' : check.status === 'warning' ? '⚠' : '✗'}
+                    {check.status === 'pass' ? '[done]' : check.status === 'warning' ? '[warn]' : '[fail]'}
                   </div>
                   <span className="text-sm text-slate-300">{check.name}</span>
                 </div>
@@ -31,7 +31,7 @@ export function ValidationStatus() {
             ))
           ) : (
             <div className="flex items-center gap-3 py-2">
-              <div className="w-5 h-5 rounded flex items-center justify-center text-xs bg-green-500/20 text-green-400">✓</div>
+              <div className="w-5 h-5 rounded flex items-center justify-center text-xs bg-green-500/20 text-green-400">[done]</div>
               <span className="text-sm text-slate-300">All validations passed</span>
             </div>
           )}

@@ -64,19 +64,19 @@ score_explore = distanceTraveled + timeSprinting + timeOutOfCombat  (sum-based)
 
 ### 7.3 Fix Applied (v2.1)
 ```
-score_combat  = avg(enemiesHit, damageDone, timeInCombat, kills)          → [0, 1]
-score_collect = avg(itemsCollected, pickupAttempts, timeNearInteractables) → [0, 1]
-score_explore = avg(distanceTraveled, timeSprinting)                       → [0, 1]
+score_combat  = avg(enemiesHit, damageDone, timeInCombat, kills)          -> [0, 1]
+score_collect = avg(itemsCollected, pickupAttempts, timeNearInteractables) -> [0, 1]
+score_explore = avg(distanceTraveled, timeSprinting)                       -> [0, 1]
 ```
 
 Key changes:
-1. Per-archetype **averages** (÷ feature count) - equal ceiling of 1.0 for all archetypes
+1. Per-archetype **averages** (/ feature count) - equal ceiling of 1.0 for all archetypes
 2. `timeOutOfCombat` **removed** from Exploration - only active movement signals used
 
 No new telemetry data was collected. The fix operates entirely within the existing 10-feature dataset.
 
 ### 7.4 Pipeline Regeneration
-Notebooks 04 → 05 → 06 → 07 were rerun on 2026-03-06. All model artifacts updated:
+Notebooks 04 -> 05 -> 06 -> 07 were rerun on 2026-03-06. All model artifacts updated:
 - `cluster_centroids.json` - regenerated with v2.1 activity scores
 - `anfis_mlp_weights.json` - retrained on new soft membership values
 - Post-rerun metrics: test_mae = 0.0107, train_mae = 0.0125
@@ -97,10 +97,10 @@ Two derived features were added to the pipeline to address archetype discriminat
 - **`damage_per_hit`** = `damageDone / max(enemiesHit, 1)` - distinguishes high-accuracy from high-volume combat
 - **`pickup_attempt_rate`** = `pickupAttempts / max(timeNearInteractables, 1)` - distinguishes deliberate collectors from incidental ones
 
-Both are computed server-side from existing raw telemetry before normalization. The feature vector expanded from 10 → 12.
+Both are computed server-side from existing raw telemetry before normalization. The feature vector expanded from 10 -> 12.
 
 ### 8.2 Pipeline Regeneration
-Notebooks 03 → 10 rerun on 2026-03-07. All integration assertions pass (9/9):
+Notebooks 03 -> 10 rerun on 2026-03-07. All integration assertions pass (9/9):
 - `scaler_params.json` - 12 features
 - `anfis_mlp_weights.json` - retrained on new inputs
 - Post-rerun metrics: **test_r2 = 0.9391**, test_mae = 0.0112, Δexplore r = 0.8394

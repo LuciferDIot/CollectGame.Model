@@ -28,8 +28,8 @@ After MinMax normalization using the same scaler (fitted on a mixed population),
 The root cause is a **composite feature problem**: each raw combat metric conflates two independent quantities:
 
 ```
-damageDone    = weapon_base_damage × hits_landed
-enemiesHit    = fire_rate × accuracy × timeInCombat
+damageDone    = weapon_base_damage x hits_landed
+enemiesHit    = fire_rate x accuracy x timeInCombat
 timeInCombat  = engagement_style (sniper: short, melee/SMG: long)
 ```
 
@@ -38,8 +38,8 @@ Because the scaler is fitted across all weapon types simultaneously, the normali
 ### 1.3 Impact on Archetype Classification
 
 **Scenario: Sniper-class player**
-- `damageDone` is high (1-shot or 2-shot kills) → normalized well
-- `enemiesHit` is low (3–5 hits per window vs. 30–50 for SMG) → normalized poorly
+- `damageDone` is high (1-shot or 2-shot kills) -> normalized well
+- `enemiesHit` is low (3-5 hits per window vs. 30-50 for SMG) -> normalized poorly
 - `timeInCombat` is short (sniper engages, kills, disengages quickly)
 - **Result**: Combat activity score underestimates true combat intent
 
@@ -118,7 +118,7 @@ The v2.1 revision addressed a similar structural ambiguity (`timeOutOfCombat` as
 
 ### 3.2 Impact
 
-- Explorers who cover the full map surface will encounter many interactables incidentally → inflated Collection score
+- Explorers who cover the full map surface will encounter many interactables incidentally -> inflated Collection score
 - Combat players who fight near objective areas accumulate `timeNearInteractables` passively
 - The Collection cluster centroid in v2.1 reflects this contamination: `pct_explore: 0.5223` (Collection cluster has 52% Exploration signal, more than the Exploration cluster itself at some data slices)
 
@@ -164,7 +164,7 @@ The system maintains per-player session state with a 40-second timeout. If a net
 ### 5.3 Proposed Future Improvement
 
 - Persist session state to a durable store (Redis, database) rather than in-memory only
-- Implement session recovery: if a window arrives within 2× the normal cadence (60s), attempt delta reconstruction from the last known state
+- Implement session recovery: if a window arrives within 2x the normal cadence (60s), attempt delta reconstruction from the last known state
 - Log timeout events as a diagnostic metric
 
 ---
@@ -183,7 +183,7 @@ The adaptation module applies a uniform sensitivity coefficient of 0.3 to all di
 
 ### 6.3 Proposed Future Improvement
 
-- Conduct a player study to empirically measure the perceived difficulty impact of ±10% change in each parameter
+- Conduct a player study to empirically measure the perceived difficulty impact of +/-10% change in each parameter
 - Derive parameter-specific sensitivity coefficients (e.g., health: 0.15, spawn: 0.35, speed: 0.25)
 - Store these as configurable values in the adaptation registry rather than a single global constant
 
@@ -196,10 +196,10 @@ The adaptation module applies a uniform sensitivity coefficient of 0.3 to all di
 The ANFIS pipeline produces a **target multiplier** - a scalar in `[0.6, 1.4]` - that represents how difficulty should shift relative to a neutral baseline of 1.0. In the current implementation, this multiplier is applied as a simple scalar to individual enemy parameters:
 
 ```
-enemy_health    = base_health    × target_multiplier × sensitivity
-enemy_speed     = base_speed     × target_multiplier × sensitivity
-enemy_damage    = base_damage    × target_multiplier × sensitivity
-spawn_rate      = base_spawn     × target_multiplier × sensitivity
+enemy_health    = base_health    x target_multiplier x sensitivity
+enemy_speed     = base_speed     x target_multiplier x sensitivity
+enemy_damage    = base_damage    x target_multiplier x sensitivity
+spawn_rate      = base_spawn     x target_multiplier x sensitivity
 ```
 
 This approach works as a proof-of-concept but has a perceptual limitation: players typically cannot feel small percentage changes in enemy health or damage. A 10% increase in enemy health feels like "enemies take a few extra hits" - subtle and often imperceptible, especially in fast-paced games.
@@ -210,13 +210,13 @@ A more direct and perceptible difficulty lever would be the **global enemy cap**
 
 | Target Multiplier | Action | Player Experience |
 |------------------|--------|-------------------|
-| 0.7 (struggling) | Cap: 10 → 7 | Fewer enemies, reduced pressure |
+| 0.7 (struggling) | Cap: 10 -> 7 | Fewer enemies, reduced pressure |
 | 1.0 (balanced) | Cap: 10 (unchanged) | Normal gameplay |
-| 1.3 (underperforming) | Cap: 10 → 13 | More enemies, increased challenge |
+| 1.3 (underperforming) | Cap: 10 -> 13 | More enemies, increased challenge |
 
 This maps cleanly to the ANFIS output:
 ```
-global_enemy_cap = floor(base_cap × target_multiplier)
+global_enemy_cap = floor(base_cap x target_multiplier)
 ```
 
 The player experience change is **qualitative** (more/fewer enemies is immediately felt) rather than **quantitative** (slightly stronger enemies may go unnoticed).
@@ -232,7 +232,7 @@ Implementing a global enemy cap adjustment requires a running **Procedural Conte
 
 These operations, particularly navmesh queries, are GPU-accelerated in modern game engines (Unreal Engine NavMesh baking uses the GPU for large worlds). The research hardware available for this thesis had **limited GPU resources**, making continuous high-frequency PCG testing infeasible for an extended validation study.
 
-**Consequence for the thesis**: The adaptive difficulty system was validated in an **offline/simulation mode** - the ANFIS pipeline (classification → prediction) was evaluated against synthetic and recorded telemetry. The adaptation output (target multiplier) was verified to be numerically correct and semantically aligned, but the **full real-time closed-loop test** (ANFIS → PCG → player observation → new telemetry → ANFIS) was not executed for an extended session.
+**Consequence for the thesis**: The adaptive difficulty system was validated in an **offline/simulation mode** - the ANFIS pipeline (classification -> prediction) was evaluated against synthetic and recorded telemetry. The adaptation output (target multiplier) was verified to be numerically correct and semantically aligned, but the **full real-time closed-loop test** (ANFIS -> PCG -> player observation -> new telemetry -> ANFIS) was not executed for an extended session.
 
 ### 7.4 What Was Validated vs. What Was Not
 
@@ -243,7 +243,7 @@ These operations, particularly navmesh queries, are GPU-accelerated in modern ga
 | K-Means clustering | Validated offline | Silhouette = 0.3752 |
 | Soft membership (IDW) | Validated offline | Numerically stable |
 | Temporal delta computation | Validated offline | r=0.808 for Δexplore |
-| MLP inference | Validated offline | R² = 0.9391 (v2.2 rerun) |
+| MLP inference | Validated offline | R^2 = 0.9391 (v2.2 rerun) |
 | Scalar parameter adaptation | Validated in demo UI | Health/speed/damage multipliers |
 | **Global enemy cap adaptation** | **Not implemented** | PCG infrastructure required |
 | **Full real-time closed-loop** | **Not validated** | GPU resource constraint |
@@ -253,13 +253,13 @@ These operations, particularly navmesh queries, are GPU-accelerated in modern ga
 With adequate GPU resources and full game engine integration:
 
 ```
-1. ANFIS pipeline runs every 30s → produces target_multiplier
+1. ANFIS pipeline runs every 30s -> produces target_multiplier
 2. Difficulty controller computes:
-     new_cap = clamp(floor(base_cap × target_multiplier), min_cap, max_cap)
+     new_cap = clamp(floor(base_cap x target_multiplier), min_cap, max_cap)
 3. PCG system receives new_cap:
      if current_active < new_cap: spawn additional enemies at valid navmesh points
      if current_active > new_cap: flag excess enemies for graceful despawn
-4. Game continues → new telemetry captured → next ANFIS window
+4. Game continues -> new telemetry captured -> next ANFIS window
 ```
 
 This creates a **true adaptive feedback loop** where difficulty responds to player behavior through a more natural mechanism (population density) rather than invisible stat scaling.
@@ -303,7 +303,7 @@ The limitations above are documented for completeness. Within the thesis, the fo
 
 5. **GPU resource constraints prevented full PCG integration** - the ANFIS pipeline is validated in simulation. The global enemy cap adaptation and closed-loop real-time testing are identified as future work requiring production GPU infrastructure. This is consistent with standard practice in adaptive game AI research, where the learned controller is validated separately from the game engine integration.
 
-The thesis argues that despite these limitations, the system achieves its core objective: producing a statistically valid, generalizing model (R² = 0.9391, v2.2) that adapts difficulty based on real behavioral signals. Future work can address each limitation incrementally as telemetry infrastructure matures.
+The thesis argues that despite these limitations, the system achieves its core objective: producing a statistically valid, generalizing model (R^2 = 0.9391, v2.2) that adapts difficulty based on real behavioral signals. Future work can address each limitation incrementally as telemetry infrastructure matures.
 
 ---
 

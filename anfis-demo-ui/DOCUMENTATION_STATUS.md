@@ -81,7 +81,7 @@ All core pipeline files now have **tutorial-style, beginner-friendly documentati
 
 Each documented file includes:
 
-1. **📖 Block Header**
+1. ** Block Header**
    - What the file does (plain English)
    - Why we need it (real-world problem)
    - How it works (high-level overview)
@@ -139,7 +139,7 @@ Each documented file includes:
 - Reproducibility notes
 
 ### For Students
-- Learning progression (simple → complex)
+- Learning progression (simple -> complex)
 - Mathematical foundations
 - Practical applications
 - Common pitfalls explained
@@ -181,7 +181,7 @@ Each documented file includes:
 - Performance metrics
 - Thesis mapping
 
-## 🎉 Key Achievements
+##  Key Achievements
 
 1. **Accessibility**: Anyone can understand the system, regardless of background
 2. **Completeness**: Every function has purpose explained
@@ -217,7 +217,7 @@ If you want even MORE documentation:
 ## Documentation Style Guide Used
 
 - **Headers**: Use `===` for major sections
-- **Examples**: Always show input→process→output
+- **Examples**: Always show input->process->output
 - **Code Blocks**: Include language hint for syntax
 - **Analogies**: Relate to everyday experiences
 - **Formulas**: Show both symbolic and numerical
@@ -226,7 +226,7 @@ If you want even MORE documentation:
 
 ---
 
-## 🔄 v2.1 Update (March 2026)
+##  v2.1 Update (March 2026)
 
 ### Changed Files
 - **`activity.ts`**: Activity scoring formula corrected - per-archetype averages, `timeOutOfCombat` excluded from Exploration
@@ -244,7 +244,7 @@ All inline code comments in `activity.ts` were already updated in the previous s
 
 **Status**: COMPLETE - All core pipeline files fully documented
 **Build Status**: PASSING - No TypeScript errors
-**Quality**: ⭐⭐⭐⭐⭐ - Tutorial-grade documentation
+**Quality**:  - Tutorial-grade documentation
 
 *Last Updated: March 6, 2026*
 

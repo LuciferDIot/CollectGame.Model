@@ -164,7 +164,7 @@ function PredictionDistributionLegend({ mean }: { mean: number }) {
        <div className="flex items-center gap-2">
          <div className="w-2 h-0.5 bg-amber-500 border-dashed border-t"></div>
          <HelpfulTooltip 
-           trigger={<span className="cursor-pointer hover:underline decoration-dotted underline-offset-4">Distribution Bands (±2σ)</span>}
+           trigger={<span className="cursor-pointer hover:underline decoration-dotted underline-offset-4">Distribution Bands (+/-2σ)</span>}
            title="Standard Deviation Bands (σ)" 
            description="Statistical boundaries covering 95% of expected values." 
            calculation="Range = [μ - 2σ, μ + 2σ]"

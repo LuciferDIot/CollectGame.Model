@@ -18,7 +18,7 @@ import { ModelTab } from './tabs/model-tab';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-const ARCHETYPE_EMOJI: Record<string, string> = { Combat: '⚔️', Collection: '🎒', Exploration: '🗺️' };
+const ARCHETYPE_EMOJI: Record<string, string> = { Combat: '', Collection: '', Exploration: '' };
 const ARCHETYPE_COLOR: Record<string, string> = { Combat: 'text-rose-400', Collection: 'text-amber-400', Exploration: 'text-sky-400' };
 const ARCHETYPE_BG: Record<string, string> = { Combat: 'bg-rose-500', Collection: 'bg-amber-500', Exploration: 'bg-sky-500' };
 const ARCHETYPE_DESC: Record<string, string> = { Combat: 'fighting enemies', Collection: 'collecting items', Exploration: 'exploring the map' };
@@ -67,14 +67,14 @@ function PlainEnglishSummary({
   const sessionChangeText = (() => {
     if (!hasPrev || !prevDominant) return null;
     if (prevDominant.category !== dominant.category) {
-      return `Changed from ${ARCHETYPE_EMOJI[prevDominant.category]} ${prevDominant.category} last window — the AI detected a shift in play style.`;
+      return `Changed from ${ARCHETYPE_EMOJI[prevDominant.category]} ${prevDominant.category} last window -- the AI detected a shift in play style.`;
     }
     if (dominantDelta != null && Math.abs(dominantDelta) >= 0.05) {
       return dominantDelta > 0
-        ? `${dominant.category} tendency increased by ${Math.round(dominantDelta * 100)}% from last window — AI is intensifying the response.`
-        : `${dominant.category} tendency dropped by ${Math.round(Math.abs(dominantDelta) * 100)}% from last window — AI is easing off.`;
+        ? `${dominant.category} tendency increased by ${Math.round(dominantDelta * 100)}% from last window -- AI is intensifying the response.`
+        : `${dominant.category} tendency dropped by ${Math.round(Math.abs(dominantDelta) * 100)}% from last window -- AI is easing off.`;
     }
-    return 'Play style was consistent with last window — the AI made a minor adjustment.';
+    return 'Play style was consistent with last window -- the AI made a minor adjustment.';
   })();
 
   return (
@@ -96,7 +96,7 @@ function PlainEnglishSummary({
             {multDir === 'unchanged' ? 'stay the same' : `${multDir} by ${multPct}%`}
           </span>
           {' '}
-          <span className="font-mono text-slate-400">({mult.toFixed(3)}×</span>
+          <span className="font-mono text-slate-400">({mult.toFixed(3)}x</span>
           {multDeltaVal != null && Math.abs(multDeltaVal) >= 0.001 && (
             <span className="font-mono"> {deltaBadge(multDeltaVal)}</span>
           )}
@@ -194,26 +194,26 @@ function PlainEnglishSummary({
             </CalcSection>
           ) : (
             <CalcSection step="3" title="Behavioural deltas" color="text-amber-400">
-              No previous window yet — deltas are all 0 for this run. The AI feeds Δ=0 into the surrogate,
+              No previous window yet -- deltas are all 0 for this run. The AI feeds Δ=0 into the surrogate,
               meaning only the current memberships drive the output. Run again to get real deltas.
             </CalcSection>
           )}
 
           {/* Step 4: Surrogate model output */}
           <CalcSection step="4" title="Surrogate model (MLP) output" color="text-emerald-400">
-            Inputs: [combat={categories.find(c => c.category === 'Combat')?.softMembership.toFixed(3) ?? '—'},
-            collect={categories.find(c => c.category === 'Collection')?.softMembership.toFixed(3) ?? '—'},
-            explore={categories.find(c => c.category === 'Exploration')?.softMembership.toFixed(3) ?? '—'}{hasPrev ? ', Δcombat, Δcollect, Δexplore' : ', Δ×3=0'}] →
-            MLP forward pass → raw output → clamped to [0.6, 1.4] →{' '}
-            <span className={`font-mono font-bold ${multColor}`}>{mult.toFixed(3)}×</span>.
-            {prevMult != null && <span className="block mt-1 text-slate-500">Previous multiplier was {prevMult.toFixed(3)}×. Change: {mult > prevMult ? '+' : ''}{((mult - prevMult) * 100).toFixed(1)} percentage points.</span>}
+            Inputs: [combat={categories.find(c => c.category === 'Combat')?.softMembership.toFixed(3) ?? '--'},
+            collect={categories.find(c => c.category === 'Collection')?.softMembership.toFixed(3) ?? '--'},
+            explore={categories.find(c => c.category === 'Exploration')?.softMembership.toFixed(3) ?? '--'}{hasPrev ? ', Δcombat, Δcollect, Δexplore' : ', Δx3=0'}] {"->"}
+            MLP forward pass {"->"} raw output {"->"} clamped to [0.6, 1.4] {"->"} {' '}
+            <span className={`font-mono font-bold ${multColor}`}>{mult.toFixed(3)}x</span>.
+            {prevMult != null && <span className="block mt-1 text-slate-500">Previous multiplier was {prevMult.toFixed(3)}x. Change: {mult > prevMult ? '+' : ''}{((mult - prevMult) * 100).toFixed(1)} percentage points.</span>}
           </CalcSection>
 
           {/* Step 5: Parameter cascade */}
           <CalcSection step="5" title="Parameter cascade" color="text-rose-400">
             Each archetype group's parameters are scaled by a category factor:
             <span className="block font-mono text-cyan-400 mt-1 text-[10px]">
-              factor = 1.0 + ({mult.toFixed(3)} − 1.0) × (0.5 + membership × 1.5)
+              factor = 1.0 + ({mult.toFixed(3)} − 1.0) x (0.5 + membership x 1.5)
             </span>
             <span className="block mt-1 text-slate-500">
               {categories.map(c => {
@@ -223,8 +223,8 @@ function PlainEnglishSummary({
                 return `${c.category}: factor=${factor.toFixed(3)}`;
               }).join(' · ')}
             </span>
-            Parameters scale directly (<span className="font-mono text-slate-300">base × factor</span>) or inversely
-            (<span className="font-mono text-slate-300">base ÷ factor</span>) depending on whether they should increase or decrease with difficulty.
+            Parameters scale directly (<span className="font-mono text-slate-300">base x factor</span>) or inversely
+            (<span className="font-mono text-slate-300">base / factor</span>) depending on whether they should increase or decrease with difficulty.
           </CalcSection>
 
           <div className="pt-1 border-t border-slate-700/30">

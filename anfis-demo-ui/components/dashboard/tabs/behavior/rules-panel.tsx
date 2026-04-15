@@ -60,8 +60,8 @@ export function RulesPanel({ rules }: RulesPanelProps) {
                       }
                       title="Rule Firing Strength (STR)"
                       description="How strongly this fuzzy rule fired for the current player input. Each ANFIS rule is an IF-THEN condition like 'IF combat is HIGH AND exploration is LOW THEN multiplier is +0.3'. STR is how well the player's current telemetry satisfies that condition."
-                      calculation={"STR = min(μ₁, μ₂, ..., μₙ)  — product of all antecedent membership values.\nRange: 0.0 (rule did not fire) → 1.0 (perfectly satisfied)."}
-                      interpretation={"≥ 0.5 (green) = rule strongly active — high influence on outcome.\n< 0.5 (blue)  = rule partially active — moderate contribution.\nOnly rules with STR > 0.01 are shown."}
+                      calculation={"STR = min(μ₁, μ₂, ..., μₙ)  -- product of all antecedent membership values.\nRange: 0.0 (rule did not fire) -> 1.0 (perfectly satisfied)."}
+                      interpretation={"≥ 0.5 (green) = rule strongly active -- high influence on outcome.\n< 0.5 (blue)  = rule partially active -- moderate contribution.\nOnly rules with STR > 0.01 are shown."}
                     />
                     <span
                       className={cn(

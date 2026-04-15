@@ -20,7 +20,7 @@ export function ModelEvaluationCard() {
                 trigger={<span className="cursor-pointer hover:underline decoration-dotted underline-offset-4">Model Evaluation (Offline)</span>}
                 title="Supervised Learning Validation"
                 description="Metrics calculated on a held-out test set (unseen data) after training. These values validate the model's theoretical capability."
-                interpretation="We froze 20% of the player data (Test Set) and asked the model to predict it. High R² confirms it learned general rules, not just memorized the training data."
+                interpretation="We froze 20% of the player data (Test Set) and asked the model to predict it. High R^2 confirms it learned general rules, not just memorized the training data."
               />
             </CardTitle>
           </div>
@@ -39,10 +39,10 @@ export function ModelEvaluationCard() {
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <ShieldCheck className="h-3.5 w-3.5" />
               <HelpfulTooltip 
-                trigger={<span className="cursor-pointer hover:underline decoration-dotted underline-offset-4">Test R² Score</span>}
-                title="Coefficient of Determination (R²)"
+                trigger={<span className="cursor-pointer hover:underline decoration-dotted underline-offset-4">Test R^2 Score</span>}
+                title="Coefficient of Determination (R^2)"
                 description="Measures how well the model replicates the teacher's variance. 1.0 is perfect, 0.0 is random."
-                calculation="R² = 1 - (SS_res / SS_tot)"
+                calculation="R^2 = 1 - (SS_res / SS_tot)"
                 interpretation="0.956 means the model captures 95.6% of the target's behavior logic."
               />
             </div>

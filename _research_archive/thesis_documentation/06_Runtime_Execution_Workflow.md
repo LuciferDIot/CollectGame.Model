@@ -4,7 +4,7 @@
 >
 > **v2.2 Update (March 2026)**: Two derived features added - `damage_per_hit` (Combat, 5th feature) and `pickup_attempt_rate` (Collection, 4th feature). Raw feature vector is now 12-wide (10 original + 2 derived computed server-side before normalization). Scaler, centroids, and MLP weights regenerated.
 >
-> **v2.2.1 Update (March 2026)**: Training bias fixed (base=0.9→1.0 in target formula). MLP output calibration changed from min-max rescaling to **neutral-centred**: `display = clamp(1.0 + (raw − 0.932006) × 2.0, 0.6, 1.4)`. Final metrics: **Test R² = 0.9264, Test MAE = 0.0127**. `mlp_neutral = 0.932006` stored in `anfis_mlp_weights.json` and auto-updated by notebook 07 after each retrain.
+> **v2.2.1 Update (March 2026)**: Training bias fixed (base=0.9->1.0 in target formula). MLP output calibration changed from min-max rescaling to **neutral-centred**: `display = clamp(1.0 + (raw − 0.932006) x 2.0, 0.6, 1.4)`. Final metrics: **Test R^2 = 0.9264, Test MAE = 0.0127**. `mlp_neutral = 0.932006` stored in `anfis_mlp_weights.json` and auto-updated by notebook 07 after each retrain.
 
 ## 1. Runtime Flow Diagram
 
@@ -74,7 +74,7 @@ For each active player session, the runtime system must maintain a minimal state
 This workflow uses the v2.2.1 models (2026-03-07). Changes from v2.0:
 - **v2.1**: Activity scoring corrected - averages instead of sums, `timeOutOfCombat` excluded from Exploration
 - **v2.2**: Derived features added (`damage_per_hit`, `pickup_attempt_rate`); scaler expanded to 12 features
-- **v2.2.1**: Training target base corrected (0.9→1.0); output calibration changed to neutral-centred mapping
+- **v2.2.1**: Training target base corrected (0.9->1.0); output calibration changed to neutral-centred mapping
 
 All execution frequencies and failure-safe behaviors remain as specified above.
 

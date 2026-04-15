@@ -12,7 +12,7 @@ export function ModelTab() {
 
   return (
     <div className="m-0 p-4 sm:p-5 space-y-6 w-full">
-      {/* Intro banner — tutorial mode only */}
+      {/* Intro banner -- tutorial mode only */}
       {tutorialMode && (
         <div className="p-3 rounded-lg border border-violet-800/30 bg-violet-950/20 flex items-start gap-2.5">
           <Info size={16} className="text-violet-400 shrink-0 mt-0.5" />
@@ -20,7 +20,7 @@ export function ModelTab() {
             <p className="text-xs font-semibold text-violet-300 mb-0.5">What is this tab?</p>
             <p className="text-[11px] text-slate-400 leading-relaxed">
               This shows <span className="text-slate-300">how accurate the AI model is</span> and the technical details of how it was trained.
-              R² close to 1.0 means very accurate predictions. MAE (Mean Absolute Error) shows the average prediction mistake in multiplier units.
+              R^2 close to 1.0 means very accurate predictions. MAE (Mean Absolute Error) shows the average prediction mistake in multiplier units.
             </p>
           </div>
         </div>
@@ -28,7 +28,7 @@ export function ModelTab() {
 
       <ExecutiveHealthPanel />
 
-      {/* Model Notes — tutorial mode only */}
+      {/* Model Notes -- tutorial mode only */}
       {tutorialMode && (
         <div className="border-t border-slate-700/50 pt-4 opacity-75 hover:opacity-100 transition-opacity">
           <h4 className="text-xs font-semibold text-slate-100 mb-3 flex items-center gap-2 uppercase tracking-wider">
@@ -48,7 +48,7 @@ export function ModelTab() {
               className="p-4 rounded bg-blue-950/10 border border-blue-900/30 hover:bg-blue-950/20 transition-colors cursor-help group"
             >
               <p className="text-xs font-bold text-blue-300 mb-1 uppercase tracking-wide group-hover:text-blue-200">Exploration Scoring (v2.1)</p>
-              <p className="text-xs text-blue-200/60 leading-relaxed">Exploration score uses only active movement signals: distanceTraveled + timeSprinting. timeOutOfCombat is excluded — it is a passive signal and the arithmetic complement of timeInCombat.</p>
+              <p className="text-xs text-blue-200/60 leading-relaxed">Exploration score uses only active movement signals: distanceTraveled + timeSprinting. timeOutOfCombat is excluded -- it is a passive signal and the arithmetic complement of timeInCombat.</p>
             </div>
           </div>
         </div>

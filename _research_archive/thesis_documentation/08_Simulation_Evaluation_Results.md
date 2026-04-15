@@ -5,7 +5,7 @@ To validate the ANFIS pipeline, we simulated a dataset of player telemetry windo
 
 | Window | Type | Soft Combat | Soft Collect | Soft Explore | Δ Combat | Δ Collect | Δ Explore | Display $M$ |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| 1 | **Balanced** | 0.33 | 0.33 | 0.34 | 0.00 | 0.00 | 0.00 | **1.00** ← guaranteed by neutral-centred calibration |
+| 1 | **Balanced** | 0.33 | 0.33 | 0.34 | 0.00 | 0.00 | 0.00 | **1.00** <-- guaranteed by neutral-centred calibration |
 | 2 | **High Combat** | 0.85 | 0.10 | 0.05 | +0.40 | −0.10 | −0.30 | **~1.36** (HARDER) |
 | 3 | **Struggling** | 0.70 | 0.20 | 0.10 | −0.50 | −0.10 | +0.10 | **~0.82** (easier) |
 | 4 | **Collector** | 0.10 | 0.80 | 0.10 | −0.10 | +0.40 | −0.10 | **~0.87** (easier) |
@@ -18,13 +18,13 @@ To validate the ANFIS pipeline, we simulated a dataset of player telemetry windo
 ## 2. ANFIS Prediction Accuracy (v2.2.1 - corrected)
 The ANFIS model (approximated via a 6-16-8-1 MLP surrogate) was evaluated on a test split (20%) of the full synthetic dataset.
 
-*   **Total Samples**: 3,240 (80/20 split → 2,592 train / 648 test)
+*   **Total Samples**: 3,240 (80/20 split -> 2,592 train / 648 test)
 *   **Mean Absolute Error (MAE)**: `0.0127`
-*   **R² Score**: `0.9264`
+*   **R^2 Score**: `0.9264`
 *   **Convergence**: 21 iterations (LBFGS solver, max_iter=500)
 *   **mlp_neutral**: 0.932006 (neutral-centred calibration baseline)
 
-The low MAE (1.3% of target span) indicates the surrogate faithfully reproduces the fuzzy inference surface. Note: earlier versions of this report cited R²=0.982 and MAE=0.0102 - those figures came from a biased training run (base=0.9) and a smaller dataset. The current figures reflect the corrected v2.2.1 retrain.
+The low MAE (1.3% of target span) indicates the surrogate faithfully reproduces the fuzzy inference surface. Note: earlier versions of this report cited R^2=0.982 and MAE=0.0102 - those figures came from a biased training run (base=0.9) and a smaller dataset. The current figures reflect the corrected v2.2.1 retrain.
 
 ## 3. Calibration Study Results (N=7)
 A small-scale user study was conducted to calibrate the base difficulty modes before enabling full adaptation. Participants played three fixed modes in randomized order.
@@ -33,7 +33,7 @@ A small-scale user study was conducted to calibrate the base difficulty modes be
 *   **Mode C (Hard)**: $M=1.5$. Reported as "Frustratingly difficult" and "Unfair enemy spawns" by 5/7 users.
 *   **Mode B (Medium)**: $M=1.0$. Reported as "Balanced" but "Repetitive" by 4/7 users.
 
-**Conclusion**: The Adaptive System (v2.2.1) target range is $[0.60, 1.40]$. The lower bound (0.6×) corresponds to full assistance mode; the upper bound (1.4×) represents maximum challenge, below the "Unfair" threshold observed in Mode C ($M=1.5$). Balanced players are guaranteed to receive $M=1.0$ via neutral-centred calibration.
+**Conclusion**: The Adaptive System (v2.2.1) target range is $[0.60, 1.40]$. The lower bound (0.6x) corresponds to full assistance mode; the upper bound (1.4x) represents maximum challenge, below the "Unfair" threshold observed in Mode C ($M=1.5$). Balanced players are guaranteed to receive $M=1.0$ via neutral-centred calibration.
 
 ## 4. Visualization: Delta Impact on Difficulty
 The following matrix illustrates how changes in player performance ($\Delta$) shift the Difficulty Multiplier ($M$) for a balanced player ($u \approx 0.33$).
@@ -51,7 +51,7 @@ The following matrix illustrates how changes in player performance ($\Delta$) sh
 **Bridge Implementation**:
 To verify these simulation results in the live game, we implemented the "Trust Anchor" chart in the Admin Dashboard.
 
-*   **Offline vs Online**: This report proves the *Model* works (R²=0.98). The Dashboard proves the *Game* submits correct data.
+*   **Offline vs Online**: This report proves the *Model* works (R^2=0.98). The Dashboard proves the *Game* submits correct data.
 *   **Visual Validation**:
     *   The "Trust Anchor" plots real-time telemetry (white dots) against the K-Means centroids (colored backgrounds).
     *   **Success Criteria**: If a player is fighting, their dot MUST move into the Red (Combat) zone.

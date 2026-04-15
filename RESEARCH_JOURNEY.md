@@ -35,7 +35,7 @@
 
 ## 1. Project Goal
 
-Build an **ANFIS (Adaptive Neuro-Fuzzy Inference System)–based adaptive difficulty system** for CollectGame. The system analyses real-time player telemetry in 30-second windows, classifies player behaviour into three archetypes (Combat, Collection, Exploration), and outputs a **difficulty multiplier** that adjusts the game in real time.
+Build an **ANFIS (Adaptive Neuro-Fuzzy Inference System)-based adaptive difficulty system** for CollectGame. The system analyses real-time player telemetry in 30-second windows, classifies player behaviour into three archetypes (Combat, Collection, Exploration), and outputs a **difficulty multiplier** that adjusts the game in real time.
 
 **Why ANFIS?** Traditional rule-based difficulty adjustment is brittle. ANFIS combines fuzzy logic (interpretable membership functions) with neural network learning (data-driven optimisation), making it ideal for modelling the continuous spectrum of player behaviour.
 
@@ -91,7 +91,7 @@ Raw CSVs
 06_ANFIS_Preparation              ─── Build 6-feature input + target variable
   │
   ▼
-07_ANFIS_Training                 ─── Train MLP surrogate (6→16→8→1)
+07_ANFIS_Training                 ─── Train MLP surrogate (6->16->8->1)
   │
   ▼
 08_Evaluation_Visualizations      ─── Charts, validation, quality metrics
@@ -142,7 +142,7 @@ death_time ≤ window_timestamp < death_time + 30
 
 ### What It Does
 
-1. Calculates each player's total play duration: `duration_min = (total_rows × 30) / 60`
+1. Calculates each player's total play duration: `duration_min = (total_rows x 30) / 60`
 2. Filters out players with < 20 minutes of play time
 3. Caps analysis to the first 45 minutes (90 rows) per player
 4. Sorts chronologically before trimming
@@ -179,9 +179,9 @@ df[features] = scaler.fit_transform(df[features].fillna(0))
 | Method | Result | Decision |
 |--------|--------|----------|
 | **MinMaxScaler (Uniform)** | [0, 1] bounds, stable for neural networks | **Selected** |
-| **Log-Sparse Scaler** | +0.4% Silhouette improvement | ❌ Rejected - destroyed interpretability |
-| **RobustScaler** | No fixed bounds | ❌ Rejected - risks gradient explosion in MLP |
-| **Per-player Min-Max** | Captures individual behavioural ranges | ❌ Rejected - loses cross-player comparability |
+| **Log-Sparse Scaler** | +0.4% Silhouette improvement | [fail] Rejected - destroyed interpretability |
+| **RobustScaler** | No fixed bounds | [fail] Rejected - risks gradient explosion in MLP |
+| **Per-player Min-Max** | Captures individual behavioural ranges | [fail] Rejected - loses cross-player comparability |
 
 ### Why Uniform MinMaxScaler Won
 
@@ -192,7 +192,7 @@ df[features] = scaler.fit_transform(df[features].fillna(0))
 
 ### Critical Bug (Phase 1)
 
-In Phase 1, the scaler was **not actually applied** - `fit_transform()` was never called. Raw features like `distanceTraveled` (range 0–5,000) dominated clustering, causing 98.6% of windows to be classified as "Exploration". This was the single most impactful bug in the project. See [Critical Bugs](#16-critical-bugs-encountered--fixed).
+In Phase 1, the scaler was **not actually applied** - `fit_transform()` was never called. Raw features like `distanceTraveled` (range 0-5,000) dominated clustering, causing 98.6% of windows to be classified as "Exploration". This was the single most impactful bug in the project. See [Critical Bugs](#16-critical-bugs-encountered--fixed).
 
 ### Output
 
@@ -301,10 +301,10 @@ First window for each player is initialised to 0.
 
 | K | Silhouette | Decision | Reason |
 |---|------------|----------|--------|
-| 2 | 0.4166 | ❌ Rejected | Higher metric but lumps "Collectors" and "Explorers" into one cluster - incompatible with the 3-archetype game design |
+| 2 | 0.4166 | [fail] Rejected | Higher metric but lumps "Collectors" and "Explorers" into one cluster - incompatible with the 3-archetype game design |
 | **3** | **0.3752** | **Selected** | Maps perfectly to the three gameplay pillars (Combat, Collection, Exploration) |
-| 4 | Lower | ❌ Rejected | Splits archetypes unnecessarily, no game design justification |
-| 5 | Lower | ❌ Rejected | Over-segmentation, unstable clusters |
+| 4 | Lower | [fail] Rejected | Splits archetypes unnecessarily, no game design justification |
+| 5 | Lower | [fail] Rejected | Over-segmentation, unstable clusters |
 
 **Why accept lower Silhouette for K=3?** The clustering serves the game design, not the other way around. K=2's higher metric is meaningless if it cannot distinguish collectors from explorers - a distinction that directly affects difficulty tuning.
 
@@ -342,29 +342,29 @@ The target variable is the **difficulty multiplier** the model learns to predict
 #### Option A - Static Heuristic (Rejected)
 
 ```
-Target = 1.0 - (0.1 × deaths) + (0.05 × normalised_activity)
+Target = 1.0 - (0.1 x deaths) + (0.05 x normalised_activity)
 Clipped to [0.5, 1.5]
 ```
 
 - **Result**: Target variance σ = 0.011 (collapsed to near-constant ~1.02)
-- **Problem**: MLP could not learn - predicting the mean was optimal (R² = -4.69)
+- **Problem**: MLP could not learn - predicting the mean was optimal (R^2 = -4.69)
 - **Root cause**: Deaths were too rare and activity intensity too uniform to generate meaningful variance
 
 #### Option B - Delta-Weighted Canonical (Selected Done)
 
 ```
 Target = 0.9
-       + 0.22 × (soft_combat  - 0.5)
-       + 0.18 × (soft_collect - 0.5)
-       + 0.15 × (soft_explore - 0.5)
-       + 0.55 × delta_combat
-       + 0.40 × delta_collect
-       + 0.35 × delta_explore
-       - 0.25 × death_rate_normalised
+       + 0.22 x (soft_combat  - 0.5)
+       + 0.18 x (soft_collect - 0.5)
+       + 0.15 x (soft_explore - 0.5)
+       + 0.55 x delta_combat
+       + 0.40 x delta_collect
+       + 0.35 x delta_explore
+       - 0.25 x death_rate_normalised
 Clipped to [0.6, 1.4]
 ```
 
-- **Result**: Target variance σ = 0.0625 (5.5× improvement over Option A)
+- **Result**: Target variance σ = 0.0625 (5.5x improvement over Option A)
 - **Key insight**: Deltas are the **primary variance drivers** (weights 0.55, 0.40, 0.35), not static state
 - **Rationale**: A player with 80% combat + positive delta (engaging more) should have different difficulty than 80% combat + negative delta (disengaging)
 
@@ -372,9 +372,9 @@ Clipped to [0.6, 1.4]
 
 | Metric | Option A | Option B | Improvement |
 |--------|----------|----------|-------------|
-| Target σ | 0.011 | 0.0625 | **5.5×** |
-| Target span | 0.023 | 0.41 | **18×** |
-| Model R² | -4.69 | 0.9224 | Functional vs. broken |
+| Target σ | 0.011 | 0.0625 | **5.5x** |
+| Target span | 0.023 | 0.41 | **18x** |
+| Model R^2 | -4.69 | 0.9224 | Functional vs. broken |
 
 Option A failed because the MLP had no meaningful signal to learn from. The target was essentially constant, so predicting the mean was optimal. Option B solved this by using behaviour *changes* (deltas) as the primary drivers of variance.
 
@@ -397,7 +397,7 @@ Trains a compact neural network (MLP) to approximate the ANFIS difficulty surfac
 ### Architecture
 
 ```
-Input (6) → Hidden (16, ReLU) → Hidden (8, ReLU) → Output (1, Linear)
+Input (6) -> Hidden (16, ReLU) -> Hidden (8, ReLU) -> Output (1, Linear)
 ```
 
 ### Training Configuration
@@ -426,11 +426,11 @@ The fuzzy logic is already embedded in the **input features** (soft membership, 
 
 | Metric | Train | Test |
 |--------|-------|------|
-| R² | 0.8369 | **0.9224** |
+| R^2 | 0.8369 | **0.9224** |
 | MAE | 0.0127 | **0.0108** |
 | Iterations | 23 | - |
 
-**Key observation**: Test R² > Train R² indicates excellent generalisation (no overfitting).
+**Key observation**: Test R^2 > Train R^2 indicates excellent generalisation (no overfitting).
 
 ### Model Export
 
@@ -587,9 +587,9 @@ Static soft membership alone tells you **what** a player is doing, not **how the
 
 | Signal Pair | Correlation (r) | p-value | Interpretation |
 |-------------|-----------------|---------|----------------|
-| **Δexplore ↔ Δtarget** | **0.808** | < 1e-77 | Very strong positive |
-| Δcombat ↔ Δtarget | -0.471 | < 1e-77 | Moderate negative |
-| Δcollect ↔ Δtarget | 0.323 | Significant | Weak positive |
+| **Δexplore <-> Δtarget** | **0.808** | < 1e-77 | Very strong positive |
+| Δcombat <-> Δtarget | -0.471 | < 1e-77 | Moderate negative |
+| Δcollect <-> Δtarget | 0.323 | Significant | Weak positive |
 
 ### Key Finding
 
@@ -599,7 +599,7 @@ When a player's exploration engagement increases (Δexplore > 0), the target mul
 
 - 316 combat burst instances detected
 - Mean target change during bursts: -0.018 (difficulty slightly decreases)
-- Variance: Raw 0.000536 → With deltas 0.000409 (76.3% efficiency)
+- Variance: Raw 0.000536 -> With deltas 0.000409 (76.3% efficiency)
 
 ### Decision
 
@@ -613,18 +613,18 @@ This was the **most critical turning point** in the entire project.
 
 ### The Problem - Variance Collapse
 
-The original target formula (Option A) produced targets clustered at ~1.02 with σ = 0.011. The neural network had nothing to learn - predicting the mean was optimal, yielding R² = -4.69 (worse than a constant prediction).
+The original target formula (Option A) produced targets clustered at ~1.02 with σ = 0.011. The neural network had nothing to learn - predicting the mean was optimal, yielding R^2 = -4.69 (worse than a constant prediction).
 
 ### Root Cause Analysis
 
-1. **Deaths too rare**: Most windows had 0 deaths → the -0.1 × deaths term had no effect
+1. **Deaths too rare**: Most windows had 0 deaths -> the -0.1 x deaths term had no effect
 2. **Activity too uniform**: Normalised activity intensity was nearly constant across windows
 3. **Fuzzy constraints**: Soft membership values were already bounded [0, 1], limiting variance
 
 ### Option A - Static Heuristic
 
 ```
-Target = 1.0 - (0.1 × deaths) + (0.05 × normalised_activity)
+Target = 1.0 - (0.1 x deaths) + (0.05 x normalised_activity)
 Clipped to [0.5, 1.5]
 ```
 
@@ -634,13 +634,13 @@ Clipped to [0.5, 1.5]
 
 ```
 Target = 0.9
-       + 0.22 × (soft_combat  - 0.5)
-       + 0.18 × (soft_collect - 0.5)
-       + 0.15 × (soft_explore - 0.5)
-       + 0.55 × delta_combat          ← Primary variance driver
-       + 0.40 × delta_collect         ← Primary variance driver
-       + 0.35 × delta_explore         ← Primary variance driver
-       - 0.25 × death_rate_normalised
+       + 0.22 x (soft_combat  - 0.5)
+       + 0.18 x (soft_collect - 0.5)
+       + 0.15 x (soft_explore - 0.5)
+       + 0.55 x delta_combat          <-- Primary variance driver
+       + 0.40 x delta_collect         <-- Primary variance driver
+       + 0.35 x delta_explore         <-- Primary variance driver
+       - 0.25 x death_rate_normalised
 Clipped to [0.6, 1.4]
 ```
 
@@ -660,11 +660,11 @@ Clipped to [0.6, 1.4]
 
 | Metric | Option A | Option B |
 |--------|----------|----------|
-| Target σ | 0.011 | **0.0625** (5.5×) |
-| Target span | 0.023 | **0.41** (18×) |
-| Model R² | -4.69 | **0.9224** |
+| Target σ | 0.011 | **0.0625** (5.5x) |
+| Target span | 0.023 | **0.41** (18x) |
+| Model R^2 | -4.69 | **0.9224** |
 | Model MAE | ~0.011 | **0.0108** |
-| Trainability | ❌ Broken | Functional |
+| Trainability | [fail] Broken | Functional |
 
 ---
 
@@ -674,7 +674,7 @@ Clipped to [0.6, 1.4]
 
 - **Symptom**: 98.6% of windows classified as "Exploration"
 - **Root cause**: `MinMaxScaler.fit_transform()` was never called; raw feature values were used
-- **Impact**: `distanceTraveled` (range 0–5,000) dominated all other features (range 0–100)
+- **Impact**: `distanceTraveled` (range 0-5,000) dominated all other features (range 0-100)
 - **Fix**: Apply MinMaxScaler strictly to all 10 features before any downstream computation
 - **Lesson**: Always verify normalisation by checking feature ranges after transformation
 
@@ -688,7 +688,7 @@ Clipped to [0.6, 1.4]
 
 ### Bug 3 - Target Variance Collapse (Option A)
 
-- **Symptom**: Model R² = -4.69 (worse than predicting the mean)
+- **Symptom**: Model R^2 = -4.69 (worse than predicting the mean)
 - **Root cause**: Target variable had σ = 0.011, making all targets effectively identical
 - **Impact**: MLP could not learn any meaningful mapping
 - **Fix**: Redesigned target formula (Option B) with delta-weighted coefficients
@@ -696,7 +696,7 @@ Clipped to [0.6, 1.4]
 
 ### Combined Impact
 
-These bugs collectively shifted model accuracy from ~40% to **92.2%** (R² = 0.9224). The normalization and column bugs were the most impactful, transforming cluster quality from meaningless to interpretable.
+These bugs collectively shifted model accuracy from ~40% to **92.2%** (R^2 = 0.9224). The normalization and column bugs were the most impactful, transforming cluster quality from meaningless to interpretable.
 
 ---
 
@@ -725,13 +725,13 @@ These bugs collectively shifted model accuracy from ~40% to **92.2%** (R² = 0.9
 
 ```
 Telemetry (30s window)
-  → Normalise using scaler_params.json
-  → Compute activity scores & percentages
-  → Compute distances to 3 centroids
-  → Inverse-distance soft membership
-  → Compute deltas from previous window
-  → MLP forward pass (6→16→8→1)
-  → Difficulty multiplier [0.6, 1.4]
+  -> Normalise using scaler_params.json
+  -> Compute activity scores & percentages
+  -> Compute distances to 3 centroids
+  -> Inverse-distance soft membership
+  -> Compute deltas from previous window
+  -> MLP forward pass (6->16->8->1)
+  -> Difficulty multiplier [0.6, 1.4]
 ```
 
 ### Export Script
@@ -756,7 +756,7 @@ Contains the **Option A failure evidence**:
 
 | File | Key Content |
 |------|-------------|
-| `metrics.json` | R² = -4.69 (train: -5.39, val: -4.59) - catastrophic failure |
+| `metrics.json` | R^2 = -4.69 (train: -5.39, val: -4.59) - catastrophic failure |
 | `split_info.json` | Train: 2,159 / Val: 491 / Test: 514 samples |
 | `verdict.json` | "SEVERELY OVERFITTED (CRITICAL FAILURE)" - sensitivity analysis showed soft_combat had max impact of only 0.145 |
 | `plots/distribution.png` | Target distribution visualisation |
@@ -790,9 +790,9 @@ This evaluation was the **trigger for switching from Option A to Option B**.
 
 | Metric | Value |
 |--------|-------|
-| Test R² | 0.9264 |
+| Test R^2 | 0.9264 |
 | Test MAE | 0.0127 |
-| Train R² | 0.8600 |
+| Train R^2 | 0.8600 |
 | Target CV | 0.022 |
 | Target Range | [0.6, 1.4] |
 
@@ -800,9 +800,9 @@ This evaluation was the **trigger for switching from Option A to Option B**.
 
 | Signal | Correlation |
 |--------|-------------|
-| Δexplore → Δtarget | r = 0.808 |
-| Δcombat → Δtarget | r = -0.471 |
-| Δcollect → Δtarget | r = 0.323 |
+| Δexplore -> Δtarget | r = 0.808 |
+| Δcombat -> Δtarget | r = -0.471 |
+| Δcollect -> Δtarget | r = 0.323 |
 
 ### Production Configuration (Locked)
 
@@ -847,9 +847,9 @@ Every major decision in this project was validated experimentally and then locke
 | Feature weighting | Uniform, Exploration-reduced | Uniform | Sensitivity analysis |
 | Soft membership | Hard assignment, Inverse distance | Inverse distance | Design requirement |
 | Delta signals | Exclude, Include | Include | Correlation analysis (r=0.808) |
-| Target formula | Option A (static), Option B (delta-weighted) | Option B | Variance analysis + R² comparison |
+| Target formula | Option A (static), Option B (delta-weighted) | Option B | Variance analysis + R^2 comparison |
 | Model architecture | Full ANFIS, MLP 6-16-8-1 | MLP Surrogate | Runtime performance |
-| Session filter | Various thresholds | 20–45 min | Duration analysis |
+| Session filter | Various thresholds | 20-45 min | Duration analysis |
 | Window size | Various | 30 seconds | Design trade-off |
 
 ---
@@ -858,11 +858,11 @@ Every major decision in this project was validated experimentally and then locke
 
 ```
 CollectGame.Model/
-├── README.md                          ← Production system overview
-├── CHANGELOG.md                       ← Version history
-├── FINAL_SYSTEM_STATUS.md             ← Architecture status
-├── QUICK_START.md                     ← How to run the pipeline
-├── RESEARCH_JOURNEY.md                ← This document
+├── README.md                          <-- Production system overview
+├── CHANGELOG.md                       <-- Version history
+├── FINAL_SYSTEM_STATUS.md             <-- Architecture status
+├── QUICK_START.md                     <-- How to run the pipeline
+├── RESEARCH_JOURNEY.md                <-- This document
 │
 ├── _research_archive/
 │   ├── core/
@@ -875,34 +875,34 @@ CollectGame.Model/
 │   │   │   ├── 06_ANFIS_Preparation.ipynb
 │   │   │   ├── 07_ANFIS_Training.ipynb
 │   │   │   └── 08_Evaluation_Visualizations.ipynb
-│   │   ├── pipeline_config.yaml       ← Locked production config
+│   │   ├── pipeline_config.yaml       <-- Locked production config
 │   │   ├── DELTA_IMPLEMENTATION_GUIDE.md
 │   │   └── README.md
 │   │
 │   ├── experiments/
-│   │   ├── experiment_A_baseline/     ← Full 8-notebook pipeline (A)
-│   │   ├── experiment_B_feature_aware/← Full 8-notebook pipeline (B)
-│   │   ├── comparison_table.csv       ← A vs B metrics
-│   │   ├── optimization_results.csv   ← 108-config grid search
-│   │   ├── delta_effect_analysis.json ← Temporal signal analysis
+│   │   ├── experiment_A_baseline/     <-- Full 8-notebook pipeline (A)
+│   │   ├── experiment_B_feature_aware/<-- Full 8-notebook pipeline (B)
+│   │   ├── comparison_table.csv       <-- A vs B metrics
+│   │   ├── optimization_results.csv   <-- 108-config grid search
+│   │   ├── delta_effect_analysis.json <-- Temporal signal analysis
 │   │   ├── feature_weight_sensitivity.csv
 │   │   └── exploration_interpretation_report.csv
 │   │
 │   ├── data/
-│   │   ├── telemetry_phase_2.*.csv    ← Raw source data (3 files)
-│   │   ├── processed/                 ← Pipeline outputs (CSVs + PNGs)
-│   │   └── models/                    ← Trained model artifacts (6 JSONs)
+│   │   ├── telemetry_phase_2.*.csv    <-- Raw source data (3 files)
+│   │   ├── processed/                 <-- Pipeline outputs (CSVs + PNGs)
+│   │   └── models/                    <-- Trained model artifacts (6 JSONs)
 │   │
-│   ├── model_evaluation_output/       ← Option A failure evidence
-│   │   ├── metrics.json               ← R² = -4.69
-│   │   ├── verdict.json               ← "CRITICAL FAILURE"
-│   │   └── plots/                     ← Distribution, residuals, sensitivity
+│   ├── model_evaluation_output/       <-- Option A failure evidence
+│   │   ├── metrics.json               <-- R^2 = -4.69
+│   │   ├── verdict.json               <-- "CRITICAL FAILURE"
+│   │   └── plots/                     <-- Distribution, residuals, sensitivity
 │   │
-│   ├── thesis_documentation/          ← 13 thesis-ready documents
-│   ├── export_model_artifacts.py      ← JSON export script
+│   ├── thesis_documentation/          <-- 13 thesis-ready documents
+│   ├── export_model_artifacts.py      <-- JSON export script
 │   └── Independent_Telemetry_Duration_Analysis.ipynb
 │
-└── anfis-demo-ui/                     ← Web demo (Next.js)
+└── anfis-demo-ui/                     <-- Web demo (Next.js)
 ```
 
 ---
@@ -952,9 +952,9 @@ sessions. Switching to averages gives every archetype an equal ceiling of 1.0.
 
 ```
 # v2.1 formula
-score_combat  = avg(enemiesHit, damageDone, timeInCombat, kills)          → [0, 1]
-score_collect = avg(itemsCollected, pickupAttempts, timeNearInteractables) → [0, 1]
-score_explore = avg(distanceTraveled, timeSprinting)                       → [0, 1]
+score_combat  = avg(enemiesHit, damageDone, timeInCombat, kills)          -> [0, 1]
+score_collect = avg(itemsCollected, pickupAttempts, timeNearInteractables) -> [0, 1]
+score_explore = avg(distanceTraveled, timeSprinting)                       -> [0, 1]
 
 pct_X = score_X / (score_combat + score_collect + score_explore)
 ```
@@ -989,7 +989,7 @@ The centroids in `cluster_centroids.json` and model weights in `anfis_mlp_weight
 were computed with the v2.0 formula and must be regenerated:
 
 ```
-Rerun: 04 → 05 → 06 → 07
+Rerun: 04 -> 05 -> 06 -> 07
 ```
 
 Notebook 05 now includes an automatic export cell that writes `cluster_centroids.json`
@@ -997,7 +997,7 @@ directly to `anfis-demo-ui/models/` upon completion.
 
 ### Pipeline Regeneration Status - Completed 2026-03-06
 
-Notebooks 04 → 05 → 06 → 07 were rerun with the v2.1 formula.
+Notebooks 04 -> 05 -> 06 -> 07 were rerun with the v2.1 formula.
 
 **New cluster centroids (post-rerun):**
 
@@ -1007,7 +1007,7 @@ Notebooks 04 → 05 → 06 → 07 were rerun with the v2.1 formula.
 | 1 | Exploration | 0.0467 | 0.1042 | 0.8491 |
 | 2 | Combat | 0.5110 | 0.0581 | 0.4309 |
 
-**Key shift from v2.0 → v2.1 centroids**: The Exploration centroid now requires `pct_explore = 0.849` to reach (up from 0.879 in v2.0 using inflated old formula), but the Combat centroid's `pct_explore` dropped from 0.430 to 0.431 (minor), confirming that passive `timeOutOfCombat` inflation was the dominant driver of the old formula's biases. The Collection centroid's `pct_explore` component dropped from 0.630 to 0.522, correctly de-coupling collection behavior from exploration scoring.
+**Key shift from v2.0 -> v2.1 centroids**: The Exploration centroid now requires `pct_explore = 0.849` to reach (up from 0.879 in v2.0 using inflated old formula), but the Combat centroid's `pct_explore` dropped from 0.430 to 0.431 (minor), confirming that passive `timeOutOfCombat` inflation was the dominant driver of the old formula's biases. The Collection centroid's `pct_explore` component dropped from 0.630 to 0.522, correctly de-coupling collection behavior from exploration scoring.
 
 **New model metrics (post-rerun):**
 - train_mae: 0.0125
@@ -1033,22 +1033,22 @@ Two weaknesses identified in the v2.1 activity scoring:
 | Area | Change |
 |---|---|
 | `03_Normalization.ipynb` | Added derived feature cells + scaler export cell |
-| `04_Activity_Contributions.ipynb` | Combat ÷5, Collect ÷4 |
+| `04_Activity_Contributions.ipynb` | Combat /5, Collect /4 |
 | `lib/engine/index.ts` | Pre-compute `damage_per_hit` / `pickup_attempt_rate` (snake_case) |
 | `lib/engine/activity.ts` | Updated divisors and fallback `?? 0` |
-| `lib/session/session-manager.ts` | Timeout 40s → 90s |
+| `lib/session/session-manager.ts` | Timeout 40s -> 90s |
 | `lib/engine/adaptation.ts` | `SENSITIVITY` registry replaces global 0.3 |
-| `models/scaler_params.json` | 10 → 12 features |
-| `models/deployment_manifest.json` | v2.0/FROZEN → v2.2/PRODUCTION |
+| `models/scaler_params.json` | 10 -> 12 features |
+| `models/deployment_manifest.json` | v2.0/FROZEN -> v2.2/PRODUCTION |
 
-### Pipeline Rerun Outcome (NB 03 → 07)
+### Pipeline Rerun Outcome (NB 03 -> 07)
 
 All notebooks reruns as of 2026-03-06:
 
 | Artifact | Key Result |
 |---|---|
 | `scaler_params.json` | 12 features (added `damage_per_hit`, `pickup_attempt_rate`) |
-| `anfis_mlp_weights.json` | Test R²: 0.9392, Test MAE: 0.0112 |
+| `anfis_mlp_weights.json` | Test R^2: 0.9392, Test MAE: 0.0112 |
 | `cluster_centroids.json` | 3 centroids re-computed on v2.2 activity scores |
 
 **Case sensitivity bug fix**: The engine initially computed features as `damagePerHit`/`pickupAttemptRate` (camelCase) but the scaler expected `damage_per_hit`/`pickup_attempt_rate` (snake_case). Fixed in `lib/engine/index.ts`.

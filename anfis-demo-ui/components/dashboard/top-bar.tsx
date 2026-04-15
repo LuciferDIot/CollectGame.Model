@@ -215,7 +215,7 @@ export function TopBar() {
               {isRunning ? '...' : 'Run'}
             </Button>
 
-            {/* Analytics — appears after pipeline runs */}
+            {/* Analytics -- appears after pipeline runs */}
             {pipelineState.executionTime > 0 && (
               <Button size="sm" onClick={() => setAnalyticsOpen(true)}
                 className="gap-1 h-8 px-3 bg-violet-600 hover:bg-violet-500 text-white border-0 font-black uppercase text-[10px] tracking-wider rounded-lg shadow-[0_0_15px_-5px_rgba(139,92,246,0.5)] animate-fade-in shrink-0"

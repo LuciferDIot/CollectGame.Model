@@ -149,14 +149,14 @@ export class MinMaxNormalizer {
    * === SPECIAL CASES ===
    * 
    * Case 1: Missing Data
-   *   If player has no value for a feature → default to 0
+   *   If player has no value for a feature -> default to 0
    * 
    * Case 2: Zero Range
-   *   If min = max (no variation in training data) → return min_value
+   *   If min = max (no variation in training data) -> return min_value
    *   Example: If all players always start with 100 health
    * 
    * Case 3: Out of Range
-   *   If value > max or value < min → clamp to [0, 1]
+   *   If value > max or value < min -> clamp to [0, 1]
    *   Example: Player killed 100 enemies (way above typical 50 max)
    *   Result: Clamped to 1.0
    * 
@@ -226,14 +226,14 @@ export class MinMaxNormalizer {
    * 
    * === THE FORMULA ===
    * 
-   * Original = normalized × (max - min) + min
+   * Original = normalized x (max - min) + min
    * 
    * === EXAMPLE ===
    * 
    * Normalized: 0.2
    * Range: 0-50
    * 
-   * Original = 0.2 × (50 - 0) + 0 = 10
+   * Original = 0.2 x (50 - 0) + 0 = 10
    * 
    * === PROCESS ===
    * 
@@ -243,7 +243,7 @@ export class MinMaxNormalizer {
    *    Example: 0.4
    * 
    * 2. MULTIPLY BY RANGE
-   *    0.4 × 2000 = 800
+   *    0.4 x 2000 = 800
    * 
    * 3. ADD MINIMUM
    *    800 + 0 = 800
@@ -267,14 +267,14 @@ export class MinMaxNormalizer {
       // ========================================
       // STEP 2: APPLY INVERSE FORMULA
       // ========================================
-      // Formula: value = normalized × range + min
+      // Formula: value = normalized x range + min
       // 
       // Example:
       //   scaledValue = 0.4 (normalized)
       //   dataRange[idx] = 2000 (max damage - min damage)
       //   dataMin[idx] = 0 (min damage)
       //   
-      //   original = 0.4 × 2000 + 0 = 800 damage
+      //   original = 0.4 x 2000 + 0 = 800 damage
       original[featureName] = scaledValue * this.dataRange[idx] + this.dataMin[idx];
     });
 
@@ -315,10 +315,10 @@ export class MinMaxNormalizer {
  * - Maximum kills: 50
  * - Average kills: 15
  * 
- * Player A: 10 kills → normalized = 10/50 = 0.2 (below average)
- * Player B: 15 kills → normalized = 15/50 = 0.3 (average)
- * Player C: 30 kills → normalized = 30/50 = 0.6 (above average)
- * Player D: 100 kills → normalized = 100/50 = 2.0 → clamped to 1.0 (exceptional!)
+ * Player A: 10 kills -> normalized = 10/50 = 0.2 (below average)
+ * Player B: 15 kills -> normalized = 15/50 = 0.3 (average)
+ * Player C: 30 kills -> normalized = 30/50 = 0.6 (above average)
+ * Player D: 100 kills -> normalized = 100/50 = 2.0 -> clamped to 1.0 (exceptional!)
  * 
  * Now the AI can easily see who's performing well!
  * 

@@ -49,7 +49,7 @@ export function MembershipDiagnostics({ session, currentRound }: MembershipDiagn
                 trigger={<div className="p-1.5 rounded-md hover:bg-slate-800/50 transition-colors cursor-help"><Cpu className="w-3.5 h-3.5 text-slate-500" /></div>}
                 title="Soft Membership (Fuzzification)"
                 description="The degree to which the player currently fits into each Archetype (0.0 to 1.0). Unlike hard clustering, this is fuzzy and continuous."
-                interpretation="Option B uses this for 'Contextual Bias'—smoothing the output but not driving the main variance."
+                interpretation="Option B uses this for 'Contextual Bias'--smoothing the output but not driving the main variance."
             />
         </div>
       </CardHeader>

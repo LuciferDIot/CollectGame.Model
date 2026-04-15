@@ -97,13 +97,13 @@ export function clamp(value: number, min: number, max: number): number {
  * 
  * === WHEN TO USE ===
  * For parameters that should increase with difficulty:
- * - Enemy health (harder → more health)
- * - Enemy damage (harder → more damage)
- * - Enemy count (harder → more enemies)
+ * - Enemy health (harder -> more health)
+ * - Enemy damage (harder -> more damage)
+ * - Enemy count (harder -> more enemies)
  * 
  * === THE FORMULA ===
  * ```
- * result = base × multiplier
+ * result = base x multiplier
  * ```
  * 
  * === EXAMPLES ===
@@ -134,7 +134,7 @@ export function clamp(value: number, min: number, max: number): number {
  * 
  * @param base - The starting value
  * @param totalMultiplier - How much to scale (1.0 = no change)
- * @returns Scaled value (base × multiplier)
+ * @returns Scaled value (base x multiplier)
  * 
  * ============================================================================
  */
@@ -152,15 +152,15 @@ export function applyDirectScaling(base: number, totalMultiplier: number): numbe
  * 
  * === WHEN TO USE ===
  * For parameters that should DECREASE with difficulty:
- * - Health pickups (harder → fewer pickups)
- * - Ammo drops (harder → less ammo)
- * - Cooldown times (harder → longer cooldowns)
+ * - Health pickups (harder -> fewer pickups)
+ * - Ammo drops (harder -> less ammo)
+ * - Cooldown times (harder -> longer cooldowns)
  * 
  * === WHY INVERSE? ===
  * 
  * If difficulty goes UP, we want these things to go DOWN:
- * - Direct scaling: 100 × 1.2 = 120 ❌ (health pickups increase!)
- * - Inverse scaling: 100 / 1.2 = 83 ✅ (health pickups decrease!)
+ * - Direct scaling: 100 x 1.2 = 120 [fail] (health pickups increase!)
+ * - Inverse scaling: 100 / 1.2 = 83 [done] (health pickups decrease!)
  * 
  * === THE FORMULA ===
  * ```
@@ -202,10 +202,10 @@ export function applyDirectScaling(base: number, totalMultiplier: number): numbe
  * === WHY MINIMUM OF 0.001? ===
  * 
  * Without safety:
- * - 100 / 0 = Infinity → Program crashes! 💥
+ * - 100 / 0 = Infinity -> Program crashes! 
  * 
  * With safety:
- * - 100 / 0.001 = 100,000 → Large but valid number ✅
+ * - 100 / 0.001 = 100,000 -> Large but valid number [done]
  * - Gets clamped by min/max in adaptation anyway
  * 
  * @param base - The starting value
@@ -247,16 +247,16 @@ export function applyInverseScaling(base: number, totalMultiplier: number): numb
  * ```
  * lowerBound = 1.0 - (sensitivity / 2)
  * upperBound = 1.0 + (sensitivity / 2)
- * modifier = lowerBound + (sensitivity × influence)
+ * modifier = lowerBound + (sensitivity x influence)
  * result = clamp(modifier, lowerBound, upperBound)
  * ```
  * 
  * === WHY THIS FORMULA? ===
  * 
  * We want:
- * - Neutral player (influence = 0.5) → modifier = 1.0 (no change)
- * - High archetype (influence = 1.0) → modifier = upperBound
- * - Low archetype (influence = 0.0) → modifier = lowerBound
+ * - Neutral player (influence = 0.5) -> modifier = 1.0 (no change)
+ * - High archetype (influence = 1.0) -> modifier = upperBound
+ * - Low archetype (influence = 0.0) -> modifier = lowerBound
  * - Sensitivity controls the RANGE of adjustment
  * 
  * === DETAILED WALKTHROUGH ===
@@ -274,12 +274,12 @@ export function applyInverseScaling(base: number, totalMultiplier: number): numb
  * lowerBound = 1.0 - (0.3 / 2) = 1.0 - 0.15 = 0.85
  * upperBound = 1.0 + (0.3 / 2) = 1.0 + 0.15 = 1.15
  * 
- * Range: 0.85 to 1.15 (±15% adjustment possible)
+ * Range: 0.85 to 1.15 (+/-15% adjustment possible)
  * ```
  * 
  * Step 2: Calculate modifier
  * ```
- * modifier = 0.85 + (0.3 × 0.7)
+ * modifier = 0.85 + (0.3 x 0.7)
  *          = 0.85 + 0.21
  *          = 1.06
  * ```
@@ -300,7 +300,7 @@ export function applyInverseScaling(base: number, totalMultiplier: number): numb
  * calculateCanonicalModifier(0.5, 0.3)
  * // influence = 0.5 (neutral)
  * // lowerBound = 0.85
- * // modifier = 0.85 + (0.3 × 0.5) = 0.85 + 0.15 = 1.0
+ * // modifier = 0.85 + (0.3 x 0.5) = 0.85 + 0.15 = 1.0
  * // Returns: 1.0 (no change for neutral player)
  * ```
  * 
@@ -308,7 +308,7 @@ export function applyInverseScaling(base: number, totalMultiplier: number): numb
  * ```typescript
  * calculateCanonicalModifier(1.0, 0.3)
  * // influence = 1.0 (100% focused)
- * // modifier = 0.85 + (0.3 × 1.0) = 1.15
+ * // modifier = 0.85 + (0.3 x 1.0) = 1.15
  * // Returns: 1.15 (maximum increase)
  * ```
  * 
@@ -317,7 +317,7 @@ export function applyInverseScaling(base: number, totalMultiplier: number): numb
  * calculateCanonicalModifier(0.8, 0.1)
  * // sensitivity = 0.1 (parameter barely cares)
  * // lowerBound = 0.95, upperBound = 1.05
- * // modifier = 0.95 + (0.1 × 0.8) = 1.03
+ * // modifier = 0.95 + (0.1 x 0.8) = 1.03
  * // Returns: 1.03 (small adjustment only)
  * ```
  * 
@@ -357,7 +357,7 @@ export function calculateCanonicalModifier(influence: number, sensitivity: numbe
  * 
  * Computers can't store exact decimals:
  * ```typescript
- * 0.1 + 0.2 === 0.3  // Returns: false! 😱
+ * 0.1 + 0.2 === 0.3  // Returns: false! 
  * 0.1 + 0.2          // Actually: 0.30000000000000004
  * ```
  * 
@@ -384,7 +384,7 @@ export function calculateCanonicalModifier(influence: number, sensitivity: numbe
  * // b = 0.3
  * // difference = 0.00000000000000004
  * // tolerance = 0.001
- * // 0.00000000000000004 < 0.001 → true ✅
+ * // 0.00000000000000004 < 0.001 -> true [done]
  * ```
  * 
  * Example 2: Membership validation
@@ -393,14 +393,14 @@ export function calculateCanonicalModifier(influence: number, sensitivity: numbe
  * isApproximatelyEqual(sum, 1.0, 0.001)
  * // sum = 1.000000
  * // difference from 1.0 = 0.0
- * // Returns: true ✅
+ * // Returns: true [done]
  * ```
  * 
  * Example 3: Actually different numbers
  * ```typescript
  * isApproximatelyEqual(1.5, 1.0, 0.001)
  * // difference = 0.5
- * // 0.5 < 0.001 → false ❌
+ * // 0.5 < 0.001 -> false [fail]
  * // These are genuinely different!
  * ```
  * 
@@ -408,11 +408,11 @@ export function calculateCanonicalModifier(influence: number, sensitivity: numbe
  * ```typescript
  * isApproximatelyEqual(1.002, 1.0, 0.01)
  * // difference = 0.002
- * // 0.002 < 0.01 → true ✅ (within 1% tolerance)
+ * // 0.002 < 0.01 -> true [done] (within 1% tolerance)
  * 
  * isApproximatelyEqual(1.002, 1.0, 0.001)
  * // difference = 0.002
- * // 0.002 < 0.001 → false ❌ (exceeds 0.1% tolerance)
+ * // 0.002 < 0.001 -> false [fail] (exceeds 0.1% tolerance)
  * ```
  * 
  * @param a - First number

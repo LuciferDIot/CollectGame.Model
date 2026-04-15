@@ -21,7 +21,7 @@
  * 
  * STEP 2: Send to API Endpoint
  * ----------------------------
- * We make an HTTP POST request to '/api/pipeline'
+ * We make an HTTP POST request to '/api/pipeline/adapt'
  * This is like knocking on the door of the AI brain's office.
  * 
  * STEP 3: Wait for Response
@@ -100,7 +100,7 @@ export async function fetchSimulationResults(
     logRequest(userId, telemetry, requestBody);
     
     // 3. Send Request
-    const response = await fetch('/api/pipeline', {
+    const response = await fetch('/api/pipeline/adapt', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(requestBody)
@@ -137,8 +137,8 @@ function preparePayload(
 }
 
 function logRequest(userId: string, originalTelemetry: TelemetryFeatures, requestBody: any) {
-    console.log('📤 Sending request to API:', {
-        endpoint: '/api/pipeline',
+    console.log('[pipeline/adapt] Sending request:', {
+        endpoint: '/api/pipeline/adapt',
         player: userId,
         actionsTracked: Object.keys(originalTelemetry).length,
         deaths: requestBody.telemetry.deathCount,
@@ -159,7 +159,7 @@ async function handleResponseError(response: Response) {
         // Fallback to statusText if JSON parsing fails
     }
 
-    console.error('❌ API request failed:', {
+    console.error('[pipeline/adapt] Request failed:', {
         status: response.status,
         statusText: response.statusText,
         detail: errorMessage
@@ -170,7 +170,7 @@ async function handleResponseError(response: Response) {
 
 function logResponse(result: any) {
     const timestamp = new Date().toISOString();
-    console.log('✅ Received AI recommendations:', {
+    console.log('[pipeline/adapt] Response received:', {
         timestamp,
         multiplier: result.target_multiplier,
         playerStyle: result.soft_membership,

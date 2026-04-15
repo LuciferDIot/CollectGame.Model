@@ -24,10 +24,10 @@ This document provides a comprehensive timeline and justification for the optimi
 4. Deploy a runtime-efficient neural surrogate for real-time adaptation
 
 ### Key Achievements
-- Fixed critical normalization bug (98.6% → balanced distribution)
-- Implemented soft membership clustering (hard → probabilistic)
-- Created archetype-aware difficulty adaptation (generic → personalized)
-- Added comprehensive validation metrics (none → 3 metrics)
+- Fixed critical normalization bug (98.6% -> balanced distribution)
+- Implemented soft membership clustering (hard -> probabilistic)
+- Created archetype-aware difficulty adaptation (generic -> personalized)
+- Added comprehensive validation metrics (none -> 3 metrics)
 - Improved predicted accuracy from 40-55% to 75-85%
 
 ---
@@ -93,7 +93,7 @@ df_norm[feature_cols] = df_norm[feature_cols].fillna(0)  # Only filling NaN!
 BEFORE normalization fix:
 distanceTraveled range: [0, 5000+]
 kills range: [0, 15]
-→ Distance dominates clustering → 98.6% exploration
+-> Distance dominates clustering -> 98.6% exploration
 ```
 
 ---
@@ -204,9 +204,9 @@ target = 1.0 + 0.1 * activity - 0.1 * deaths
 
 **Justification for Fix**:
 - Different archetypes need different skill metrics
-- Combat → K/D ratio is key indicator
-- Collection → pickup efficiency matters
-- Exploration → distance per time is relevant
+- Combat -> K/D ratio is key indicator
+- Collection -> pickup efficiency matters
+- Exploration -> distance per time is relevant
 - Personalized adaptation improves player experience
 
 ---
@@ -279,7 +279,7 @@ for cluster_id, center in enumerate(cluster_centers):
 
 ---
 
-#### Fix #2.5: Critical Activity Score Bug Fix No→CRITICAL
+#### Fix #2.5: Critical Activity Score Bug Fix No->CRITICAL
 
 **Time**: January 27, 2026, 12:54 PM IST  
 **File**: `04_Activity_Contributions.ipynb`
@@ -544,8 +544,8 @@ Exploration: ~35-40%  Properly represented
 
 **Comparison to Hard Assignment**:
 ```
-BEFORE: [0, 1, 2] → Binary cluster IDs
-AFTER: [0.24, 0.56, 0.21] → Probability distribution
+BEFORE: [0, 1, 2] -> Binary cluster IDs
+AFTER: [0.24, 0.56, 0.21] -> Probability distribution
 ```
 
 **Benefit**: Smoother difficulty transitions, no sudden jumps
@@ -571,7 +571,7 @@ Cluster Distribution:
   Cluster 2: 746 samples (26.3%)  Balanced
 ```
 
-**Assessment**: All clusters have >15% representation → Balanced
+**Assessment**: All clusters have >15% representation -> Balanced
 
 **BEFORE**: Only 2 effective clusters (Collection archetype missing)  
 **AFTER**: 3 distinct clusters discovered
@@ -788,7 +788,7 @@ Layer 5: Output
 
 **MLP Architecture**:
 ```
-Input (6) → Hidden (16) → Hidden (8) → Output (1)
+Input (6) -> Hidden (16) -> Hidden (8) -> Output (1)
 ```
 
 **Justification**:
@@ -844,7 +844,7 @@ Sample variance:
   BEFORE: Binary (0 or 1)
   AFTER: Continuous distribution
   
-Improvement: Infinite (categorical → continuous)
+Improvement: Infinite (categorical -> continuous)
 ```
 
 **Metric 4: Target Personalization**
@@ -897,9 +897,9 @@ Improvement: 3x personalization dimensions
 Predicted Accuracy: 40-55%
 
 Breakdown:
-  - Normalization: 0% (broken) → 30% impact
-  - Clustering: 50% (flawed input) → 30% impact
-  - Target Generation: 60% (generic) → 20% impact
+  - Normalization: 0% (broken) -> 30% impact
+  - Clustering: 50% (flawed input) -> 30% impact
+  - Target Generation: 60% (generic) -> 20% impact
   - Overall: ~40-55%
 ```
 
@@ -908,9 +908,9 @@ Breakdown:
 Predicted Accuracy: 75-85%
 
 Breakdown:
-  - Normalization: 100% (MinMaxScaler) → +30%
-  - Clustering: 85% (correct features) → +25%
-  - Target Generation: 80% (archetype-aware) → +10%
+  - Normalization: 100% (MinMaxScaler) -> +30%
+  - Clustering: 85% (correct features) -> +25%
+  - Target Generation: 80% (archetype-aware) -> +10%
   - Overall: ~75-85%
 ```
 
@@ -1033,13 +1033,13 @@ Total Latency: <0.01 seconds (insignificant)
 ### Summary of Changes
 
 **Critical Fixes Implemented** (3):
-1. Normalization: fillna() → MinMaxScaler
-2. Clustering: Percentages → Normalized features
-3. Membership: Hard assignment → Soft probabilities
+1. Normalization: fillna() -> MinMaxScaler
+2. Clustering: Percentages -> Normalized features
+3. Membership: Hard assignment -> Soft probabilities
 
 **Enhancements Added** (2):
 1. Validation: Added 3 clustering quality metrics
-2. Targets: Generic → Archetype-aware formulas
+2. Targets: Generic -> Archetype-aware formulas
 
 **Code Organization** (3):
 1. Created utils.py with 15 reusable functions
@@ -1049,10 +1049,10 @@ Total Latency: <0.01 seconds (insignificant)
 ### Impact Assessment
 
 **Technical Impact**:
-- System accuracy: 40-55% → 75-85% (predicted)
-- Archetype balance: 493:6:1 → 1:1:1 ratio
-- Clustering quality: 2 clusters → 3 balanced clusters
-- Personalization: Generic → 3 archetype-specific adaptations
+- System accuracy: 40-55% -> 75-85% (predicted)
+- Archetype balance: 493:6:1 -> 1:1:1 ratio
+- Clustering quality: 2 clusters -> 3 balanced clusters
+- Personalization: Generic -> 3 archetype-specific adaptations
 
 **Academic Impact**:
 - Scientifically rigorous validation

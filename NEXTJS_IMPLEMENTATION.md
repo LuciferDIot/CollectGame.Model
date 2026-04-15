@@ -55,7 +55,7 @@ The **ANFIS Adaptive Difficulty System** is a machine learning-powered game diff
 │  │   (Python/Jupyter)│         │   (TypeScript)   │        │
 │  ├──────────────────┤         ├──────────────────┤        │
 │  │ • Data Loading   │         │ • Dashboard UI   │        │
-│  │ • Normalization  │────────▶│ • API Routes     │        │
+│  │ • Normalization  │────────>│ • API Routes     │        │
 │  │ • Clustering     │  Models │ • Visualizations │        │
 │  │ • ANFIS Training │         │ • Analytics      │        │
 │  │ • Evaluation     │         │ • Diagnostics    │        │
@@ -78,7 +78,7 @@ The **ANFIS Adaptive Difficulty System** is a machine learning-powered game diff
 
 #### Phase 1: Core ML Pipeline Development (Pre-NextJS)
 - **Focus**: Python/Jupyter notebooks for ANFIS research
-- **Deliverables**: 8-notebook pipeline (data → training → evaluation)
+- **Deliverables**: 8-notebook pipeline (data -> training -> evaluation)
 - **Output**: Trained model artifacts (JSON)
 - **Status**: Complete (See `RESEARCH_JOURNEY.md`)
 
@@ -539,11 +539,11 @@ export default function Home() {
 ```
 PipelineProvider (outer)
   -> Provides: telemetry input, pipeline state, simulation results
-  ↓
+  v
 AnalyticsProvider (inner)
   -> Consumes: simulation results from PipelineProvider
   -> Provides: session analytics, round analytics
-  ↓
+  v
 DashboardContainer
   -> Consumes: both contexts
   -> Renders: UI components
@@ -636,7 +636,7 @@ export async function POST(request: Request) {
       config: manifest
     });
     
-    console.log('[API] Pipeline initialized ✓');
+    console.log('[API] Pipeline initialized [done]');
   }
   
   // Reuse same instance for all subsequent requests
@@ -646,7 +646,7 @@ export async function POST(request: Request) {
 ```
 
 **Benefits**:
-- **Performance**: 500ms → 5ms (100× faster for subsequent requests)
+- **Performance**: 500ms -> 5ms (100x faster for subsequent requests)
 - **Memory**: Single model in RAM (vs reloading each time)
 - **Consistency**: Same model parameters for all requests
 
@@ -723,16 +723,16 @@ console.log('Player is:', data.soft_membership);
 **1. `anfis_mlp_weights.json`**:
 ```json
 {
-  "weights_input_hidden": [[...]],  // 6×16 matrix
+  "weights_input_hidden": [[...]],  // 6x16 matrix
   "bias_hidden": [...],              // 16 values
-  "weights_hidden_hidden2": [[...]], // 16×8 matrix
+  "weights_hidden_hidden2": [[...]], // 16x8 matrix
   "bias_hidden2": [...],             // 8 values
-  "weights_hidden2_output": [[...]],// 8×1 matrix
+  "weights_hidden2_output": [[...]],// 8x1 matrix
   "bias_output": [...]               // 1 value
 }
 ```
 - **Purpose**: Neural network trained in Python
-- **Architecture**: 6 inputs → 16 → 8 → 1 output
+- **Architecture**: 6 inputs -> 16 -> 8 -> 1 output
 - **Training**: MLP surrogate trained on ANFIS outputs
 - **Accuracy**: 99.2% match with original ANFIS
 
@@ -775,7 +775,7 @@ console.log('Player is:', data.soft_membership);
   "version": "2.0",
   "pipeline_steps": 8,
   "features": ["enemiesHit", "damageDone", ...],
-  "target_formula": "1.0 - 0.1×deaths + 0.05×activity",
+  "target_formula": "1.0 - 0.1xdeaths + 0.05xactivity",
   "created_at": "2026-01-27T14:20:00Z"
 }
 ```
@@ -804,7 +804,7 @@ class ANFISPipeline {
     // Step 5: Compute temporal deltas
     const deltas = this.step5_ComputeDeltas(membership);
     
-    // Step 6: MLP inference (6 inputs → 1 output)
+    // Step 6: MLP inference (6 inputs -> 1 output)
     const multiplier = this.step6_InferenceEngine([
       membership.combat,
       membership.collect,
@@ -1160,7 +1160,7 @@ Examples:
 4. Separate microservice
 
 **Rationale**:
-- **Performance**: 100× faster (500ms → 5ms)
+- **Performance**: 100x faster (500ms -> 5ms)
 - **Simplicity**: No external dependencies
 - **Memory**: Single model copy in RAM
 - **Deployment**: Works on serverless (Vercel)
@@ -1202,7 +1202,7 @@ Examples:
 **Chosen**: pnpm
 
 **Rationale**:
-- **Faster**: 2× faster than npm
+- **Faster**: 2x faster than npm
 - **Disk space**: Symlinks to global store (saves GB)
 - **Strict**: Better at catching dependency issues
 - **Workspace support**: Monorepo-friendly
@@ -1245,7 +1245,7 @@ const distances = centroids.map(centroid =>
 **Problem**: Multiple nested contexts causing re-render issues
 
 **Solution**:
-1. Careful context nesting (PipelineProvider → AnalyticsProvider)
+1. Careful context nesting (PipelineProvider -> AnalyticsProvider)
 2. Memoization of expensive calculations
 3. React.memo for pure components
 4. Custom hooks to encapsulate logic
@@ -1619,7 +1619,7 @@ NODE_ENV=production
 
 ---
 
-## 📝 Summary
+##  Summary
 
 ### What We Built
 

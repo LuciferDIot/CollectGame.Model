@@ -149,7 +149,7 @@ Latency run 5: 39ms
 | 2 | Missing `userId` | telemetry only | 400 Bad Request | **400** | - | PASS |
 | 3 | Missing `telemetry` | userId only | 400 Bad Request | **400** | - | PASS |
 | 4 | Empty body `{}` | - | 400 Bad Request | **400** | - | PASS |
-| 5 | Warm latency (×5) | Valid payload | < 200 ms | **35–47 ms** | avg ≈ 40 ms | PASS |
+| 5 | Warm latency (x5) | Valid payload | < 200 ms | **35-47 ms** | avg ≈ 40 ms | PASS |
 
 ---
 

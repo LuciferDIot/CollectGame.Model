@@ -51,7 +51,7 @@ scaler_params = {
 
 with open(MODELS_DIR / 'scaler_params.json', 'w') as f:
     json.dump(scaler_params, f, indent=2)
-print(f"✓ Saved scaler params for {len(available_features)} features")
+print(f"[done] Saved scaler params for {len(available_features)} features")
 
 # 2. Extract Cluster Centroids
 print("\n2. Extracting cluster centroids...")
@@ -91,7 +91,7 @@ for cluster_id, archetype in mapping.items():
 
 with open(MODELS_DIR / 'cluster_centroids.json', 'w') as f:
     json.dump(cluster_centroids, f, indent=2)
-print(f"✓ Saved {len(cluster_centroids)} cluster centroids with archetype mapping")
+print(f"[done] Saved {len(cluster_centroids)} cluster centroids with archetype mapping")
 
 # 3. Load or retrain MLP weights
 print("\n3. Extracting MLP weights...")
@@ -147,12 +147,12 @@ try:
     with open(MODELS_DIR / 'anfis_mlp_weights.json', 'w') as f:
         json.dump(mlp_weights, f, indent=2)
     
-    print(f"✓ Saved MLP weights (Test MAE: {mlp_weights['training_metrics']['test_mae']:.6f})")
-    print(f"  Architecture: 6 → 16 → 8 → 1")
+    print(f"[done] Saved MLP weights (Test MAE: {mlp_weights['training_metrics']['test_mae']:.6f})")
+    print(f"  Architecture: 6 -> 16 -> 8 -> 1")
     print(f"  Iterations: {mlp_weights['training_metrics']['num_iterations']}")
     
 except Exception as e:
-    print(f"⚠ Could not extract MLP weights: {e}")
+    print(f"[warn] Could not extract MLP weights: {e}")
     print("  Using existing anfis_mlp_weights.json")
 
 # 4. Create comprehensive deployment manifest
@@ -189,14 +189,14 @@ deployment_manifest = {
 
 with open(MODELS_DIR / 'deployment_manifest.json', 'w') as f:
     json.dump(deployment_manifest, f, indent=2)
-print("✓ Saved deployment manifest")
+print("[done] Saved deployment manifest")
 
 print("\n" + "="*60)
-print("✅ Model artifact export complete!")
+print("[done] Model artifact export complete!")
 print("="*60)
 print(f"\nExported artifacts:")
 print(f"  • scaler_params.json ({len(available_features)} features)")
 print(f"  • cluster_centroids.json (3 archetypes)")
-print(f"  • anfis_mlp_weights.json (6→16→8→1 MLP)")
+print(f"  • anfis_mlp_weights.json (6->16->8->1 MLP)")
 print(f"  • deployment_manifest.json")
 print(f"\nLocation: {MODELS_DIR}")

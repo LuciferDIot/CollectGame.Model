@@ -91,7 +91,7 @@ Rerun sequence: notebooks 04 -> 05 -> 06 -> 07.
 - Dominant windows (>0.6): 32%
 
 ### MLP Surrogate (v2.2.1)
-- Train R²: 0.860 | Test R²: 0.9264
+- Train R^2: 0.860 | Test R^2: 0.9264
 - Train MAE: 0.0139 | Test MAE: 0.0127
 - Convergence: 21 iterations (LBFGS)
 - mlp_neutral: 0.932006
@@ -155,14 +155,14 @@ CollectGame.Model/
 
 | Section | Test | Result |
 |---------|------|--------|
-| 2 | Test R² reproduced | 0.9264 |
+| 2 | Test R^2 reproduced | 0.9264 |
 | 2 | Test MAE reproduced | 0.0127 |
 | 3 | Balanced (1/3, 1/3, 1/3) neutral | display = 1.000 |
 | 3 | First window delta=0 | equals neutral |
 | 3 | Extreme combat + delta | display = 1.127 in [0.6, 1.4] |
 | 3 | Extreme explore + delta | display = 0.829 in [0.6, 1.4] |
 | 4 | Residual analysis | within bounds |
-| 5 | Bootstrap 95% CI | stored R² inside CI |
+| 5 | Bootstrap 95% CI | stored R^2 inside CI |
 
 ### Notebook 10 - Pipeline Integration
 

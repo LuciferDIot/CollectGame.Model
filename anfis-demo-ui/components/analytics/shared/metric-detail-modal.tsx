@@ -87,13 +87,13 @@ export function MetricDetailModal({
         {/* ── Scrollable body ── */}
         <div className="flex-1 overflow-y-auto relative z-10 divide-y divide-slate-800/40">
 
-          {/* A — What is this */}
+          {/* A -- What is this */}
           <section className="px-6 py-5 space-y-2">
             <SectionLabel icon={<BookOpen className="w-3.5 h-3.5" />} label="What is this?" color="text-slate-400" />
             <p className="text-sm text-slate-300 leading-relaxed">{content.what}</p>
           </section>
 
-          {/* B — Why it matters */}
+          {/* B -- Why it matters */}
           <section className="px-6 py-5 space-y-2">
             <SectionLabel icon={<Lightbulb className="w-3.5 h-3.5" />} label="Why it matters" color="text-amber-500" />
             <p className="text-sm text-amber-100/80 bg-amber-950/10 p-4 rounded-lg border-l-2 border-amber-500/40 leading-relaxed">
@@ -101,7 +101,7 @@ export function MetricDetailModal({
             </p>
           </section>
 
-          {/* C — How it's computed */}
+          {/* C -- How it's computed */}
           <section className="px-6 py-5 space-y-2">
             <SectionLabel icon={<Calculator className="w-3.5 h-3.5" />} label="How it's computed" color="text-cyan-500" />
             <pre className="text-xs text-cyan-300 font-mono bg-cyan-950/20 p-4 rounded-lg border border-cyan-900/30 whitespace-pre-wrap wrap-break-word leading-relaxed">
@@ -109,7 +109,7 @@ export function MetricDetailModal({
             </pre>
           </section>
 
-          {/* D — How to read it */}
+          {/* D -- How to read it */}
           <section className="px-6 py-5 space-y-2">
             <SectionLabel icon={<Eye className="w-3.5 h-3.5" />} label="How to read it" color="text-emerald-500" />
             <pre className="text-xs text-emerald-200/80 bg-emerald-950/10 p-4 rounded-lg border border-emerald-900/20 whitespace-pre-wrap wrap-break-word leading-relaxed italic">
@@ -117,7 +117,7 @@ export function MetricDetailModal({
             </pre>
           </section>
 
-          {/* E — Design decisions (only shown when present) */}
+          {/* E -- Design decisions (only shown when present) */}
           {content.designDecisions && (
             <section className="px-6 py-5 space-y-3">
               <SectionLabel icon={<Wrench className="w-3.5 h-3.5" />} label="Design decisions" color="text-violet-400" />

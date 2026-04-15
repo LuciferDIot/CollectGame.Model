@@ -122,7 +122,7 @@ export function RuleInspectorDrawer() {
 
                 <p className="text-[11px] text-slate-500 mt-4 leading-relaxed px-1">
                   <span className="text-slate-400 font-semibold uppercase text-[10px] mr-2">System Note:</span>
-                  16 learned IF-THEN patterns optimized for R² ≥ 0.93. This layer acts as the "reasoning" core of the AURA difficulty adaptation system.
+                  16 learned IF-THEN patterns optimized for R^2 ≥ 0.93. This layer acts as the "reasoning" core of the AURA difficulty adaptation system.
                 </p>
               </div>
             </div>
