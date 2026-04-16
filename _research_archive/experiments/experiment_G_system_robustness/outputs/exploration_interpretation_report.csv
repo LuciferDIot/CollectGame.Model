@@ -1,0 +1,4 @@
+metric,value,interpretation
+pearson_corr_soft_vs_residual,1.0,below 0.99 means IDW adds independent signal
+divergent_windows_count,0.0,windows where IDW disagrees with naive residual
+pure_explorer_windows,1372.0,windows with soft_explore > 0.5

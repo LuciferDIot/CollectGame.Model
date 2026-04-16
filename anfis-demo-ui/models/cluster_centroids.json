@@ -3,24 +3,24 @@
     "archetype": "Combat",
     "centroid": {
       "pct_combat": 0.6584508458557516,
-      "pct_collect": 0.044139310324302586,
-      "pct_explore": 0.2974098438199458
+      "pct_collect": 0.04413931032430267,
+      "pct_explore": 0.2974098438199457
     }
   },
   "1": {
     "archetype": "Exploration",
     "centroid": {
-      "pct_combat": 0.009980181516020814,
-      "pct_collect": 0.14233362069180275,
-      "pct_explore": 0.8476861977921765
+      "pct_combat": 0.009980181516020203,
+      "pct_collect": 0.14233362069180278,
+      "pct_explore": 0.8476861977921768
     }
   },
   "2": {
     "archetype": "Collection",
     "centroid": {
       "pct_combat": 0.3267296749125025,
-      "pct_collect": 0.1818544373374581,
-      "pct_explore": 0.4914158877500393
+      "pct_collect": 0.18185443733745807,
+      "pct_explore": 0.4914158877500394
     }
   }
 }

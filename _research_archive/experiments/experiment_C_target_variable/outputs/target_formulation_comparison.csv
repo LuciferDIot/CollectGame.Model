@@ -1,0 +1,3 @@
+option,formula,target_std,target_range,mlp_test_mae,mlp_test_r2,verdict
+A - static only,1 + 0.22*c + 0.18*col + 0.15*exp - 0.25*death,0.026558,0.3022,0.009042,0.2903,"rejected - near-zero variance, MLP predicts mean"
+B - delta-weighted,A + 0.55*dc + 0.40*dcol + 0.35*dexp,0.074026,0.5487,0.010079,0.9401,"selected - meaningful variance, MLP learns signal"

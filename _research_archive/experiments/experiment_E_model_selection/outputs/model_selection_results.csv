@@ -1,0 +1,10 @@
+,model,test_mae,test_r2,inference_us,unity_portability
+1,Ridge Regression,0.002461,0.9804,33.71,matrix only
+2,Linear Regression,0.00247,0.9804,31.12,matrix only
+3,Gradient Boosting,0.004834,0.9643,123.65,lookup table
+4,Random Forest,0.005263,0.957,19365.15,lookup table
+5,SVR (RBF),0.00848,0.9693,77.34,kernel trick
+6,Decision Tree,0.009114,0.8545,50.95,lookup table
+7,MLP large (32-16-8),0.012495,0.933,55.25,matrix only
+8,MLP medium (16-8),0.012705,0.9264,48.65,matrix only
+9,MLP small (8-4),0.01641,0.882,49.67,matrix only

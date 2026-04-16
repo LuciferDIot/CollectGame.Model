@@ -1,0 +1,4 @@
+approach,mae_vs_target,r2_vs_target,inference_us,deployable_in_unity,adapts_to_new_data,verdict
+Direct Formula,0.276837,-13.0975,153.66,yes,no,exact but brittle - fixed weights forever
+ANFIS (729 rules),approx same as formula,approx same as formula,70.15,difficult,yes,accurate but too slow for 30s game loop
+MLP Surrogate (16-8),0.012705,0.9264,48.66,yes,yes,"selected - near-formula accuracy, low latency, portable"

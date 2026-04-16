@@ -1,0 +1,4 @@
+label,features,n_features,test_mae,test_r2
+soft only (no delta),"soft_combat, soft_collect, soft_explore",3,0.047803,0.3056
+delta only (no soft),"delta_combat, delta_collect, delta_explore",3,0.033964,0.6836
+combined (soft + delta),"soft_combat, soft_collect, soft_explore, delta_combat, delta_collect, delta_explore",6,0.012705,0.9264
