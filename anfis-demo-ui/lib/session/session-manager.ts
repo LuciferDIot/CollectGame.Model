@@ -74,6 +74,7 @@ import { calculateDeltaVector, hasSessionTimedOut } from '@/lib/engine/utils';
  */
 interface UserSessionState {
     lastSoftMembership: SoftMembership;
+    smoothedSoftMembership: SoftMembership;
     lastTimestamp: number;
 }
 
@@ -185,6 +186,10 @@ export class PipelineSessionManager {
         soft_explore: 1 / 3,
     };
 
+    // EMA smoothing factor. 0.3 = 30% current window + 70% previous smoothed value.
+    // Prevents abrupt archetype jumps between windows without hiding real behavioral shifts.
+    private readonly EMA_ALPHA = 0.3;
+
     /**
      * ==========================================================================
      * MAIN METHOD: computeDeltasAndUpdate()
@@ -290,8 +295,9 @@ export class PipelineSessionManager {
         // Delta = current - neutral baseline, so the MLP sees how far this
         // player already deviates from a balanced profile on first contact.
         if (!userState) {
-            const deltas = calculateDeltaVector(currentSoft, this.NEUTRAL_BASELINE);
-            this.updateState(userId, currentSoft, now);
+            const smoothed = this.applyEMA(currentSoft, this.NEUTRAL_BASELINE);
+            const deltas = calculateDeltaVector(smoothed, this.NEUTRAL_BASELINE);
+            this.updateState(userId, currentSoft, smoothed, now);
             return deltas;
         }
 
@@ -302,34 +308,20 @@ export class PipelineSessionManager {
         // long break carries a meaningful deviation signal, not zeroes.
         if (hasSessionTimedOut(userState.lastTimestamp, this.STATE_TIMEOUT_MS)) {
             console.log(`[SessionManager] Timeout for ${userId}. Resetting to neutral baseline.`);
-            const deltas = calculateDeltaVector(currentSoft, this.NEUTRAL_BASELINE);
-            this.updateState(userId, currentSoft, now);
+            const smoothed = this.applyEMA(currentSoft, this.NEUTRAL_BASELINE);
+            const deltas = calculateDeltaVector(smoothed, this.NEUTRAL_BASELINE);
+            this.updateState(userId, currentSoft, smoothed, now);
             return deltas;
         }
 
         // ========================================
         // CASE 3: ACTIVE SESSION (CALCULATE DELTAS)
         // ========================================
-        // Player is actively playing - calculate behavioral changes
-
-        /**
-         * calculateDeltaVector() computes:
-         *   delta = current - previous
-         * 
-         * For each dimension (combat, collect, explore):
-         *   delta_X = current.soft_X - previous.soft_X
-         * 
-         * Example:
-         *   current_combat = 0.75
-         *   previous_combat = 0.60
-         *   delta_combat = 0.75 - 0.60 = +0.15
-         */
-        const deltas = calculateDeltaVector(currentSoft, userState.lastSoftMembership);
-
-        // Update memory with current state for next time
-        this.updateState(userId, currentSoft, now);
-
-        // Return the calculated changes
+        // Apply EMA to the current soft membership before computing deltas.
+        // This dampens window-to-window spikes without hiding real behavioral shifts.
+        const smoothed = this.applyEMA(currentSoft, userState.smoothedSoftMembership);
+        const deltas = calculateDeltaVector(smoothed, userState.smoothedSoftMembership);
+        this.updateState(userId, currentSoft, smoothed, now);
         return deltas;
     }
 
@@ -369,11 +361,22 @@ export class PipelineSessionManager {
      * @param soft - Their current memberships (will be copied)
      * @param timestamp - When this state was recorded
      */
-    private updateState(userId: string, soft: SoftMembership, timestamp: number) {
+    private updateState(userId: string, raw: SoftMembership, smoothed: SoftMembership, timestamp: number) {
         this.userStates.set(userId, {
-            lastSoftMembership: { ...soft },  // Spread operator creates copy
-            lastTimestamp: timestamp
+            lastSoftMembership: { ...raw },
+            smoothedSoftMembership: { ...smoothed },
+            lastTimestamp: timestamp,
         });
+    }
+
+    // EMA: alpha * current + (1 - alpha) * previous
+    private applyEMA(current: SoftMembership, previous: SoftMembership): SoftMembership {
+        const a = this.EMA_ALPHA;
+        return {
+            soft_combat:  a * current.soft_combat  + (1 - a) * previous.soft_combat,
+            soft_collect: a * current.soft_collect + (1 - a) * previous.soft_collect,
+            soft_explore: a * current.soft_explore + (1 - a) * previous.soft_explore,
+        };
     }
 
     /**

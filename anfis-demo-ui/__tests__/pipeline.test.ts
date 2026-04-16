@@ -119,16 +119,18 @@ describe('ANFISPipeline Integration (v2.2)', () => {
             },
         };
 
+        const EMA_ALPHA = 0.3;
         const result = pipeline.process(telemetry as any);
 
-        // delta must equal soft_combat - 1/3, not zero
-        const expectedDelta = result.soft_membership.soft_combat - 1 / 3;
+        // EMA smooths the first window: smoothed = alpha*current + (1-alpha)*neutral
+        // delta = smoothed - neutral = alpha * (current - neutral)
+        const expectedDelta = EMA_ALPHA * (result.soft_membership.soft_combat - 1 / 3);
         expect(result.deltas.delta_combat).toBeCloseTo(expectedDelta, 5);
 
         // same contract holds immediately after an explicit reset
         pipeline.reset('reset-test-user');
         const result2 = pipeline.process(telemetry as any);
-        const expectedDelta2 = result2.soft_membership.soft_combat - 1 / 3;
+        const expectedDelta2 = EMA_ALPHA * (result2.soft_membership.soft_combat - 1 / 3);
         expect(result2.deltas.delta_combat).toBeCloseTo(expectedDelta2, 5);
     });
 });
