@@ -1,4 +1,4 @@
 metric,value,interpretation
 pearson_corr_soft_vs_residual,1.0,= 1.0 confirms IDW normalization sum-to-1 constraint is working
-pure_explorer_windows,1372.0,windows with soft_explore > 0.5 - behavioral cluster is populated
-pure_explorer_avg_kills,0.0013,near-zero confirms Exploration cluster is behaviorally distinct from Combat
+pure_explorer_windows,561.0,windows with soft_explore > 0.5 - behavioral cluster is populated
+pure_explorer_avg_kills,0.0,near-zero confirms Exploration cluster is behaviorally distinct from Combat
