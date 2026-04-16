@@ -92,19 +92,43 @@ describe('ANFISPipeline Integration (v2.2)', () => {
         expect(healthParam.final).toBeGreaterThan(0);
     });
 
-    it('should handle session resets correctly', () => {
+    it('should compute neutral-baseline delta on first and post-reset calls', () => {
         /**
-         * TEST CASE: Reset Branching
-         * If Reset field exists, pipelines deltas should be zeroed out
-         * to prevent difficulty jumps from inconsistent previous frames.
+         * TEST CASE: Neutral-baseline delta seeding
+         * On the first call for a userId (or after pipeline.reset()), the session
+         * manager has no previous state. Instead of returning zero deltas, it now
+         * computes delta = current_soft - (1/3, 1/3, 1/3) so the MLP receives a
+         * meaningful deviation signal on the very first window.
          */
         const telemetry = {
-            userId: 'test-user',
-            features: { enemiesHit: 50 },
-            reset: true
+            userId: 'reset-test-user',
+            timestamp: new Date().toISOString(),
+            duration: 30,
+            features: {
+                enemiesHit: 50,
+                damageDone: 5000,
+                timeInCombat: 28,
+                kills: 10,
+                itemsCollected: 0,
+                pickupAttempts: 0,
+                timeNearInteractables: 0,
+                distanceTraveled: 20,
+                timeSprinting: 5,
+                timeOutOfCombat: 2,
+                deathCount: 0,
+            },
         };
 
         const result = pipeline.process(telemetry as any);
-        expect(result.deltas.delta_combat).toBe(0);
+
+        // delta must equal soft_combat - 1/3, not zero
+        const expectedDelta = result.soft_membership.soft_combat - 1 / 3;
+        expect(result.deltas.delta_combat).toBeCloseTo(expectedDelta, 5);
+
+        // same contract holds immediately after an explicit reset
+        pipeline.reset('reset-test-user');
+        const result2 = pipeline.process(telemetry as any);
+        const expectedDelta2 = result2.soft_membership.soft_combat - 1 / 3;
+        expect(result2.deltas.delta_combat).toBeCloseTo(expectedDelta2, 5);
     });
 });
