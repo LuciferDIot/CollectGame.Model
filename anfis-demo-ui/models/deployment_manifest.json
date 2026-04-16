@@ -1,7 +1,7 @@
 {
   "version": "2.2",
   "status": "PRODUCTION",
-  "export_date": "2026-03-06T16:17:54+05:30",
+  "export_date": "2026-05-06T20:30:00+05:30",
   "pipeline": {
     "features": [
       "enemiesHit",
@@ -47,7 +47,7 @@
     },
     "pct_combat": "(enemiesHit + damageDone + timeInCombat + kills + damage_per_hit) / 5",
     "pct_collect": "(itemsCollected + pickupAttempts + timeNearInteractables + pickup_attempt_rate) / 4",
-    "pct_explore": "(distanceTraveled + timeSprinting) / 2"
+    "pct_explore": "(distanceTraveled + timeSprinting) / 4"
   },
   "session": {
     "timeout_ms": 90000,

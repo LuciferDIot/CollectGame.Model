@@ -34,11 +34,13 @@ export function calculateActivityScores(normalized: NormalizedFeatures): Activit
     (normalized.pickup_attempt_rate as number) ?? 0,
   ]) / 4;
 
-  // Exploration: 2 active movement features only
+  // Exploration: 2 active movement features, divided by 4 (half the collect ceiling).
+  // This prevents a collector who moves slightly from scoring explore ≈ collect,
+  // which was collapsing the Collection centroid toward Exploration in pct space.
   const score_explore = calculateComponentSum([
     (normalized.distanceTraveled as number) ?? 0,
     (normalized.timeSprinting as number) ?? 0,
-  ]) / 2;
+  ]) / 4;
 
   const score_total = score_combat + score_collect + score_explore;
 

@@ -1,26 +1,26 @@
 {
   "0": {
-    "archetype": "Combat",
+    "archetype": "Collection",
     "centroid": {
-      "pct_combat": 0.6584508458557516,
-      "pct_collect": 0.04413931032430267,
-      "pct_explore": 0.2974098438199457
+      "pct_combat": 0.2168469378621355,
+      "pct_collect": 0.4854092502249181,
+      "pct_explore": 0.29774381191294647
     }
   },
   "1": {
     "archetype": "Exploration",
     "centroid": {
-      "pct_combat": 0.009980181516020203,
-      "pct_collect": 0.14233362069180278,
-      "pct_explore": 0.8476861977921768
+      "pct_combat": 0.007230672593310339,
+      "pct_collect": 0.06346497116196423,
+      "pct_explore": 0.9293043562447255
     }
   },
   "2": {
-    "archetype": "Collection",
+    "archetype": "Combat",
     "centroid": {
-      "pct_combat": 0.3267296749125025,
-      "pct_collect": 0.18185443733745807,
-      "pct_explore": 0.4914158877500394
+      "pct_combat": 0.7252720260429242,
+      "pct_collect": 0.09634006886112138,
+      "pct_explore": 0.17838790509595437
     }
   }
 }
