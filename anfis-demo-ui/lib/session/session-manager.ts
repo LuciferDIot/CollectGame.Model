@@ -176,6 +176,15 @@ export class PipelineSessionManager {
      */
     private readonly STATE_TIMEOUT_MS = 90000; // 90 seconds
 
+    // Calibration neutral baseline: equal membership across all three archetypes.
+    // Used as the implicit "previous state" for new/reset sessions so that
+    // delta = current - neutral rather than delta = 0.
+    private readonly NEUTRAL_BASELINE: SoftMembership = {
+        soft_combat: 1 / 3,
+        soft_collect: 1 / 3,
+        soft_explore: 1 / 3,
+    };
+
     /**
      * ==========================================================================
      * MAIN METHOD: computeDeltasAndUpdate()
@@ -273,38 +282,29 @@ export class PipelineSessionManager {
         // STEP 0: SETUP
         // ========================================
         const userState = this.userStates.get(userId);  // Get saved state
-        const now = Date.now();                          // Current timestamp
-        const emptyDeltas = {                            // Zero-change deltas
-            delta_combat: 0,
-            delta_collect: 0,
-            delta_explore: 0
-        };
+        const now = Date.now();
 
         // ========================================
         // CASE 1: NEW USER
         // ========================================
-        // If we've never seen this player before
+        // Delta = current - neutral baseline, so the MLP sees how far this
+        // player already deviates from a balanced profile on first contact.
         if (!userState) {
-            // Save their current state for next time
+            const deltas = calculateDeltaVector(currentSoft, this.NEUTRAL_BASELINE);
             this.updateState(userId, currentSoft, now);
-
-            // Return zero deltas (no previous state to compare)
-            return emptyDeltas;
+            return deltas;
         }
 
         // ========================================
         // CASE 2: STALE SESSION (TIMEOUT)
         // ========================================
-        // If player hasn't been active recently
+        // Same logic: reset to neutral baseline so the first window after a
+        // long break carries a meaningful deviation signal, not zeroes.
         if (hasSessionTimedOut(userState.lastTimestamp, this.STATE_TIMEOUT_MS)) {
-            // Log for debugging/monitoring
-            console.log(`[SessionManager] Timeout for ${userId}. Resetting Deltas.`);
-
-            // Reset their state (treat as new session)
+            console.log(`[SessionManager] Timeout for ${userId}. Resetting to neutral baseline.`);
+            const deltas = calculateDeltaVector(currentSoft, this.NEUTRAL_BASELINE);
             this.updateState(userId, currentSoft, now);
-
-            // Return zero deltas (session break = fresh start)
-            return emptyDeltas;
+            return deltas;
         }
 
         // ========================================
