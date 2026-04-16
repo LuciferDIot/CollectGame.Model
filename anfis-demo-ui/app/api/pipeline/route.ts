@@ -16,17 +16,22 @@ import centroids from '@/models/cluster_centroids.json';
 import manifest from '@/models/deployment_manifest.json';
 import scalerParams from '@/models/scaler_params.json';
 
-// Pipeline is loaded once at startup and reused across requests.
-let pipelineInstance: ANFISPipeline | null = null;
+// globalThis keeps the instance alive across HMR module reloads in Next.js dev mode.
+// A plain module-level variable gets wiped every time the file is re-evaluated,
+// which resets the session manager and breaks sequential delta tracking.
+declare global {
+  // eslint-disable-next-line no-var
+  var _anfisLegacyPipeline: ANFISPipeline | undefined;
+}
 
 function getPipeline() {
-  if (pipelineInstance) return pipelineInstance;
+  if (globalThis._anfisLegacyPipeline) return globalThis._anfisLegacyPipeline;
 
   try {
     console.log('[/api/pipeline] Initializing ANFIS pipeline...');
-    pipelineInstance = new ANFISPipeline(scalerParams, centroids, mlpWeights, manifest);
+    globalThis._anfisLegacyPipeline = new ANFISPipeline(scalerParams, centroids, mlpWeights, manifest);
     console.log('[/api/pipeline] Pipeline ready.');
-    return pipelineInstance;
+    return globalThis._anfisLegacyPipeline;
   } catch (error) {
     console.error('[/api/pipeline] Initialization failed:', error);
     throw error;
