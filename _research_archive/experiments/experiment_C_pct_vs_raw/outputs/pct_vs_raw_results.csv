@@ -1,0 +1,9 @@
+approach,k,silhouette,davies_bouldin,calinski_harabasz
+A_percentage,2,0.5799,0.6131,6177.57
+B_raw,2,0.5058,0.8159,4004.7
+A_percentage,3,0.4948,0.8206,5253.03
+B_raw,3,0.4635,0.8218,3339.86
+A_percentage,4,0.4856,0.7386,5856.94
+B_raw,4,0.3749,1.1329,2910.96
+A_percentage,5,0.4798,0.7599,5712.16
+B_raw,5,0.3117,1.1917,2604.99
