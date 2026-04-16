@@ -1,3 +1,0 @@
-Metric,Exp_A_Rigid_KMeans,Exp_B_SoftIDW,Rigid_Penalty
-Silhouette Score,0.36964632788637214,0.14690777992913573,-60.26%
-Calinski-Harabasz,2153.4700275957002,661.3826382787107,-69.29%

@@ -1,0 +1,8 @@
+label,features,n_features,test_mae,test_r2,dropped_feature,mae_increase,mae_increase_pct
+baseline (all features),"soft_combat, soft_collect, soft_explore, delta_combat, delta_collect, delta_explore",6,0.012705,0.9264,,,
+drop soft_combat,"soft_collect, soft_explore, delta_combat, delta_collect, delta_explore",5,0.014036,0.9293,soft_combat,0.001331,10.48
+drop soft_collect,"soft_combat, soft_explore, delta_combat, delta_collect, delta_explore",5,0.013052,0.9291,soft_collect,0.000347,2.73
+drop soft_explore,"soft_combat, soft_collect, delta_combat, delta_collect, delta_explore",5,0.012533,0.9336,soft_explore,-0.000172,-1.35
+drop delta_combat,"soft_combat, soft_collect, soft_explore, delta_collect, delta_explore",5,0.008918,0.9571,delta_combat,-0.003787,-29.81
+drop delta_collect,"soft_combat, soft_collect, soft_explore, delta_combat, delta_explore",5,0.018151,0.8771,delta_collect,0.005446,42.87
+drop delta_explore,"soft_combat, soft_collect, soft_explore, delta_combat, delta_collect",5,0.014223,0.9011,delta_explore,0.001518,11.95
