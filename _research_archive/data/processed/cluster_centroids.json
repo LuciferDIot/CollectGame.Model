@@ -2,9 +2,9 @@
   "0": {
     "archetype": "Combat",
     "centroid": {
-      "pct_combat": 0.6584508458557515,
+      "pct_combat": 0.6584508458557516,
       "pct_collect": 0.044139310324302586,
-      "pct_explore": 0.29740984381994573
+      "pct_explore": 0.2974098438199458
     }
   },
   "1": {
