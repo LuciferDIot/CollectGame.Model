@@ -1,12 +1,2 @@
-metric,value
-exploration_dominant_windows_pct,25.82174462705436
-mean_soft_combat_in_explore_dominant,0.3078395576827807
-mean_soft_collect_in_explore_dominant,0.4907363842267668
-mean_soft_explore_in_explore_dominant,0.2014240580904525
-high_explore_high_combat_pct,3.16055625790139
-correlation_delta_explore_target,0.8081888793138915
-correlation_delta_combat_target,-0.47056673169015534
-correlation_delta_collect_target,0.3226969192247398
-p_value_delta_explore,0.0
-p_value_delta_combat,4.700704183980047e-174
-p_value_delta_collect,1.454480929706977e-77
+interpretation,windows_dominant,pct_of_total
+Exploration as traversal/downtime,1507,46.51
