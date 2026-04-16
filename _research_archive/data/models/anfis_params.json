@@ -1,8 +1,8 @@
 {
   "architecture": "6-16-8-1",
   "metrics": {
-    "train_mae": 0.013926157357563945,
-    "test_mae": 0.01270477975194402
+    "train_mae": 0.013926157357563954,
+    "test_mae": 0.012704779751944036
   },
   "features": [
     "soft_combat",
