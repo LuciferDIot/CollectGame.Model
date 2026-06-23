@@ -1,4 +1,4 @@
-﻿# Complete Development Journey - ANFIS Adaptive Difficulty System
+# Complete Development Journey - ANFIS Adaptive Difficulty System
 
 **Project**: CollectGame.Model
 **Final Version**: v2.2.1
@@ -76,7 +76,7 @@ Parameters swept: K (2,3,4,5) x outlier handling (none, IQR, Z-score) x normaliz
 
 ### 2.3 Signal Analysis: Delta Integration
 Correlation analysis showed:
-- **Δexplore -> Δtarget**: r = 0.808 (very strong)
+- **Δexplore -> Δtarget**: r = -0.758 (absolute |r| = 0.758, very strong)
 - **Δcombat -> Δtarget**: r = −0.471 (moderate)
 
 **Decision**: Add 3 temporal delta signals (Δcombat, Δcollect, Δexplore) to ANFIS input, extending from 3 to 6 features. This captured *behavioral velocity* - not just where the player is, but which direction they're moving.
@@ -177,7 +177,7 @@ Architecture: **6 -> 16 -> 8 -> 1** (ReLU hidden, Linear output)
 ### 4.4 Why an MLP Instead of Full ANFIS at Runtime?
 Full ANFIS inference requires iterative least-squares parameter estimation per forward pass - O(n^2) in rule count. With 3 fuzzy inputs and 3 archetypes (3^3 = 27 rules), this takes 50-200ms. The MLP forward pass is O(weights) and completes in <1ms.
 
-The MLP was trained on 3,240 synthetic samples generated from the ANFIS rule evaluation, achieving Test R^2=0.9264. The slight accuracy loss (100% -> 92.6%) is acceptable given the 200x inference speed improvement.
+The MLP was trained on 3,240 synthetic samples generated from the ANFIS rule evaluation, achieving Test R^2=0.9350. The slight accuracy loss (100% -> 93.5%) is acceptable given the 200x inference speed improvement.
 
 ---
 
@@ -211,7 +211,7 @@ Problem: Extreme deltas (+/-1.0) are unrealistic. Real players produce deltas in
 A balanced player (1/3, 1/3, 1/3, 0, 0, 0) semantically means "average behavior, no trend" -> should produce display=1.0 by definition.
 
 ```python
-mlp_neutral = model.predict([[1/3, 1/3, 1/3, 0, 0, 0]])[0]  # = 0.932006
+mlp_neutral = model.predict([[1/3, 1/3, 1/3, 0, 0, 0]])[0]  # = 0.931601
 ```
 
 Then:
@@ -307,7 +307,7 @@ The dashboard was made responsive for presentation on both 1080p monitors and la
 | Feature space | 12 features (10 raw + 2 derived) | 10 raw only | Sniper and collector discrimination gaps |
 | Activity scoring | Per-archetype average | Sum | Equal ceiling per archetype; prevents structural bias |
 | Clustering | K=3, soft IDW | K=2, K=4, hard K-Means | K=2 incompatible with 3 archetypes; K=4 collapses; hard K-Means causes boundary oscillation |
-| ANFIS input | 6D (3 soft + 3 delta) | 3D (soft only) | Deltas capture velocity; r=0.808 correlation with target |
+| ANFIS input | 6D (3 soft + 3 delta) | 3D (soft only) | Deltas capture velocity; r=-0.758 correlation with target |
 | MLP architecture | 6->16->8->1 | [32], [16,8,4], LSTM | Smallest with R^2>0.90; 5-fold CV validated |
 | MLP activation | ReLU | sigmoid, tanh | Faster convergence; no vanishing gradient |
 | Runtime inference | MLP surrogate | Full ANFIS | ANFIS O(n^2) = 50-200ms; MLP <1ms |
@@ -350,9 +350,9 @@ The dashboard was made responsive for presentation on both 1080p monitors and la
 | Features | 12 (10 raw + 2 derived) |
 | Archetypes | 3 (Combat, Collection, Exploration) |
 | MLP | 6->16->8->1, ReLU/Linear |
-| Test R^2 | 0.9264 |
-| Test MAE | 0.0127 |
-| Calibration | Neutral-centred: `display = clamp(1.0 + (raw − 0.932006) x 2.0, 0.6, 1.4)` |
+| Test R^2 | 0.9350 |
+| Test MAE | 0.0123 |
+| Calibration | Neutral-centred: `display = clamp(1.0 + (raw − 0.931601) x 2.0, 0.6, 1.4)` |
 | Safety clamp | [0.6, 1.4] |
 | Session timeout | 90,000ms |
 | Tests | 19/19 passing |

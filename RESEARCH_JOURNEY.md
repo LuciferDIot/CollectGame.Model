@@ -427,7 +427,7 @@ The fuzzy logic is already embedded in the **input features** (soft membership, 
 | Metric | Train | Test |
 |--------|-------|------|
 | R^2 | 0.8369 | **0.9224** |
-| MAE | 0.0127 | **0.0108** |
+| MAE | 0.0123 | **0.0108** |
 | Iterations | 23 | - |
 
 **Key observation**: Test R^2 > Train R^2 indicates excellent generalisation (no overfitting).
@@ -790,9 +790,9 @@ This evaluation was the **trigger for switching from Option A to Option B**.
 
 | Metric | Value |
 |--------|-------|
-| Test R^2 | 0.9264 |
-| Test MAE | 0.0127 |
-| Train R^2 | 0.8600 |
+| Test R^2 | 0.9350 |
+| Test MAE | 0.0123 |
+| Train R^2 | 0.8631 |
 | Target CV | 0.022 |
 | Target Range | [0.6, 1.4] |
 

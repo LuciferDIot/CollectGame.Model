@@ -1,4 +1,4 @@
-﻿# Backend Architecture & Complete Request-Response Flow
+# Backend Architecture & Complete Request-Response Flow
 
 > **For Non-Technical Readers:** This document explains how our AI-powered game difficulty system works, from the moment a player's data arrives to when we send back perfectly-tuned game settings. No machine learning knowledge required!
 
@@ -725,8 +725,7 @@ pct_explore = score_explore / (score_combat + score_collect + score_explore)
 - **v2.2 Derived Signals**: 
     - **`damagePerHit` (Combat)**: Raw enemy hits underrepresents per-shot impact (snipers). Including Damage per Hit ensures precision playstyles are recognized.
     - **`pickupAttemptRate` (Collection)**: Distinguishes intentional loot interaction from incidental proximity while exploring.
-- **Averages, not sums (v2.1)**: Each archetype has a max score of 1.0 regardless of feature count.
-  Using sums gave Combat (now 5 features) a major raw-score advantage over Exploration (2). Averaging removes this bias.
+- **Averages and custom scaling, not sums (v2.1)**: Combat (5 features) and Collection (4 features) are averaged to have a maximum score ceiling of 1.0. Exploration (2 features) uses a divisor of 4 (sum / 4), giving it a ceiling of 0.5. This prevents exploration scores from dominating and collapsing the Collection centroid. Using sums in earlier versions gave Combat a structural raw-score advantage over Exploration.
 - **`timeOutOfCombat` excluded from Exploration**: This signal is passive - it increases
   whenever the player is not in combat, regardless of intent. On maps with sparse enemy
   spawns, a combat-seeking player accumulates high Exploration score purely from waiting.

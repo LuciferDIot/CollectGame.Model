@@ -1,4 +1,4 @@
-﻿# System Verification and Implementation Report
+# System Verification and Implementation Report
 
 ## 1. Introduction
 This report documents the final configuration and verification status of the ANFIS-based Adaptive Difficulty System (Version 2.0). The system architecture has been frozen following comprehensive experimental validation and is prepared for deployment.
@@ -105,6 +105,28 @@ Notebooks 03 -> 10 rerun on 2026-03-07. All integration assertions pass (9/9):
 - `anfis_mlp_weights.json` - retrained on new inputs
 - Post-rerun metrics: **test_r2 = 0.9391**, test_mae = 0.0112, Δexplore r = 0.8394
 
-### 8.3 Final System Status
-**Version**: 2.2.0 | **Status**: PRODUCTION Done
+### 8.3 Final System Status (v2.2.0)
+- **Version**: 2.2.0 | **Status**: DEPRECATED (superseded by v2.2.1)
+
+---
+
+## Section 9: v2.2.1 Update - Training Bias Fix & Calibration (2026-03-07)
+
+### 9.1 Summary
+Following deployment of v2.2, a systematic training bias was discovered where the neutral point mapped to `0.808` instead of `1.0` due to fuzzy membership cancellation. The system was retrained with `base=1.0` in the target formula, and a neutral-centred calibration scheme was introduced:
+
+```
+display = clamp(1.0 + (raw - mlp_neutral) * 2.0, 0.6, 1.4)
+```
+
+where `mlp_neutral = 0.931601` is stored in the model weights.
+
+### 9.2 Pipeline Regeneration
+Notebooks 03 -> 10 re-run. All integration assertions pass (9/9):
+- `anfis_mlp_weights.json` - retrained weights + `mlp_neutral: 0.931601`
+- Post-rerun metrics: **test_r2 = 0.9350**, test_mae = 0.0123, Δexplore r = -0.758
+
+### 9.3 Final System Status
+**Version**: 2.2.1 | **Status**: PRODUCTION READY
+
 

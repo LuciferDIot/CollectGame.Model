@@ -19,10 +19,10 @@ To validate the ANFIS pipeline, we simulated a dataset of player telemetry windo
 The ANFIS model (approximated via a 6-16-8-1 MLP surrogate) was evaluated on a test split (20%) of the full synthetic dataset.
 
 *   **Total Samples**: 3,240 (80/20 split -> 2,592 train / 648 test)
-*   **Mean Absolute Error (MAE)**: `0.0127`
-*   **R^2 Score**: `0.9264`
+*   **Mean Absolute Error (MAE)**: `0.0123`
+*   **R^2 Score**: `0.9350`
 *   **Convergence**: 21 iterations (LBFGS solver, max_iter=500)
-*   **mlp_neutral**: 0.932006 (neutral-centred calibration baseline)
+*   **mlp_neutral**: 0.931601 (neutral-centred calibration baseline)
 
 The low MAE (1.3% of target span) indicates the surrogate faithfully reproduces the fuzzy inference surface. Note: earlier versions of this report cited R^2=0.982 and MAE=0.0102 - those figures came from a biased training run (base=0.9) and a smaller dataset. The current figures reflect the corrected v2.2.1 retrain.
 

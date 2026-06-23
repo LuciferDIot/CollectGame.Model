@@ -4,7 +4,7 @@
 >
 > **v2.2 Update (March 2026)**: Two derived features added - `damage_per_hit` (Combat, 5th feature) and `pickup_attempt_rate` (Collection, 4th feature). Raw feature vector is now 12-wide (10 original + 2 derived computed server-side before normalization). Scaler, centroids, and MLP weights regenerated.
 >
-> **v2.2.1 Update (March 2026)**: Training bias fixed (base=0.9->1.0 in target formula). MLP output calibration changed from min-max rescaling to **neutral-centred**: `display = clamp(1.0 + (raw − 0.932006) x 2.0, 0.6, 1.4)`. Final metrics: **Test R^2 = 0.9264, Test MAE = 0.0127**. `mlp_neutral = 0.932006` stored in `anfis_mlp_weights.json` and auto-updated by notebook 07 after each retrain.
+> **v2.2.1 Update (March 2026)**: Training bias fixed (base=0.9->1.0 in target formula). MLP output calibration changed from min-max rescaling to **neutral-centred**: `display = clamp(1.0 + (raw − 0.931601) x 2.0, 0.6, 1.4)`. Final metrics: **Test R^2 = 0.9350, Test MAE = 0.0123**. `mlp_neutral = 0.931601` stored in `anfis_mlp_weights.json` and auto-updated by notebook 07 after each retrain.
 
 ## 1. Runtime Flow Diagram
 
@@ -40,7 +40,7 @@ The game engine requires the following frozen artifacts (JSON/Binary) exported f
     *   *Source*: Notebook `03_Normalization.ipynb`
 2.  **`cluster_centroids.json`**: Contains the (3, 3) centroid matrix in pct_combat/collect/explore space.
     *   *Source*: Notebook `05_Clustering.ipynb`
-3.  **`anfis_mlp_weights.json`**: Contains weights/biases for the 6-input MLP + `mlp_neutral` (0.932006) for neutral-centred calibration.
+3.  **`anfis_mlp_weights.json`**: Contains weights/biases for the 6-input MLP + `mlp_neutral` (0.931601) for neutral-centred calibration.
     *   *Source*: Notebook `07_ANFIS_Training.ipynb` (auto-exports `mlp_neutral` after every retrain)
 4.  **`deployment_manifest.json`**: Hard constraints - `target_multiplier_range: [0.6, 1.4]`, feature order, version.
     *   *Source*: Manually maintained; version-bumped per release

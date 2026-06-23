@@ -1,4 +1,4 @@
-﻿# Known Limitations and Future Work
+# Known Limitations and Future Work
 
 > **Scope**: This document catalogs structural limitations of the ANFIS Adaptive Difficulty System (v2.1) that cannot be resolved within the current telemetry schema or dataset, and proposes concrete future improvements for each. Intended for inclusion in the Limitations and Future Work chapter of the thesis.
 
@@ -242,8 +242,8 @@ These operations, particularly navmesh queries, are GPU-accelerated in modern ga
 | Activity scoring (v2.1) | Validated offline | Notebook 04 |
 | K-Means clustering | Validated offline | Silhouette = 0.3752 |
 | Soft membership (IDW) | Validated offline | Numerically stable |
-| Temporal delta computation | Validated offline | r=0.808 for Δexplore |
-| MLP inference | Validated offline | R^2 = 0.9391 (v2.2 rerun) |
+| Temporal delta computation | Validated offline | r=-0.758 for Δexplore |
+| MLP inference | Validated offline | R^2 = 0.9350 (v2.2.1 retrain) |
 | Scalar parameter adaptation | Validated in demo UI | Health/speed/damage multipliers |
 | **Global enemy cap adaptation** | **Not implemented** | PCG infrastructure required |
 | **Full real-time closed-loop** | **Not validated** | GPU resource constraint |
@@ -303,9 +303,9 @@ The limitations above are documented for completeness. Within the thesis, the fo
 
 5. **GPU resource constraints prevented full PCG integration** - the ANFIS pipeline is validated in simulation. The global enemy cap adaptation and closed-loop real-time testing are identified as future work requiring production GPU infrastructure. This is consistent with standard practice in adaptive game AI research, where the learned controller is validated separately from the game engine integration.
 
-The thesis argues that despite these limitations, the system achieves its core objective: producing a statistically valid, generalizing model (R^2 = 0.9391, v2.2) that adapts difficulty based on real behavioral signals. Future work can address each limitation incrementally as telemetry infrastructure matures.
+The thesis argues that despite these limitations, the system achieves its core objective: producing a statistically valid, generalizing model (R^2 = 0.9350, v2.2.1) that adapts difficulty based on real behavioral signals. Future work can address each limitation incrementally as telemetry infrastructure matures.
 
 ---
 
-*Created: 2026-03-06 | Updated: 2026-03-07 | Version: v2.2 | Status: THESIS-READY*
+*Created: 2026-03-06 | Updated: 2026-03-07 | Version: v2.2.1 | Status: THESIS-READY*
 

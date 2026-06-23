@@ -35,7 +35,7 @@ ANFIS-based adaptive difficulty system using K-Means clustering, fuzzy soft memb
 ### Target Generation (Option B, v2.2.1)
 - **Formula**: `T = 1.0 + 0.22*(soft_combat-0.5) + 0.18*(soft_collect-0.5) + 0.15*(soft_explore-0.5) + 0.55*delta_combat + 0.40*delta_collect + 0.35*delta_explore - 0.25*death_rate`
 - **Clipped to**: [0.6, 1.4]
-- **Display calibration**: `display = clamp(1.0 + (raw - mlp_neutral) * 2.0, 0.6, 1.4)` where `mlp_neutral = 0.932006`
+- **Display calibration**: `display = clamp(1.0 + (raw - mlp_neutral) * 2.0, 0.6, 1.4)` where `mlp_neutral = 0.931601`
 
 ---
 
@@ -107,15 +107,15 @@ Expected outputs:
 
 ### MLP Surrogate (v2.2.1)
 - Architecture: 6->16->8->1 (ReLU hidden, Linear output)
-- Test R^2: 0.9264 | Test MAE: 0.0127
+- Test R^2: 0.9350 | Test MAE: 0.0123
 - Convergence: 21 iterations (LBFGS, max_iter=500)
-- mlp_neutral: 0.932006 | AMPLIFICATION: 2.0
+- mlp_neutral: 0.931601 | AMPLIFICATION: 2.0
 
 ### Target Distribution (post-retrain)
-- Range: [0.60, 1.107] | Mean: 0.902 | Std: 0.074
+- Range: [0.60, 1.121] | Mean: 0.910 | Std: 0.076
 
 ### Responsiveness
-- delta_explore to delta_target: r = 0.808
+- delta_explore to delta_target: r = -0.758
 
 ---
 

@@ -50,7 +50,7 @@ See `pipeline_config.yaml` for complete settings.
 - `delta_collect` = soft_collect(t) - soft_collect(t-1)
 - `delta_explore` = soft_explore(t) - soft_explore(t-1)
 
-**Rationale**: Δexplore has r=0.808 correlation with target changes (validated in experiments)
+**Rationale**: Δexplore has r=-0.758 correlation with target changes (validated in experiments)
 
 **Implementation**: Per-player sequential differencing, first window = 0
 
@@ -89,7 +89,7 @@ See `pipeline_config.yaml` for complete settings.
 - Target CV: 0.022 (very low variance)
 
 **Responsiveness** (with deltas): [done]
-- Δexplore -> Δtarget: r=0.808
+- Δexplore -> Δtarget: r=-0.758
 
 ---
 

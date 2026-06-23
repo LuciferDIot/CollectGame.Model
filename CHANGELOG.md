@@ -18,24 +18,24 @@ After deploying v2.2, analytics showed the pipeline almost exclusively outputtin
 - **Retrained notebooks 06-10** with `base=1.0` in target formula (Option B canonical)
 - **Replaced min-max rescaling** with neutral-centred calibration:
   `display = clamp(1.0 + (raw - mlp_neutral) x 2.0, 0.6, 1.4)`
-  where `mlp_neutral` = MLP output for balanced (1/3, 1/3, 1/3, 0, 0, 0) input = 0.932006
+  where `mlp_neutral` = MLP output for balanced (1/3, 1/3, 1/3, 0, 0, 0) input = 0.931601
 - **Self-updating**: notebook 07 auto-computes and saves `mlp_neutral` after each retrain
 
 ### Changed
 - **`06_ANFIS_Preparation.ipynb`**: `base=0.9` changed to `base=1.0` in target formula
 - **`07_ANFIS_Training.ipynb`**: Added `mlp_neutral` computation and export; replaced output_range sweep with clean deploy cell that saves `training_stats.json`
-- **`lib/engine/index.ts`**: `computeTargetMultiplier()` now uses neutral-centred formula; reads `mlp_neutral` from `anfis_mlp_weights.json` with fallback 0.932
-- **`anfis_mlp_weights.json`**: Added `mlp_neutral: 0.932006`; `output_range` kept as documentation only
-- **`training_stats.json`**: Updated with correct post-retrain distribution (min=0.60, max=1.107, mean=0.902, std=0.074)
+- **`lib/engine/index.ts`**: `computeTargetMultiplier()` now uses neutral-centred formula; reads `mlp_neutral` from `anfis_mlp_weights.json` with fallback 0.9316
+- **`anfis_mlp_weights.json`**: Added `mlp_neutral: 0.931601`; `output_range` kept as documentation only
+- **`training_stats.json`**: Updated with correct post-retrain distribution (min=0.60, max=1.121, mean=0.910, std=0.076)
 
 ### New Training Metrics (post-retrain)
 | Metric | Before (biased) | After (corrected) |
 |--------|-----------------|-------------------|
-| Test R^2 | 0.9391 | **0.9264** |
-| Test MAE | 0.0112 | **0.0127** |
+| Test R^2 | 0.9391 | **0.9350** |
+| Test MAE | 0.0112 | **0.0123** |
 | Target min | 0.609 | **0.600** |
-| Target max | 1.021 | **1.107** |
-| Target mean | 0.801 | **0.902** |
+| Target max | 1.021 | **1.121** |
+| Target mean | 0.801 | **0.910** |
 
 ### Verification
 - Balanced (1/3, 1/3, 1/3) gives display = **1.000** (exact neutral) - confirmed
@@ -77,8 +77,8 @@ Introduced two derived features to improve archetype discrimination, replaced th
 - `data/processed/5_clustered_telemetry.csv`
 - `data/processed/6_anfis_dataset.csv`
 - `data/models/scaler_params.json` (12 features)
-- `data/models/anfis_mlp_weights.json` (Test R^2: 0.9264, MAE: 0.0127 - post training-bias fix)
-- `anfis-demo-ui/models/` (all synced including `mlp_neutral: 0.932006`)
+- `data/models/anfis_mlp_weights.json` (Test R^2: 0.9350, MAE: 0.0123 - post training-bias fix)
+- `anfis-demo-ui/models/` (all synced including `mlp_neutral: 0.931601`)
 
 ### Engine Fix
 - Fixed camelCase to snake_case mismatch in `lib/engine/index.ts` for derived feature keys

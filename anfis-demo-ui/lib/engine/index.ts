@@ -39,7 +39,7 @@ export class ANFISPipeline {
     this.manifest = manifest;
     // MLP output for balanced (1/3,1/3,1/3) no-delta input -- semantic neutral point.
     // Auto-recomputed by notebook 07 after each retrain; stored in anfis_mlp_weights.json.
-    this.mlpNeutral = mlpWeights.mlp_neutral ?? 0.932;
+    this.mlpNeutral = mlpWeights.mlp_neutral ?? 0.931601;
   }
 
   process(telemetry: TelemetryWindow): PipelineOutput {
@@ -52,7 +52,7 @@ export class ANFISPipeline {
     // Step 2: Normalize (Min-Max, 12 features including 2 derived)
     const normalized = this.step2_NormalizeFeatures(telemetry.features);
 
-    // Step 3: Activity scores (per-archetype averages -> equal ceiling)
+    // Step 3: Activity scores (per-archetype scaling to prevent exploration dominance)
     const activityScores = this.step3_CalculateActivityScores(normalized);
 
     // Step 4: Soft membership via IDW (K=3)

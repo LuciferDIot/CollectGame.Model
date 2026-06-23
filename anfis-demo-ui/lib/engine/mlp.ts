@@ -9,7 +9,7 @@ import type { ANFISInput, MLPWeights } from './types';
  *
  * Activation: ReLU for hidden layers, Linear for output.
  * Training: sklearn LBFGS, converged in 21 iterations (v2.2.1).
- * Metrics: Test R^2 = 0.9264, Test MAE = 0.0127.
+ * Metrics: Test R^2 = 0.9350, Test MAE = 0.0123.
  */
 export class MLPInference {
   private weights: number[][][];

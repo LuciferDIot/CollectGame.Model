@@ -4,11 +4,13 @@ import type { ActivityScores, NormalizedFeatures } from './types';
 /**
  * Computes per-archetype activity percentages from normalized telemetry.
  *
- * Each archetype score is the average of its constituent features (not a sum),
- * so every archetype has an equal ceiling of 1.0 regardless of how many features
- * it uses. Using sums would give Combat (5 features) a structural ceiling
- * advantage over Exploration (2 features), biasing soft membership toward Combat
- * for any player with moderate activity across all categories.
+ * Archetype scores are computed using customized scaling. For Combat and Collection,
+ * the score is the average of its constituent features (not a sum) to provide a
+ * consistent ceiling of 1.0 regardless of feature count (5 and 4 respectively).
+ * Exploration uses a divisor of 4 for its 2 active movement features, giving it a
+ * lower ceiling of 0.5. This prevents a collector who moves slightly from scoring
+ * explore ≈ collect, which was collapsing the Collection centroid toward Exploration
+ * in pct space.
  *
  * timeOutOfCombat is excluded from the Exploration score. It accumulates passively
  * whenever a player is not in combat -- including combat-intent players waiting for

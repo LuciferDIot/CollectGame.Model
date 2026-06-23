@@ -1,4 +1,4 @@
-﻿# ANFIS MLP Evaluation Report
+# ANFIS MLP Evaluation Report
 
 **Date**: 2026-01-28 (updated March 7, 2026)
 **Version**: v2.2.1 (Option B Canonical)
@@ -7,31 +7,31 @@
 
 ## Executive Summary
 
-The MLP surrogate achieved R^2 = 0.9566 on unseen data after resolving target variance collapse through Option B target redesign. The original failure (R^2 = −4.69) was caused by fuzzy-membership constraints limiting target variance to σ = 0.0113. The redesigned formula restored learnability by using deltas as primary variance drivers while preserving semantic bounds.
+The MLP surrogate achieved R^2 = 0.9350 on unseen data after resolving target variance collapse through Option B target redesign and correcting structural training bias in v2.2.1. The original failure (R^2 = −4.69) was caused by fuzzy-membership constraints limiting target variance to σ = 0.0113. The redesigned formula restored learnability by using deltas as primary variance drivers while preserving semantic bounds.
 
 ---
 
 ## Dataset Statistics
 
-### Target Distribution (Post-Option B)
+### Target Distribution (Post-Option B / v2.2.1)
 
 | Metric | Value | Status |
 |--------|-------|--------|
 | **Samples** | 3,240 | |
-| **Min** | 0.6094 | Healthy |
-| **Max** | 1.0207 | Healthy |
-| **Mean** | 0.8007 | Expected (players skew below neutral) |
-| **Std Dev** | 0.0625 | **5.5x improvement** |
-| **Span** | 0.4113 | **17.9x improvement** |
+| **Min** | 0.6000 | Healthy |
+| **Max** | 1.1213 | Healthy |
+| **Mean** | 0.9103 | Expected (players skew slightly below neutral) |
+| **Std Dev** | 0.0760 | **6.7x improvement** |
+| **Span** | 0.5213 | **22.6x improvement** |
 | **Clamp Low** | 0.0% | No saturation |
 | **Clamp High** | 0.0% | No saturation |
 
 ### Before/After Comparison
 
-| Metric | Original (Collapsed) | Option B | Δ |
-|--------|---------------------|----------|---|
-| Std Dev | 0.0113 | 0.0625 | +453% |
-| Span | 0.023 | 0.4113 | +1,688% |
+| Metric | Original (Collapsed) | Option B / v2.2.1 | Δ |
+|--------|---------------------|-------------------|---|
+| Std Dev | 0.0113 | 0.0760 | +572% |
+| Span | 0.023 | 0.5213 | +2,166% |
 | Upper Clamp % | 100% | 0% | Eliminated |
 
 ---
@@ -42,16 +42,16 @@ The MLP surrogate achieved R^2 = 0.9566 on unseen data after resolving target va
 
 | Split | MAE | RMSE | R^2 | Samples |
 |-------|-----|------|-----|---------|
-| **Train** | 0.0130 | - | **0.9550** | 2,592 |
-| **Test** | 0.0127 | - | **0.9566** | 648 |
+| **Train** | 0.0144 | - | **0.8631** | 2,592 |
+| **Test** | 0.0123 | - | **0.9350** | 648 |
 
 ### Key Observations
 
-1. **Generalization**: Test R^2 (0.9566) ≥ Train R^2 (0.9550) - no overfitting.
+1. **Generalization**: Test R^2 (0.9350) ≥ Train R^2 (0.8631) - no overfitting.
 
-2. **Error**: MAE ≈ 0.013 (3% of target span [0.6, 1.4]).
+2. **Error**: MAE ≈ 0.0123 (2.4% of target span [0.6, 1.12]).
 
-3. **Convergence**: 230 iterations - clean learning curve.
+3. **Convergence**: 21 iterations (LBFGS solver) - clean learning curve.
 
 ---
 
@@ -114,16 +114,16 @@ This hierarchy aligns with design intent: **deltas drive variance, soft terms pr
 ### Approved for Production
 
 Criteria met:
-- R^2 ≥ 0.4: achieved 0.9566
-- MAE < 10% of span: achieved 3%
+- R^2 ≥ 0.4: achieved 0.9350
+- MAE < 10% of span: achieved 2.4%
 - No overfitting: Test R^2 ≥ Train R^2
-- Target variance restored: σ = 0.062, span = 0.41
+- Target variance restored: σ = 0.0760, span = 0.52
 
 ---
 
 ## Thesis Contribution
 
-1. Fuzzy-membership constraints can cause variance collapse in supervised learning targets - σ dropped from 0.062 to 0.011, making gradient descent fail.
+1. Fuzzy-membership constraints can cause variance collapse in supervised learning targets - σ dropped from 0.0760 to 0.011, making gradient descent fail.
 2. Hybrid feature engineering (soft membership + deltas) restores the learning signal without changing architecture.
 3. The failure was statistical, not architectural - the MLP was sufficient once the target signal had adequate variance.
 
@@ -145,7 +145,7 @@ Criteria met:
 
 ## Conclusion
 
-Option B restored learnability by addressing the root cause (variance collapse) rather than symptoms. The MLP surrogate generalizes well to unseen data (Test R^2 = 0.9566) and is production-ready.
+Option B restored learnability by addressing the root cause (variance collapse) rather than symptoms. The MLP surrogate generalizes well to unseen data (Test R^2 = 0.9350) and is production-ready.
 
 ---
 
@@ -275,7 +275,7 @@ A balanced player now targets exactly **M=1.0** -> symmetric distribution.
 2. **Replaced min-max with neutral-centred calibration**:
 ```
 display = clamp(1.0 + (raw − mlp_neutral) x 2.0,  0.6, 1.4)
-mlp_neutral = MLP.predict([[1/3, 1/3, 1/3, 0, 0, 0]]) = 0.932006
+mlp_neutral = MLP.predict([[1/3, 1/3, 1/3, 0, 0, 0]]) = 0.931601
 ```
 This guarantees: balanced player -> display = 1.0, regardless of MLP output range.
 
@@ -284,14 +284,15 @@ This guarantees: balanced player -> display = 1.0, regardless of MLP output rang
 | Metric | v2.2 (biased) | v2.2.1 (corrected) |
 |--------|--------------|---------------------|
 | Target min | 0.609 | **0.600** |
-| Target max | 1.021 | **1.107** |
-| Target mean | 0.801 | **0.902** |
-| Target std | 0.062 | **0.074** |
-| Test R^2 | 0.9391 | **0.9264** |
-| Test MAE | 0.0112 | **0.0127** |
+| Target max | 1.021 | **1.121** |
+| Target mean | 0.801 | **0.910** |
+| Target std | 0.062 | **0.076** |
+| Test R^2 | 0.9391 | **0.9350** |
+| Test MAE | 0.0112 | **0.0123** |
+| Δexplore r | -0.8394 | **-0.758** |
 | Convergence | 230 iters | **21 iters** (LBFGS) |
 
-The slight R^2 decrease (0.9391 -> 0.9264) is expected: the corrected target distribution is harder to fit (wider variance, more symmetric). The model is semantically correct.
+The slight R^2 decrease (0.9391 -> 0.9350) is expected: the corrected target distribution is harder to fit (wider variance, more symmetric). The model is semantically correct.
 
 ### Verification Results
 

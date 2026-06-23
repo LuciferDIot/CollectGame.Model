@@ -310,15 +310,14 @@ export class MinMaxNormalizer {
  * 
  * === EXAMPLE WALKTHROUGH ===
  * 
- * Training Data (from 1000 players):
+ * Training Data (using actual scaler bounds for kills: min=0, max=3):
  * - Minimum kills: 0
- * - Maximum kills: 50
- * - Average kills: 15
+ * - Maximum kills: 3
  * 
- * Player A: 10 kills -> normalized = 10/50 = 0.2 (below average)
- * Player B: 15 kills -> normalized = 15/50 = 0.3 (average)
- * Player C: 30 kills -> normalized = 30/50 = 0.6 (above average)
- * Player D: 100 kills -> normalized = 100/50 = 2.0 -> clamped to 1.0 (exceptional!)
+ * Player A: 1 kill -> normalized = (1-0)/(3-0) = 0.33
+ * Player B: 2 kills -> normalized = (2-0)/(3-0) = 0.67
+ * Player C: 3 kills -> normalized = (3-0)/(3-0) = 1.00
+ * Player D: 10 kills -> normalized = (10-0)/(3-0) = 3.33 -> clamped to 1.0 (exceptional!)
  * 
  * Now the AI can easily see who's performing well!
  * 

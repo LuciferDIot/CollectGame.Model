@@ -1,4 +1,4 @@
-﻿# ANFIS Adaptive Difficulty Engine (v2.2)
+# ANFIS Adaptive Difficulty Engine (v2.2.1)
 
 This repository serves as the runtime demonstration and integration backend for the **Adaptive Neuro-Fuzzy Inference System (ANFIS)**. It implements the complete mathematical pipeline derived from the core research notebooks, allowing external game engines (Unity/Unreal) to query for real-time difficulty adjustments.
 
@@ -30,7 +30,7 @@ Raw telemetry features ($X$) are scaled to the $[0, 1]$ range using parameters f
 $$ X'_{\text{norm}} = \frac{X - \text{min}}{\text{max} - \text{min}} $$
 
 ### Step 2: Activity Score Calculation (v2.2)
-Each archetype score is computed as the **per-archetype average** of its normalized signals. This gives every archetype an equal ceiling of 1.0, preventing structural bias from feature-count asymmetry.
+Each archetype score is computed from its normalized signals using custom scaling to prevent structural bias from feature-count asymmetry.
 
 **v2.2 Formulae** (two derived features added - computed before normalization):
 
@@ -38,9 +38,9 @@ Each archetype score is computed as the **per-archetype average** of its normali
 |-----------|----------------------|---------|
 | **Combat** | EnemiesHit, DamageDone, TimeInCombat, Kills, **DamagePerHit** | $\text{score\_combat} = \text{avg}(5\text{ features})$ |
 | **Collection** | ItemsCollected, PickupAttempts, TimeNearInteractables, **PickupAttemptRate** | $\text{score\_collect} = \text{avg}(4\text{ features})$ |
-| **Exploration** | DistanceTraveled, TimeSprinting | $\text{score\_explore} = \text{avg}(2\text{ features})$ |
+| **Exploration** | DistanceTraveled, TimeSprinting | $\text{score\_explore} = \text{sum}(2\text{ features}) / 4$ |
 
-> **Why averages, not sums?** (v2.1 fix): Sums gave Combat a 4x ceiling over a 1-feature Exploration category. Averages guarantee a fair [0,1] ceiling per archetype.
+> **Why averages/custom scaling, not sums?** (v2.1 fix): Sums gave Combat a structural ceiling advantage. Custom scaling restricts Combat and Collection to a [0, 1] ceiling, and Exploration to a [0, 0.5] ceiling (dividing by 4 instead of 2). This prevents exploration from dominating and collapsing the Collection centroid toward Exploration.
 > **Why remove `timeOutOfCombat`?** (v2.1 fix): It accumulated *passively* for any player not fighting, mis-classifying attacker-intent players as Explorers on sparse-spawn maps.
 > **Why `DamagePerHit` and `PickupAttemptRate`?** (v2.2 addition): Sniper-style players deal high damage with few hits - without this, they were under-represented in Combat scoring. `PickupAttemptRate` distinguishes deliberate Collectors from incidental Explorers who pass near items without picking them up.
 
@@ -65,12 +65,12 @@ A trained Multi-Layer Perceptron (MLP) predicts a raw difficulty score, which is
 
 *   **Inputs**: $[\mu_{\text{c}}, \mu_{\text{l}}, \mu_{\text{e}}, \Delta_{\text{c}}, \Delta_{\text{l}}, \Delta_{\text{e}}]$ (6 dimensions)
 *   **Architecture**: 6 -> Dense(16, ReLU) -> Dense(8, ReLU) -> Dense(1, Linear)
-*   **Weights**: Loaded from `anfis_mlp_weights.json` (Test R^2=0.9264, MAE=0.0127)
+*   **Weights**: Loaded from `anfis_mlp_weights.json` (Test R^2=0.9350, MAE=0.0123)
 *   **Calibration** (neutral-centred):
 
 $$M_{\text{display}} = \text{clamp}\!\left(1.0 + (\text{raw} - \text{mlp\_neutral}) \times 2.0,\ 0.6,\ 1.4\right)$$
 
-where $\text{mlp\_neutral} = 0.932006$ = MLP output for a balanced (1/3,1/3,1/3) no-delta player.
+where $\text{mlp\_neutral} = 0.931601$ = MLP output for a balanced (1/3,1/3,1/3) no-delta player.
 
 > **Why neutral-centred?** A balanced player must semantically map to display=1.0 (no change). Min-max rescaling was sensitive to extreme training inputs and broke this guarantee. Neutral-centred calibration enforces it by construction. `mlp_neutral` is auto-recomputed and saved by notebook 07 after each retrain - no code changes needed.
 

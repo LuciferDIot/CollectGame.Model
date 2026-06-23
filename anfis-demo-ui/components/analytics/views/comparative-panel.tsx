@@ -45,14 +45,14 @@ export function ComparativePanel() {
                     trigger={<span className="cursor-pointer hover:underline decoration-dotted underline-offset-4">Target Std Dev</span>}
                     title="Target Standard Deviation"
                     description="Measure of signal variance. Low std means the game feels 'flat' and unresponsive."
-                    interpretation="Option B's 0.062 proves it creates a dynamic experience, unlike the flat 0.011 of the original."
+                    interpretation="Option B's 0.076 proves it creates a dynamic experience, unlike the flat 0.011 of the original."
                     calculation="std(target_signal)"
                    />
                 </td>
                 <td className="p-4 font-mono text-muted-foreground">{originalStd.toFixed(4)}</td>
                 <td className="p-4 text-muted-foreground"><ArrowRight className="h-4 w-4" /></td>
                 <td className="p-4 font-mono font-bold text-primary">{targetStd.toFixed(4)}</td>
-                <td className="p-4 text-right text-green-600 font-mono">+453%</td>
+                <td className="p-4 text-right text-green-600 font-mono">+573%</td>
               </tr>
               <tr className="border-b">
                 <td className="p-4 font-medium flex items-center gap-2">
@@ -60,14 +60,14 @@ export function ComparativePanel() {
                     trigger={<span className="cursor-pointer hover:underline decoration-dotted underline-offset-4">Target Span</span>}
                     title="Effective Signal Span"
                     description="The difference between the maximum and minimum difficulty multipliers generated."
-                    interpretation="A huge 1711% increase means the AI can now make the game significantly harder OR easier, not just slightly tweak it."
+                    interpretation="A huge 2167% increase means the AI can now make the game significantly harder OR easier, not just slightly tweak it."
                     calculation="max(target) - min(target)"
                    />
                 </td>
                 <td className="p-4 font-mono text-muted-foreground">{originalSpan.toFixed(3)}</td>
                 <td className="p-4 text-muted-foreground"><ArrowRight className="h-4 w-4" /></td>
                 <td className="p-4 font-mono font-bold text-primary">{targetSpan.toFixed(3)}</td>
-                <td className="p-4 text-right text-green-600 font-mono">+1711%</td>
+                <td className="p-4 text-right text-green-600 font-mono">+2167%</td>
               </tr>
               <tr className="border-b">
                 <td className="p-4 font-medium flex items-center gap-2">

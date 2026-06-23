@@ -1,4 +1,4 @@
-﻿# Design Decision: Training Bias Fix & Neutral-Centred Calibration
+# Design Decision: Training Bias Fix & Neutral-Centred Calibration
 
 **Version**: v2.2.1
 **Date**: March 7, 2026
@@ -85,7 +85,7 @@ display = clamp(1.0 + (raw − mlp_neutral) x AMPLIFICATION,  0.6,  1.4)
 ```
 
 where:
-- `mlp_neutral = MLP.predict([[1/3, 1/3, 1/3, 0, 0, 0]])` = **0.932006**
+- `mlp_neutral = MLP.predict([[1/3, 1/3, 1/3, 0, 0, 0]])` = **0.931601**
 - `AMPLIFICATION = 2.0` (fixed design constant: +/-0.4 raw deviation -> +/-0.8 display)
 
 **Semantic guarantee**: A balanced player with no behavioral trend always maps to exactly `display = 1.0`, regardless of how the model weights change between retrains.
@@ -101,7 +101,7 @@ export_data['mlp_neutral'] = round(mlp_neutral, 6)
 
 The Next.js engine reads this value at startup:
 ```typescript
-this.mlpNeutral = mlpWeights.mlp_neutral ?? 0.932;  // fallback if missing
+this.mlpNeutral = mlpWeights.mlp_neutral ?? 0.931601;  // fallback if missing
 ```
 
 No code changes are needed after a retrain - only re-running notebooks 06-07 and copying the updated `anfis_mlp_weights.json`.
@@ -140,12 +140,12 @@ All 19 unit tests pass. TypeScript type check clean.
 
 | Metric | v2.2 (biased) | v2.2.1 (corrected) | Notes |
 |--------|--------------|---------------------|-------|
-| Test R^2 | 0.9391 | **0.9264** | Slight decrease expected - wider variance is harder to fit |
-| Test MAE | 0.0112 | **0.0127** | +/-1.3% of [0.6,1.4] span - acceptable |
+| Test R^2 | 0.9391 | **0.9350** | Slight decrease expected - wider variance is harder to fit |
+| Test MAE | 0.0112 | **0.0123** | +/-1.3% of [0.6,1.4] span - acceptable |
 | Target min | 0.609 | **0.600** | Reaches lower clamp |
-| Target max | 1.021 | **1.107** | Now reaches above neutral |
-| Target mean | 0.801 | **0.902** | Approaching the correct centre |
-| Target std | 0.062 | **0.074** | Healthier variance |
+| Target max | 1.021 | **1.121** | Now reaches above neutral |
+| Target mean | 0.801 | **0.910** | Approaching the correct centre |
+| Target std | 0.062 | **0.076** | Healthier variance |
 | Convergence | 230 iters | **21 iters** | LBFGS faster on corrected distribution |
 
 ---
@@ -171,7 +171,7 @@ All 19 unit tests pass. TypeScript type check clean.
 | `_research_archive/core/notebooks/07_ANFIS_Training.ipynb` | Added `mlp_neutral` computation + export; replaced output_range sweep with clean deploy cell |
 | `anfis-demo-ui/lib/engine/index.ts` | `computeTargetMultiplier()` uses neutral-centred formula; reads `mlpNeutral` from weights |
 | `anfis-demo-ui/lib/engine/types.ts` | Added `mlp_neutral?: number` to `MLPWeights` interface |
-| `anfis-demo-ui/models/anfis_mlp_weights.json` | Retrained weights + `mlp_neutral: 0.932006` |
+| `anfis-demo-ui/models/anfis_mlp_weights.json` | Retrained weights + `mlp_neutral: 0.931601` |
 | `anfis-demo-ui/models/training_stats.json` | Updated with correct post-retrain target distribution |
 | `anfis-demo-ui/lib/analytics/educational-content.ts` | `how_surrogate_model_works` updated with new metrics and calibration formula |
 

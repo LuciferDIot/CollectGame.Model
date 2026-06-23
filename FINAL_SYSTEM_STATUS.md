@@ -20,11 +20,11 @@
 
 ### Configuration
 - **Features**: 12 total (10 raw telemetry + 2 derived)
-- **Activity Scoring**: per-archetype average (divided by 5 for Combat, 4 for Collect, 2 for Explore)
+- **Activity Scoring**: per-archetype average (divided by 5 for Combat, 4 for Collect, 4 for Explore (sum / 4))
 - **Clustering**: K=3, soft membership via inverse-distance weighting
 - **ANFIS Inputs**: [soft_combat, soft_collect, soft_explore, delta_combat, delta_collect, delta_explore]
 - **Target formula**: `1.0 + 0.22*(soft_combat-0.5) + 0.18*(soft_collect-0.5) + 0.15*(soft_explore-0.5) + 0.55*delta_combat + 0.40*delta_collect + 0.35*delta_explore - 0.25*death_rate`, clipped [0.6, 1.4]
-- **Calibration**: `display = clamp(1.0 + (raw - 0.932006) * 2.0, 0.6, 1.4)`
+- **Calibration**: `display = clamp(1.0 + (raw - 0.931601) * 2.0, 0.6, 1.4)`
 - **Session timeout**: 90s
 
 ### v2.1 Activity Scoring Change
@@ -44,7 +44,7 @@ Fix applied in v2.1:
 ```
 score_combat  = avg(enemiesHit, damageDone, timeInCombat, kills)            -> [0,1]  (divided by 4)
 score_collect = avg(itemsCollected, pickupAttempts, timeNearInteractables)   -> [0,1]  (divided by 3)
-score_explore = avg(distanceTraveled, timeSprinting)                         -> [0,1]  (divided by 2)
+score_explore = sum(distanceTraveled, timeSprinting) / 4                         -> [0,0.5] (divided by 4)
 ```
 
 > **v2.2 update:** Derived features (`damage_per_hit`, `pickup_attempt_rate`) were added in v2.2, extending the averages to divided by 5 (Combat) and divided by 4 (Collect). See Final Configuration above for the current formula.
@@ -91,16 +91,16 @@ Rerun sequence: notebooks 04 -> 05 -> 06 -> 07.
 - Dominant windows (>0.6): 32%
 
 ### MLP Surrogate (v2.2.1)
-- Train R^2: 0.860 | Test R^2: 0.9264
-- Train MAE: 0.0139 | Test MAE: 0.0127
+- Train R^2: 0.8631 | Test R^2: 0.9350
+- Train MAE: 0.0144 | Test MAE: 0.0123
 - Convergence: 21 iterations (LBFGS)
-- mlp_neutral: 0.932006
+- mlp_neutral: 0.931601
 
 ### Target Distribution
-- Range: [0.60, 1.107] | Mean: 0.902 | Std: 0.074
+- Range: [0.60, 1.121] | Mean: 0.910 | Std: 0.076
 
 ### Responsiveness
-- delta_explore to delta_target: r = 0.808
+- delta_explore to delta_target: r = -0.758
 
 ---
 
@@ -155,8 +155,8 @@ CollectGame.Model/
 
 | Section | Test | Result |
 |---------|------|--------|
-| 2 | Test R^2 reproduced | 0.9264 |
-| 2 | Test MAE reproduced | 0.0127 |
+| 2 | Test R^2 reproduced | 0.9350 |
+| 2 | Test MAE reproduced | 0.0123 |
 | 3 | Balanced (1/3, 1/3, 1/3) neutral | display = 1.000 |
 | 3 | First window delta=0 | equals neutral |
 | 3 | Extreme combat + delta | display = 1.127 in [0.6, 1.4] |
@@ -172,8 +172,8 @@ CollectGame.Model/
 | 2 | MinMaxScaler in [0, 1] | min=0.0, max=1.0 |
 | 3 | Soft membership sums = 1 | max deviation = 2.22e-16 |
 | 4 | First window deltas = 0 | max_abs=0.00e+00 |
-| 5 | Target in valid range | [0.60, 1.107] |
-| 6 | MLP predictions finite | raw [0.486, 1.123]; display [0.6, 1.4] |
+| 5 | Target in valid range | [0.60, 1.121] |
+| 6 | MLP predictions finite | raw [0.662, 1.097]; display [0.6, 1.4] |
 | 7 | Pearson r(delta_explore, target) >= 0.7 | r >= 0.7 |
 | 8 | No NaN in ANFIS matrix | NaN count = 0 |
 | 9 | All 3 cluster labels present | [0, 1, 2] |

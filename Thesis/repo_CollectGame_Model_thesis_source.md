@@ -1,4 +1,4 @@
-﻿# Thesis Source Document - CollectGame.Model Repository
+# Thesis Source Document - CollectGame.Model Repository
 **System**: AURA (Adaptive User-Responsive Architecture)
 **Repo**: CollectGame.Model
 **Final Version**: v2.2.1
@@ -17,7 +17,7 @@
 **Short Title**: AURA - Adaptive Neuro-Fuzzy Difficulty System
 
 **Abstract (Draft)**:
-Static and rule-based adaptive difficulty systems fail to respond to the diversity of implicit player behaviour, resulting in sub-optimal engagement and early player drop-off. This project presents AURA, a calibration-first, telemetry-driven adaptive gameplay framework that classifies player behaviour into three archetypes - Combat, Collection, and Exploration - using K-Means soft clustering with Inverse Distance Weighting (IDW) membership, and predicts a real-time difficulty multiplier using a neuro-fuzzy inference system approximated by a Multi-Layer Perceptron (MLP) surrogate for sub-millisecond runtime inference. The system operates on 30-second telemetry windows, extracting 12 behavioural features (10 raw + 2 derived ratios), computing per-archetype soft memberships and temporal deltas, and mapping these to a bounded difficulty multiplier M ∈ [0.6, 1.4]. A neutral-centred calibration scheme guarantees that a balanced player always receives M = 1.0 by anchoring the output to a semantically defined neutral input. The MLP surrogate achieves Test R^2 = 0.9264 and Test MAE = 0.0127 on 3,240 synthetic samples. An interactive analytics dashboard (Next.js 14, TypeScript) visualises the complete 8-step pipeline with educational explainers, archetype diagnostics, and window-to-window behavioural comparison. A Vitest test suite of 19 tests validates every engine module with CI/CD via GitHub Actions.
+Static and rule-based adaptive difficulty systems fail to respond to the diversity of implicit player behaviour, resulting in sub-optimal engagement and early player drop-off. This project presents AURA, a calibration-first, telemetry-driven adaptive gameplay framework that classifies player behaviour into three archetypes - Combat, Collection, and Exploration - using K-Means soft clustering with Inverse Distance Weighting (IDW) membership, and predicts a real-time difficulty multiplier using a neuro-fuzzy inference system approximated by a Multi-Layer Perceptron (MLP) surrogate for sub-millisecond runtime inference. The system operates on 30-second telemetry windows, extracting 12 behavioural features (10 raw + 2 derived ratios), computing per-archetype soft memberships and temporal deltas, and mapping these to a bounded difficulty multiplier M ∈ [0.6, 1.4]. A neutral-centred calibration scheme guarantees that a balanced player always receives M = 1.0 by anchoring the output to a semantically defined neutral input. The MLP surrogate achieves Test R^2 = 0.9350 and Test MAE = 0.0123 on 3,240 synthetic samples. An interactive analytics dashboard (Next.js 14, TypeScript) visualises the complete 8-step pipeline with educational explainers, archetype diagnostics, and window-to-window behavioural comparison. A Vitest test suite of 19 tests validates every engine module with CI/CD via GitHub Actions.
 
 ---
 
@@ -98,12 +98,12 @@ ANFIS (Adaptive Neuro-Fuzzy Inference System) was selected over alternatives bec
 ### 3.3 Why MLP Surrogate Instead of Full ANFIS at Runtime?
 Full ANFIS inference requires iterative least-squares parameter estimation: O(n^2) in rule count. With 3 fuzzy inputs and 3 archetypes (3^3 = 27 rules), this takes 50-200ms per inference. The MLP surrogate (6->16->8->1) runs in <1ms.
 
-The MLP was trained on 3,240 ANFIS-evaluated synthetic samples, achieving Test R^2 = 0.9264. The accuracy loss (100% -> 92.6%) is acceptable given the 200x inference speed gain.
+The MLP was trained on 3,240 ANFIS-evaluated synthetic samples, achieving Test R^2 = 0.9350. The accuracy loss (100% -> 93.5%) is acceptable given the 200x inference speed gain.
 
 ### 3.4 Key Model Artifacts
 | File | Contents |
 |------|---------|
-| `anfis-demo-ui/models/anfis_mlp_weights.json` | MLP weights, biases, `mlp_neutral` (0.932006), `output_range` |
+| `anfis-demo-ui/models/anfis_mlp_weights.json` | MLP weights, biases, `mlp_neutral` (0.931601), `output_range` |
 | `anfis-demo-ui/models/scaler_params.json` | Min-Max scaler params for 12 features |
 | `anfis-demo-ui/models/cluster_centroids.json` | K-Means centroids (K=3) in archetype space |
 | `anfis-demo-ui/models/deployment_manifest.json` | Hard safety constraints (clamp bounds) |
@@ -164,7 +164,7 @@ Both are computed from raw telemetry **before** normalization, then normalized a
 ```
 score_combat  = avg(enemiesHit, damageDone, timeInCombat, kills, damage_per_hit)     -> [0,1]
 score_collect = avg(itemsCollected, pickupAttempts, timeNearInteractables, pickup_attempt_rate) -> [0,1]
-score_explore = avg(distanceTraveled, timeSprinting)                                  -> [0,1]
+score_explore = sum(distanceTraveled, timeSprinting) / 4                             -> [0,0.5]
 ```
 
 **Why averages, not sums?** Sums give Combat (5 features) a 5x ceiling over Exploration (2 features). Averages impose equal ceilings per archetype, preventing structural classification bias.
@@ -295,13 +295,13 @@ Output: 1 neuron, Linear activation  (raw M before calibration)
 |--------|-------|
 | Total samples | 3,240 (80/20 split) |
 | Train MAE | 0.0130 |
-| Test MAE | **0.0127** |
+| Test MAE | **0.0123** |
 | Train R^2 | 0.9550 |
-| Test R^2 | **0.9264** |
+| Test R^2 | **0.9350** |
 | Convergence | 21 iterations (LBFGS) |
-| mlp_neutral | **0.932006** |
+| mlp_neutral | **0.931601** |
 
-**Generalisation check**: Test R^2 (0.9264) ≥ Train R^2 threshold - no overfitting. MAE = 1.3% of target span [0.6, 1.4].
+**Generalisation check**: Test R^2 (0.9350) ≥ Train R^2 threshold - no overfitting. MAE = 1.3% of target span [0.6, 1.4].
 
 ### 7.4 Target Distribution (v2.2.1 corrected)
 | Metric | Collapsed (v1.0) | Option B Biased (v2.2) | Option B Corrected (v2.2.1) |
@@ -310,7 +310,7 @@ Output: 1 neuron, Linear activation  (raw M before calibration)
 | Span | 0.023 | 0.411 | **0.507** |
 | Mean | - | 0.801 | **0.902** |
 | Upper clamp % | 100% | 0% | 0% |
-| Test R^2 | −4.69 | 0.9391 | **0.9264** |
+| Test R^2 | −4.69 | 0.9391 | **0.9350** |
 
 ### 7.5 Training Notebook Pipeline
 | Notebook | Purpose |
@@ -343,7 +343,7 @@ After deploying v2.2, every player scenario in the analytics dashboard showed "e
 A balanced player (1/3,1/3,1/3, Δ=0) semantically means "average behaviour, no trend" -> should always produce display=1.0.
 
 ```
-mlp_neutral = MLP.predict([[1/3, 1/3, 1/3, 0, 0, 0]])  =  0.932006
+mlp_neutral = MLP.predict([[1/3, 1/3, 1/3, 0, 0, 0]])  =  0.931601
 
 display = clamp( 1.0 + (raw − mlp_neutral) x 2.0,  0.6,  1.4 )
 ```
@@ -358,7 +358,7 @@ weights_dict['mlp_neutral'] = float(mlp_neutral)
 ```
 The Next.js engine reads it at startup:
 ```typescript
-this.mlpNeutral = mlpWeights.mlp_neutral ?? 0.932;
+this.mlpNeutral = mlpWeights.mlp_neutral ?? 0.931601;
 ```
 No manual code changes are needed after a retrain - the system is self-consistent.
 
@@ -516,8 +516,8 @@ new telemetry -> next ANFIS window
 - Analytics anomaly: "always easier" output regardless of player type
 - Root cause: base=0.9 + membership cancellation -> training neutral point = 0.808
 - Failed first fix: min-max rescaling with extreme delta=+/-1.0 inputs -> "always harder"
-- Correct fix: base=1.0 + neutral-centred calibration (mlp_neutral = 0.932006)
-- Retrained: Test R^2=0.9264, Test MAE=0.0127, convergence=21 iterations
+- Correct fix: base=1.0 + neutral-centred calibration (mlp_neutral = 0.931601)
+- Retrained: Test R^2=0.9350, Test MAE=0.0123, convergence=21 iterations
 - Self-updating: mlp_neutral auto-stored in artifact JSON after every retrain
 
 ### Phase 6 - Analytics Dashboard and CI/CD (March 2026)
@@ -535,7 +535,7 @@ new telemetry -> next ANFIS window
 | Decision | Chosen | Rejected | Reason |
 |----------|--------|----------|--------|
 | ML approach | ANFIS + MLP surrogate | Pure LSTM | ANFIS interpretable; LSTM needs large real data, no interpretability, too slow |
-| Runtime inference | MLP surrogate (<1ms) | Full ANFIS (50-200ms) | 200x speed gain; R^2 loss acceptable (0.9264 vs theoretical 1.0) |
+| Runtime inference | MLP surrogate (<1ms) | Full ANFIS (50-200ms) | 200x speed gain; R^2 loss acceptable (0.9350 vs theoretical 1.0) |
 | Feature space | 12 (10 raw + 2 derived) | 10 raw only | Sniper and deliberate-collector discrimination gaps |
 | Activity scoring | Per-archetype average | Sum | Equal ceiling per archetype; prevents structural Combat bias |
 | Temporal window | 30 seconds | 10s, 60s | 10s too noisy; 60s misses rapid style shifts |
@@ -607,7 +607,7 @@ Output: BehaviourVector [μ, Δ]
 2. Activity scores:
    score_combat  = avg(enemiesHit', damageDone', timeInCombat', kills', damage_per_hit')
    score_collect = avg(itemsCollected', pickupAttempts', timeNearInteractables', pickup_attempt_rate')
-   score_explore = avg(distanceTraveled', timeSprinting')
+   score_explore = sum(distanceTraveled', timeSprinting') / 4
 
 3. Percentage vector: P_k = score_k / Σ score_j
 
@@ -684,8 +684,8 @@ Output: Per-archetype adjusted game parameters
 | Activity scoring (v2.2) | Validated | Notebooks 03-04 |
 | K-Means clustering | Validated | Silhouette=0.3752, DB=0.977 |
 | IDW soft membership | Validated | Partition-of-unity: Σμ_k=1.0 |
-| Temporal delta | Validated | Δexplore r=0.8394 |
-| MLP inference | Validated | R^2=0.9264, MAE=0.0127 |
+| Temporal delta | Validated | Δexplore r=-0.758 |
+| MLP inference | Validated | R^2=0.9350, MAE=0.0123 |
 | Neutral-centred calibration | Validated | Balanced->M=1.000 confirmed |
 | Scalar parameter adaptation | Validated | Demo UI parameter cascade |
 | 19-test Vitest suite | Passing | All modules covered |
