@@ -93,7 +93,7 @@ export function MembershipDiagnostics({ session, currentRound }: MembershipDiagn
                             className={`h-full ${colorClass}/80 hover:${colorClass} transition-colors flex items-center justify-center relative group`} 
                             style={{ width: `${pct * 100}%` }}
                         >
-                            <div className="absolute inset-0 bg-[url('/scanline.png')] opacity-10" />
+
                         </div>
                     );
                  })}
