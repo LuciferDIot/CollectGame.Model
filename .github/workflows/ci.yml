@@ -36,14 +36,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: npm
-          cache-dependency-path: ${{ env.WORKING_DIR }}/package-lock.json
+          cache: pnpm
+          cache-dependency-path: ${{ env.WORKING_DIR }}/pnpm-lock.yaml
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Verify model files
         run: |
@@ -53,7 +57,7 @@ jobs:
           echo "✅ All model files present."
 
       - name: Build production bundle
-        run: npm run build
+        run: pnpm run build
 
   # ── 2. UNIT TESTS ───────────────────────────────────────────────────────────
   unit-tests:
@@ -67,17 +71,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: npm
-          cache-dependency-path: ${{ env.WORKING_DIR }}/package-lock.json
+          cache: pnpm
+          cache-dependency-path: ${{ env.WORKING_DIR }}/pnpm-lock.yaml
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Run unit tests
-        run: npm run test
+        run: pnpm run test
 
   # ── 3. API VALIDATION TESTS (4 parallel matrix jobs) ───────────────────────
   api-validation:
@@ -114,21 +122,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: npm
-          cache-dependency-path: ${{ env.WORKING_DIR }}/package-lock.json
+          cache: pnpm
+          cache-dependency-path: ${{ env.WORKING_DIR }}/pnpm-lock.yaml
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Build production bundle
-        run: npm run build
+        run: pnpm run build
 
       - name: Start server in background
         run: |
-          npm run start &
+          pnpm run start &
           echo "SERVER_PID=$!" >> $GITHUB_ENV
 
       - name: Wait for server to be ready
@@ -176,21 +188,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: npm
-          cache-dependency-path: ${{ env.WORKING_DIR }}/package-lock.json
+          cache: pnpm
+          cache-dependency-path: ${{ env.WORKING_DIR }}/pnpm-lock.yaml
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Build production bundle
-        run: npm run build
+        run: pnpm run build
 
       - name: Start server in background
         run: |
-          npm run start &
+          pnpm run start &
           echo "SERVER_PID=$!" >> $GITHUB_ENV
 
       - name: Wait for server to be ready
