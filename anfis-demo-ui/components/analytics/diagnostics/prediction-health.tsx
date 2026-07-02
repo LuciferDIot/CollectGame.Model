@@ -151,7 +151,7 @@ function PredictionChart({ history, mean, upperBand, lowerBand }: PredictionChar
 
 function PredictionDistributionLegend({ mean }: { mean: number }) {
   return (
-    <div className="flex justify-between items-center text-xs text-muted-foreground mt-4 pt-4 border-t border-slate-800">
+    <div className="flex justify-between items-center text-xs text-muted-foreground mt-4 pt-4 border-t border-border">
        <div className="flex items-center gap-2">
          <div className="w-2 h-0.5 bg-green-500"></div>
          <HelpfulTooltip 

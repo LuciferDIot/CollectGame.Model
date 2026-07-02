@@ -19,7 +19,7 @@ export function SchemaViewer() {
   const [showSchema, setShowSchema] = useState(false);
 
   return (
-    <Card className="bg-slate-800/30 border-slate-700">
+    <Card className="bg-card border-border">
       <button
         onClick={() => setShowSchema(!showSchema)}
         className="w-full flex items-center justify-between p-3 hover:bg-slate-700/20 transition-colors"
@@ -33,7 +33,7 @@ export function SchemaViewer() {
       </button>
 
       {showSchema && (
-        <div className="border-t border-slate-700/50 p-3 space-y-2">
+        <div className="border-t border-border/50 p-3 space-y-2">
           <p className="text-xs font-medium text-slate-300 mb-2">Expected Telemetry Fields:</p>
           <ul className="space-y-2">
             {TELEMETRY_SCHEMA.map((field) => (
@@ -54,3 +54,4 @@ export function SchemaViewer() {
     </Card>
   );
 }
+

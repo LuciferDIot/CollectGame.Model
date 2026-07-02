@@ -19,9 +19,9 @@ export function InputStatus({ json }: InputStatusProps) {
     
     if (telemetryFieldCount > 0) {
       return (
-        <Card className="bg-blue-950/30 border-blue-900/50">
+        <Card className="bg-blue-500/10 dark:bg-blue-950/30 border-blue-200/50 dark:border-blue-900/50">
           <div className="p-3">
-            <p className="text-xs text-blue-300">
+            <p className="text-xs text-blue-700 dark:text-blue-300">
               <span className="font-semibold">Telemetry:</span> {telemetryFieldCount} field{telemetryFieldCount !== 1 ? 's' : ''}
             </p>
           </div>

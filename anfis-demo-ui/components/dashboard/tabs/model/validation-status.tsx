@@ -11,11 +11,11 @@ export function ValidationStatus() {
         <span className="inline-block w-2 h-2 rounded-full bg-green-400"></span>
         Validation Checks
       </h4>
-      <Card className="bg-slate-800/50 border-slate-700">
+      <Card className="bg-card border-border">
         <div className="p-4 space-y-2">
           {pipelineState.validationChecks.length > 0 ? (
             pipelineState.validationChecks.map((check) => (
-              <div key={check.name} className="flex items-center justify-between py-2 border-b border-slate-700/30 last:border-0">
+              <div key={check.name} className="flex items-center justify-between py-2 border-b border-border/30 last:border-0">
                 <div className="flex items-center gap-3">
                   <div className={`w-5 h-5 rounded flex items-center justify-center text-xs ${
                     check.status === 'pass' ? 'bg-green-500/20 text-green-400' :
@@ -40,3 +40,4 @@ export function ValidationStatus() {
     </div>
   );
 }
+

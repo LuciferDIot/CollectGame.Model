@@ -11,7 +11,7 @@ export function AnfisArchitecture() {
         <span className="inline-block w-2 h-2 rounded-full bg-purple-400"></span>
         ANFIS Architecture
       </h4>
-      <Card className="bg-slate-800/50 border-slate-700">
+      <Card className="bg-card border-border">
         <div className="p-4 space-y-3 text-xs">
           <div className="flex justify-between">
             <span className="text-slate-500">Input Features</span>
@@ -34,3 +34,4 @@ export function AnfisArchitecture() {
     </div>
   );
 }
+

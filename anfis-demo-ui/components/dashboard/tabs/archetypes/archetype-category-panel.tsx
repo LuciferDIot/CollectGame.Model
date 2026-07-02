@@ -42,28 +42,28 @@ export function ArchetypeCategoryPanel({ pipelineState, onMetricSelect, maxSoftC
           const delta = getCategoryDelta(cat.category, pipelineState.metadata?.deltas || {} as Delta) || 0;
           const isDeltaPositive = delta > 0;
           
-          let colorStyles = "bg-slate-950/40 border-slate-800 hover:bg-slate-900/60";
-          let activeBorder = "border-slate-700";
-          let titleColor = "text-slate-400";
-          let iconColor = "text-slate-600";
+          let colorStyles = "bg-card border-border hover:bg-muted/60";
+          let activeBorder = "border-border";
+          let titleColor = "text-muted-foreground";
+          let iconColor = "text-muted-foreground/60";
           
           switch (cat.category) {
             case 'Combat':
-              colorStyles = "bg-red-950/10 hover:bg-red-950/20";
+              colorStyles = "bg-red-500/5 dark:bg-red-950/10 hover:bg-red-500/10 dark:hover:bg-red-950/20";
               activeBorder = "border-red-500/30";
-              titleColor = "text-red-400";
+              titleColor = "text-red-600 dark:text-red-400";
               iconColor = "text-red-500/80";
               break;
             case 'Collection':
-              colorStyles = "bg-cyan-950/10 hover:bg-cyan-950/20";
+              colorStyles = "bg-cyan-500/5 dark:bg-cyan-950/10 hover:bg-cyan-500/10 dark:hover:bg-cyan-950/20";
               activeBorder = "border-cyan-500/30";
-              titleColor = "text-cyan-400";
+              titleColor = "text-cyan-600 dark:text-cyan-400";
               iconColor = "text-cyan-500/80";
               break;
             case 'Exploration':
-              colorStyles = "bg-emerald-950/10 hover:bg-emerald-950/20";
+              colorStyles = "bg-emerald-500/5 dark:bg-emerald-950/10 hover:bg-emerald-500/10 dark:hover:bg-emerald-950/20";
               activeBorder = "border-emerald-500/30";
-              titleColor = "text-emerald-400";
+              titleColor = "text-emerald-600 dark:text-emerald-400";
               iconColor = "text-emerald-500/80";
               break;
           }
@@ -74,7 +74,7 @@ export function ArchetypeCategoryPanel({ pipelineState, onMetricSelect, maxSoftC
               onClick={() => onMetricSelect?.(`archetype_${cat.category.toLowerCase()}`)}
               className={cn(
                 "relative cursor-pointer transition-all duration-300 group overflow-hidden backdrop-blur-sm",
-                isSelected ? `border border-opacity-50 shadow-lg ${activeBorder}` : "border border-slate-800/60 opacity-80 hover:opacity-100",
+                isSelected ? `border border-opacity-50 shadow-lg ${activeBorder}` : "border border-border/50 opacity-80 hover:opacity-100",
                 colorStyles
               )}
             >
@@ -85,7 +85,7 @@ export function ArchetypeCategoryPanel({ pipelineState, onMetricSelect, maxSoftC
               <div className="p-4 flex flex-col h-full justify-between relative z-10">
                 <div className="flex justify-between items-start mb-2">
                     <div className="flex items-center gap-2">
-                        <div className={cn("p-1.5 rounded-md bg-slate-950/50 border border-white/5", iconColor)}>
+                        <div className={cn("p-1.5 rounded-md bg-card border border-border/50", iconColor)}>
                              <CategoryIcon category={cat.category} className="w-3.5 h-3.5" />
                         </div>
                         <h4 className={cn("text-xs font-bold uppercase tracking-wider", titleColor)}>
@@ -102,13 +102,13 @@ export function ArchetypeCategoryPanel({ pipelineState, onMetricSelect, maxSoftC
                     )}
                 </div>
 
-                <p className="text-[10px] text-slate-500 mb-4 leading-relaxed font-medium min-h-[30px]">
+                <p className="text-[10px] text-muted-foreground/60 mb-4 leading-relaxed font-medium min-h-[30px]">
                     {getCategoryText(cat.category)}
                 </p>
 
-                <div className="space-y-2 pointer-events-none bg-slate-950/30 p-2 rounded border border-white/5">
+                <div className="space-y-2 pointer-events-none bg-muted/30 p-2 rounded border border-border/40">
                   <div className="flex justify-between items-center">
-                    <span className="text-[9px] text-slate-500 uppercase font-bold tracking-widest">Affinity</span>
+                    <span className="text-[9px] text-muted-foreground/60 uppercase font-bold tracking-widest">Affinity</span>
                     <span className={cn("text-sm font-mono font-bold", titleColor)}>
                         {(cat.softMembership * 100).toFixed(1)}%
                     </span>
@@ -116,12 +116,12 @@ export function ArchetypeCategoryPanel({ pipelineState, onMetricSelect, maxSoftC
                   
                   {pipelineState.metadata?.deltas && (
                     <div className="flex justify-between items-center pt-1.5 border-t border-white/5">
-                      <span className="text-[9px] text-slate-500 uppercase font-bold tracking-widest">Velocity</span>
+                      <span className="text-[9px] text-muted-foreground/60 uppercase font-bold tracking-widest">Velocity</span>
                       <div className="flex items-center gap-1">
                           {Math.abs(delta) > 0.001 && <ArrowUpRight className={cn("w-2.5 h-2.5", isDeltaPositive ? "text-emerald-400 rotate-0" : "text-red-400 rotate-90")} />}
                           <span className={cn(
                             "text-xs font-mono",
-                            isDeltaPositive ? "text-emerald-400" : delta < 0 ? "text-red-400" : "text-slate-600"
+                            isDeltaPositive ? "text-emerald-600 dark:text-emerald-400" : delta < 0 ? "text-red-600 dark:text-red-400" : "text-muted-foreground/50"
                           )}>
                             {delta > 0 ? '+' : ''}{delta.toFixed(3)}
                           </span>

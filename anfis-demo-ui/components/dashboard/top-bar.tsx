@@ -5,8 +5,9 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import EXAMPLE_DATASETS from '@/lib/data/examples.json';
 import { usePipeline } from '@/lib/session/pipeline-context';
 import { cn } from '@/lib/utils';
-import { BarChart3, BrainCircuit, Database, Download, PlayCircle, Upload, XCircle } from 'lucide-react';
-import { useState } from 'react';
+import { BarChart3, BrainCircuit, Database, Download, PlayCircle, Upload, XCircle, Sun, Moon } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { useTheme } from 'next-themes';
 import { AnalyticsSlideOver } from './analytics-slide-over';
 import { LeftPanel } from './left-panel';
 
@@ -15,6 +16,12 @@ export function TopBar() {
   const [stepByStep, setStepByStep] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
   const [analyticsOpen, setAnalyticsOpen] = useState(false);
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleLoadExample = () => {
     const randomIndex = Math.floor(Math.random() * EXAMPLE_DATASETS.length);
@@ -134,6 +141,17 @@ export function TopBar() {
 
           <div className="w-px h-6 bg-border/40" />
 
+          {/* Theme toggle */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            title="Toggle theme"
+            className="h-8 w-8 p-0 border-border/40 text-muted-foreground hover:text-primary hover:border-primary/50 hover:bg-primary/5 bg-background/20 rounded-lg"
+          >
+            {mounted && theme === 'dark' ? <Sun size={14} className="text-yellow-400" /> : <Moon size={14} />}
+          </Button>
+
           <Button variant="outline" size="sm" onClick={handleExport} title="Export results"
             className="h-8 w-8 p-0 border-border/40 text-muted-foreground hover:text-accent hover:border-accent/40 hover:bg-accent/5 bg-background/20 rounded-lg"
           >
@@ -225,6 +243,17 @@ export function TopBar() {
             )}
 
             <div className="w-px h-5 bg-border/40 shrink-0" />
+
+            {/* Theme toggle */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              title="Toggle theme"
+              className="h-8 w-8 p-0 border-border/40 text-muted-foreground hover:text-primary hover:border-primary/50 hover:bg-primary/5 bg-background/20 rounded-lg shrink-0"
+            >
+              {mounted && theme === 'dark' ? <Sun size={13} className="text-yellow-400" /> : <Moon size={13} />}
+            </Button>
 
             {/* Export */}
             <Button variant="outline" size="sm" onClick={handleExport} title="Export"

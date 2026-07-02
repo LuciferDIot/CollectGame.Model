@@ -3,9 +3,9 @@ import { AlertTriangle, CheckCircle2 } from 'lucide-react';
 
 function getValidationStyles(status: 'valid' | 'warning' | 'error') {
     switch (status) {
-        case 'valid': return 'bg-emerald-950/30 border-emerald-900/50 text-emerald-500';
-        case 'error': return 'bg-red-950/30 border-red-900/50 text-red-500';
-        default: return 'bg-amber-950/30 border-amber-900/50 text-amber-500';
+        case 'valid': return 'bg-emerald-500/10 dark:bg-emerald-950/30 border-emerald-500/30 dark:border-emerald-900/50 text-emerald-700 dark:text-emerald-500';
+        case 'error': return 'bg-red-500/10 dark:bg-red-950/30 border-red-500/30 dark:border-red-900/50 text-red-700 dark:text-red-500';
+        default: return 'bg-amber-500/10 dark:bg-amber-950/30 border-amber-500/30 dark:border-amber-900/50 text-amber-700 dark:text-amber-500';
     }
 }
 

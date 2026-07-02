@@ -54,7 +54,7 @@ export function ExecutiveHealthPanel() {
              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse relative z-10" />
              <div className="absolute inset-0 w-2 h-2 rounded-full bg-emerald-500 animate-ping opacity-50" />
          </div>
-         <h3 className="text-[10px] font-bold text-emerald-400 uppercase tracking-[0.2em] neon-text">SYSTEM VALIDATION PROTOCOLS</h3>
+         <h3 className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-[0.2em]">SYSTEM VALIDATION PROTOCOLS</h3>
       </div>
       
       <div className="grid grid-cols-1 gap-2">

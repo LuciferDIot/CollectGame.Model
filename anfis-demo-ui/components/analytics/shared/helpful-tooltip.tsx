@@ -49,13 +49,13 @@ export function HelpfulTooltip({
           </button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px] bg-slate-900 border-slate-700">
+      <DialogContent className="sm:max-w-[425px] bg-background border-border">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-xl text-slate-100">
-            <BookOpen className="h-5 w-5 text-blue-400" />
+          <DialogTitle className="flex items-center gap-2 text-xl text-foreground">
+            <BookOpen className="h-5 w-5 text-primary" />
             {title}
           </DialogTitle>
-          <DialogDescription className="text-slate-400 text-base pt-2">
+          <DialogDescription className="text-muted-foreground text-base pt-2">
             {description}
           </DialogDescription>
         </DialogHeader>
@@ -63,11 +63,11 @@ export function HelpfulTooltip({
         <div className="grid gap-4 py-4">
           {technicalDetail && (
             <div className="space-y-2">
-              <h4 className="flex items-center gap-2 font-semibold text-slate-200 text-sm">
-                <Calculator className="h-4 w-4 text-emerald-400" />
+              <h4 className="flex items-center gap-2 font-semibold text-foreground text-sm">
+                <Calculator className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                 How it is calculated
               </h4>
-              <div className="bg-slate-950/50 p-3 rounded-md border border-slate-800 font-mono text-xs text-slate-300 overflow-x-auto whitespace-pre-wrap">
+              <div className="bg-muted/60 p-3 rounded-md border border-border font-mono text-xs text-foreground overflow-x-auto whitespace-pre-wrap">
                 {technicalDetail}
               </div>
             </div>
@@ -75,10 +75,10 @@ export function HelpfulTooltip({
 
           {interpretation && (
              <div className="space-y-2">
-               <h4 className="font-semibold text-slate-200 text-xs uppercase tracking-wider">
+               <h4 className="font-semibold text-foreground text-xs uppercase tracking-wider">
                  Interpretation
                </h4>
-               <p className="text-sm text-emerald-400/90 italic border-l-2 border-emerald-500/50 pl-3">
+               <p className="text-sm text-emerald-700 dark:text-emerald-400/90 italic border-l-2 border-emerald-500/50 pl-3">
                  {interpretation}
                </p>
              </div>

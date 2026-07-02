@@ -8,7 +8,7 @@ export function PreprocessingInfo() {
         <span className="inline-block w-2 h-2 rounded-full bg-blue-400"></span>
         Preprocessing
       </h4>
-      <Card className="bg-slate-800/50 border-slate-700">
+      <Card className="bg-card border-border">
         <div className="p-4 grid grid-cols-2 gap-4 text-xs">
           <div>
             <span className="text-slate-500">Normalization</span>
@@ -31,3 +31,4 @@ export function PreprocessingInfo() {
     </div>
   );
 }
+

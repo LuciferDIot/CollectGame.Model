@@ -24,6 +24,36 @@
   --input: oklch(0.9 0 0);
   --ring: oklch(0.6 0.18 250);
   --radius: 0.75rem;
+
+  --chart-1: oklch(0.60 0.16 210);
+  --chart-2: oklch(0.55 0.20 310);
+  --chart-3: oklch(0.65 0.18 160);
+  --chart-4: oklch(0.75 0.15 90);
+  --chart-5: oklch(0.55 0.20 30);
+  
+  --sidebar: oklch(0.98 0 0);
+  --sidebar-foreground: oklch(0.2 0 0);
+  --sidebar-primary: oklch(0.6 0.18 250);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.95 0 0);
+  --sidebar-accent-foreground: oklch(0.2 0 0);
+  --sidebar-border: oklch(0.9 0 0);
+  --sidebar-ring: oklch(0.6 0.18 250);
+
+  --primary-rgb: 0, 143, 212;
+
+  /* Premium Light Slate Palette */
+  --slate-50: oklch(0.15 0 0);
+  --slate-100: oklch(0.2 0 0);
+  --slate-200: oklch(0.25 0 0);
+  --slate-300: oklch(0.35 0 0);
+  --slate-400: oklch(0.45 0 0);
+  --slate-500: oklch(0.55 0 0);
+  --slate-600: oklch(0.65 0 0);
+  --slate-700: oklch(0.88 0 0);
+  --slate-800: oklch(0.93 0 0);
+  --slate-900: oklch(0.96 0 0);
+  --slate-950: oklch(0.98 0 0);
 }
 
 .dark {
@@ -70,6 +100,19 @@
   --sidebar-ring: oklch(0.72 0.18 210);
   
   --primary-rgb: 34, 211, 238; /* For translucent states */
+
+  /* Premium Dark Slate Palette */
+  --slate-50: oklch(0.98 0.005 260);
+  --slate-100: oklch(0.94 0.005 260);
+  --slate-200: oklch(0.88 0.01 260);
+  --slate-300: oklch(0.8 0.01 260);
+  --slate-400: oklch(0.65 0.02 260);
+  --slate-500: oklch(0.48 0.02 260);
+  --slate-600: oklch(0.35 0.02 260);
+  --slate-700: oklch(0.22 0.02 260);
+  --slate-800: oklch(0.16 0.02 260);
+  --slate-900: oklch(0.12 0.015 260);
+  --slate-950: oklch(0.08 0.015 260);
 }
 
 @theme inline {
@@ -97,6 +140,18 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
 
+  --color-slate-50: var(--slate-50);
+  --color-slate-100: var(--slate-100);
+  --color-slate-200: var(--slate-200);
+  --color-slate-300: var(--slate-300);
+  --color-slate-400: var(--slate-400);
+  --color-slate-500: var(--slate-500);
+  --color-slate-600: var(--slate-600);
+  --color-slate-700: var(--slate-700);
+  --color-slate-800: var(--slate-800);
+  --color-slate-900: var(--slate-900);
+  --color-slate-950: var(--slate-950);
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -108,9 +163,12 @@
     @apply border-border outline-ring/50;
   }
   html {
-    color-scheme: dark;
+    color-scheme: light;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+  html.dark {
+    color-scheme: dark;
   }
   body {
     @apply bg-background text-foreground selection:bg-primary/30 selection:text-white;
@@ -123,15 +181,15 @@
   }
   
   .glass-panel {
-    @apply bg-background/60 backdrop-blur-xl border border-white/5 shadow-2xl;
+    @apply bg-background/60 backdrop-blur-xl border border-black/5 dark:border-white/5 shadow-2xl;
   }
   
   .glass-card {
-    @apply bg-card/40 backdrop-blur-lg border border-white/10 hover:border-primary/30 transition-all duration-300;
+    @apply bg-card/40 backdrop-blur-lg border border-black/10 dark:border-white/10 hover:border-primary/30 transition-all duration-300;
   }
   
   .neon-text {
-    @apply text-transparent bg-clip-text bg-gradient-to-br from-primary via-accent to-primary-foreground drop-shadow-[0_0_8px_rgba(var(--primary-rgb),0.5)];
+    @apply text-transparent bg-clip-text bg-gradient-to-br from-primary via-accent to-indigo-600 dark:to-cyan-400 drop-shadow-[0_0_8px_rgba(var(--primary-rgb),0.3)];
   }
 
   .premium-gradient {

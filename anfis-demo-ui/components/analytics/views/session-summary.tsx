@@ -46,7 +46,7 @@ export function SessionSummary({ session }: SessionSummaryProps) {
       <CardContent>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           
-          <div className="flex flex-col space-y-1.5 p-3 bg-slate-900/40 rounded-lg border border-slate-800">
+          <div className="flex flex-col space-y-1.5 p-3 bg-muted/40 rounded-lg border border-border">
              <div className="flex items-center gap-2 text-muted-foreground text-xs font-medium">
                <Calculator className="h-3.5 w-3.5" />
                <span>Avg Multiplier</span>
@@ -66,7 +66,7 @@ export function SessionSummary({ session }: SessionSummaryProps) {
              <p className="text-[10px] text-green-500">Target: 1.0</p>
           </div>
 
-          <div className="flex flex-col space-y-1.5 p-3 bg-slate-900/40 rounded-lg border border-slate-800">
+          <div className="flex flex-col space-y-1.5 p-3 bg-muted/40 rounded-lg border border-border">
              <div className="flex items-center gap-2 text-muted-foreground text-xs font-medium">
                <Activity className="h-3.5 w-3.5" />
                <span>Variance (σ)</span>
@@ -78,31 +78,31 @@ export function SessionSummary({ session }: SessionSummaryProps) {
                 />
              </div>
              <HelpfulTooltip
-               trigger={<span className="text-2xl font-bold font-mono text-blue-300 cursor-pointer hover:underline block">{stdMultiplier.toFixed(3)}</span>}
+               trigger={<span className="text-2xl font-bold font-mono text-blue-600 dark:text-blue-300 cursor-pointer hover:underline block">{stdMultiplier.toFixed(3)}</span>}
                title="Variance Value"
                description="The statistical spread of difficulty adjustments."
                calculation="Standard Deviation (σ)"
              />
-             <p className="text-[10px] text-blue-400">Target: &gt; 0.05</p>
+             <p className="text-[10px] text-blue-600 dark:text-blue-400">Target: &gt; 0.05</p>
           </div>
 
-          <div className="flex flex-col space-y-1.5 p-3 bg-slate-900/40 rounded-lg border border-slate-800">
+          <div className="flex flex-col space-y-1.5 p-3 bg-muted/40 rounded-lg border border-border">
              <div className="flex items-center gap-2 text-muted-foreground text-xs font-medium">
                <Brain className="h-3.5 w-3.5" />
                <span>Dominant Style</span>
                <HelpfulTooltip title="Dominant Archetype" description="The player style most frequently detected during the session." />
              </div>
              <div className="text-xl font-bold">{dominantName}</div>
-             <p className="text-[10px] text-slate-400">{dominantPct}% of rounds</p>
+             <p className="text-[10px] text-muted-foreground">{dominantPct}% of rounds</p>
           </div>
 
-          <div className="flex flex-col space-y-1.5 p-3 bg-slate-900/40 rounded-lg border border-slate-800">
+          <div className="flex flex-col space-y-1.5 p-3 bg-muted/40 rounded-lg border border-border">
              <div className="flex items-center gap-2 text-muted-foreground text-xs font-medium">
                <TrendingUp className="h-3.5 w-3.5" />
                <span>Stability</span>
                <HelpfulTooltip title="Overall Stability" description="General health check of the adaptive loop." />
              </div>
-             <div className="text-xl font-bold text-emerald-400">Optimal</div>
+             <div className="text-xl font-bold text-emerald-600 dark:text-emerald-400">Optimal</div>
              <p className="text-[10px] text-emerald-600">No oscillation</p>
           </div>
 

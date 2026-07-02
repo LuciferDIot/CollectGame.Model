@@ -22,34 +22,34 @@ export function MetricCard({
 }: MetricCardProps) {
     const styles = {
         success: {
-            border: "border-emerald-500/20",
-            bg: "bg-emerald-950/20",
-            text: "text-emerald-400",
-            indicator: "bg-emerald-500/50",
+            border: "border-emerald-500/30",
+            bg: "bg-emerald-500/10 dark:bg-emerald-950/20",
+            text: "text-emerald-700 dark:text-emerald-400",
+            indicator: "bg-emerald-500/60",
             icon: <ShieldCheck className="w-3.5 h-3.5" />,
-            glow: "drop-shadow-[0_0_3px_rgba(16,185,129,0.3)]"
+            glow: ""
         },
         warning: {
-            border: "border-amber-500/20",
-            bg: "bg-amber-950/20",
-            text: "text-amber-400",
-            indicator: "bg-amber-500/50",
+            border: "border-amber-500/30",
+            bg: "bg-amber-500/10 dark:bg-amber-950/20",
+            text: "text-amber-700 dark:text-amber-400",
+            indicator: "bg-amber-500/60",
             icon: <AlertTriangle className="w-3.5 h-3.5" />,
             glow: ""
         },
         error: {
-            border: "border-red-500/20",
-            bg: "bg-red-950/20",
-            text: "text-red-400",
-            indicator: "bg-red-500/50",
+            border: "border-red-500/30",
+            bg: "bg-red-500/10 dark:bg-red-950/20",
+            text: "text-red-700 dark:text-red-400",
+            indicator: "bg-red-500/60",
             icon: <AlertTriangle className="w-3.5 h-3.5" />,
             glow: ""
         },
         neutral: {
-            border: "border-slate-500/20",
-            bg: "bg-slate-950/20",
-            text: "text-slate-400",
-            indicator: "bg-slate-500/50",
+            border: "border-border",
+            bg: "bg-muted/60",
+            text: "text-muted-foreground",
+            indicator: "bg-muted-foreground/40",
             icon: <Activity className="w-3.5 h-3.5" />,
             glow: ""
         }
@@ -61,8 +61,8 @@ export function MetricCard({
         <div 
           onClick={onClick}
           className={cn(
-            "relative group overflow-hidden rounded bg-[#0b1221] border border-slate-800/60 transition-all duration-300",
-            onClick && "cursor-pointer hover:border-cyan-500/50",
+            "relative group overflow-hidden rounded bg-card border border-border transition-all duration-300",
+            onClick && "cursor-pointer hover:border-primary/40",
             className
           )}
         >
@@ -78,11 +78,11 @@ export function MetricCard({
                       {currentStyle.icon}
                    </div>
                    <div>
-                      <h4 className="text-[10px] uppercase tracking-wider font-bold text-slate-400 group-hover:text-cyan-300 transition-colors">
+                      <h4 className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground group-hover:text-primary transition-colors">
                         {label}
                       </h4>
                       {subLabel && (
-                        <div className="text-[9px] text-slate-600 font-mono flex items-center gap-1">
+                        <div className="text-[9px] text-muted-foreground/50 font-mono flex items-center gap-1">
                             <Activity className="w-2 h-2" />
                             {subLabel}
                         </div>
@@ -99,7 +99,7 @@ export function MetricCard({
                       {value}
                    </div>
                    {detail && (
-                     <div className="text-[9px] text-slate-500 font-mono uppercase">
+                     <div className="text-[9px] text-muted-foreground/60 font-mono uppercase">
                         {detail}
                      </div>
                    )}
@@ -107,7 +107,7 @@ export function MetricCard({
             </div>
             
             {/* Hover Scanline */}
-            <div className="absolute inset-0 bg-linear-to-r from-transparent via-cyan-500/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 pointer-events-none" />
+            <div className="absolute inset-0 bg-linear-to-r from-transparent via-primary/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 pointer-events-none" />
         </div>
     )
 }

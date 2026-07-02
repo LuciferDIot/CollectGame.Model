@@ -10,7 +10,7 @@ export function ModelEvaluationCard() {
   const { trainR2, testR2, mae, targetStd, targetSpan } = OFFLINE_METRICS;
 
   return (
-    <Card className="border-blue-700/50 bg-blue-950/10">
+    <Card className="border-blue-500/30 bg-blue-500/5 dark:bg-blue-950/10">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -46,7 +46,7 @@ export function ModelEvaluationCard() {
                 interpretation="0.956 means the model captures 95.6% of the target's behavior logic."
               />
             </div>
-            <p className="text-2xl font-bold font-mono text-emerald-400">{testR2.toFixed(4)}</p>
+            <p className="text-2xl font-bold font-mono text-emerald-600 dark:text-emerald-400">{testR2.toFixed(4)}</p>
             <p className="text-xs text-emerald-600/80">Excellent fit (Train: {trainR2.toFixed(4)})</p>
           </div>
 
@@ -61,8 +61,8 @@ export function ModelEvaluationCard() {
                 interpretation="On average, the prediction deviates by only 0.013 from the target value."
               />
             </div>
-            <p className="text-2xl font-bold font-mono text-blue-300">{mae.toFixed(4)}</p>
-            <p className="text-xs text-blue-400/70">Low prediction error</p>
+            <p className="text-2xl font-bold font-mono text-blue-600 dark:text-blue-300">{mae.toFixed(4)}</p>
+            <p className="text-xs text-blue-600/80 dark:text-blue-400/70">Low prediction error</p>
           </div>
         </div>
 
@@ -76,9 +76,9 @@ export function ModelEvaluationCard() {
               />
           </div>
           <div className="grid grid-cols-2 gap-4">
-             <div className="bg-slate-900/40 p-2.5 rounded border border-slate-800">
+             <div className="bg-muted/50 p-2.5 rounded border border-border">
                <div className="flex justify-between text-xs mb-1">
-                 <span className="text-slate-400 flex items-center gap-1">
+                 <span className="text-muted-foreground flex items-center gap-1">
                    <HelpfulTooltip 
                     trigger={<span className="cursor-pointer hover:underline decoration-dotted underline-offset-4">Target Std Dev</span>}
                     title="Target Standard Deviation" 
@@ -87,17 +87,17 @@ export function ModelEvaluationCard() {
                     calculation="std(target_signal)"
                    />
                  </span>
-                 <span className="font-mono text-slate-200">{targetStd.toFixed(4)}</span>
+                 <span className="font-mono text-foreground">{targetStd.toFixed(4)}</span>
                </div>
-               <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+               <div className="h-1.5 bg-muted rounded-full overflow-hidden">
                  <div className="h-full bg-indigo-500" style={{ width: '80%' }} />
                </div>
-               <span className="text-[10px] text-green-400 block mt-1">5.5x variance gain</span>
+               <span className="text-[10px] text-green-600 dark:text-green-400 block mt-1">5.5x variance gain</span>
              </div>
              
-             <div className="bg-slate-900/40 p-2.5 rounded border border-slate-800">
+             <div className="bg-muted/50 p-2.5 rounded border border-border">
                <div className="flex justify-between text-xs mb-1">
-                 <span className="text-slate-400 flex items-center gap-1">
+                 <span className="text-muted-foreground flex items-center gap-1">
                     <HelpfulTooltip 
                       trigger={<span className="cursor-pointer hover:underline decoration-dotted underline-offset-4">Target Range</span>}
                       title="Target Span (Max - Min)" 
@@ -106,12 +106,12 @@ export function ModelEvaluationCard() {
                       calculation="max(target) - min(target)"
                     />
                  </span>
-                 <span className="font-mono text-slate-200">{targetSpan.toFixed(2)}</span>
+                 <span className="font-mono text-foreground">{targetSpan.toFixed(2)}</span>
                </div>
-               <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+               <div className="h-1.5 bg-muted rounded-full overflow-hidden">
                  <div className="h-full bg-indigo-500" style={{ width: '70%' }} />
                </div>
-               <span className="text-[10px] text-green-400 block mt-1">18x span gain</span>
+               <span className="text-[10px] text-green-600 dark:text-green-400 block mt-1">18x span gain</span>
              </div>
           </div>
         </div>

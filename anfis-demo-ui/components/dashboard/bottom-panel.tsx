@@ -40,24 +40,24 @@ export function BottomPanel() {
       />
 
       <Tabs defaultValue="behavior" className="flex flex-col h-full z-10">
-        <div className="w-full bg-slate-950/80 backdrop-blur-sm border-b border-cyan-500/20 overflow-x-auto scrollbar-none">
+        <div className="w-full bg-background/90 backdrop-blur-sm border-b border-border/50 overflow-x-auto scrollbar-none">
             <TabsList className="justify-start px-4 py-0 h-10 rounded-none gap-1 bg-transparent w-max md:w-full">
-            <TabsTrigger value="behavior" className="relative group data-[state=active]:bg-cyan-950/30 data-[state=active]:text-cyan-400 rounded-t-md px-4 py-2 border-b-2 border-transparent data-[state=active]:border-cyan-500 transition-all">
+            <TabsTrigger value="behavior" className="relative group data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-t-md px-4 py-2 border-b-2 border-transparent data-[state=active]:border-primary transition-all">
                 <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider">
                 <Activity className="w-3.5 h-3.5" /> Behavior
                 </span>
             </TabsTrigger>
-            <TabsTrigger value="adaptation" className="relative group data-[state=active]:bg-cyan-950/30 data-[state=active]:text-purple-400 rounded-t-md px-4 py-2 border-b-2 border-transparent data-[state=active]:border-purple-500 transition-all">
+            <TabsTrigger value="adaptation" className="relative group data-[state=active]:bg-violet-500/10 data-[state=active]:text-violet-600 dark:data-[state=active]:text-purple-400 rounded-t-md px-4 py-2 border-b-2 border-transparent data-[state=active]:border-purple-500 transition-all">
                 <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider">
                 <TrendingUp className="w-3.5 h-3.5" /> Adaptation
                 </span>
             </TabsTrigger>
-            <TabsTrigger value="model" className="relative group data-[state=active]:bg-cyan-950/30 data-[state=active]:text-emerald-400 rounded-t-md px-4 py-2 border-b-2 border-transparent data-[state=active]:border-emerald-500 transition-all">
+            <TabsTrigger value="model" className="relative group data-[state=active]:bg-emerald-500/10 data-[state=active]:text-emerald-700 dark:data-[state=active]:text-emerald-400 rounded-t-md px-4 py-2 border-b-2 border-transparent data-[state=active]:border-emerald-500 transition-all">
                 <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider">
                 <Database className="w-3.5 h-3.5" /> Model
                 </span>
             </TabsTrigger>
-            <TabsTrigger value="archetypes" className="relative group data-[state=active]:bg-cyan-950/30 data-[state=active]:text-amber-400 rounded-t-md px-4 py-2 border-b-2 border-transparent data-[state=active]:border-amber-500 transition-all">
+            <TabsTrigger value="archetypes" className="relative group data-[state=active]:bg-amber-500/10 data-[state=active]:text-amber-700 dark:data-[state=active]:text-amber-400 rounded-t-md px-4 py-2 border-b-2 border-transparent data-[state=active]:border-amber-500 transition-all">
                 <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider">
                 <GlobeLock className="w-3.5 h-3.5" /> Archetypes
                 </span>
@@ -69,7 +69,7 @@ export function BottomPanel() {
         </div>
 
         {/* Metric Summary Cards Bar - Responsive Grid */}
-        <div className="px-6 py-4 bg-slate-950/50 border-b border-slate-800/50 backdrop-blur-sm">
+        <div className="px-6 py-4 bg-muted/30 border-b border-border/40 backdrop-blur-sm">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {pipelineState.behaviorCategories.map((cat) => (
               <MetricCard

@@ -169,14 +169,14 @@ function TutorialStep({ number, icon, title, description, color }: {
   };
 
   return (
-    <div className={`flex gap-3 p-3 rounded-lg border bg-slate-900/20 ${borderColors[color]}`}>
+    <div className={`flex gap-3 p-3 rounded-lg border bg-muted/30 ${borderColors[color]}`}>
       <div className="flex flex-col items-center gap-1 shrink-0">
         <span className={`text-[10px] font-bold font-mono ${numberColors[color]}`}>{number}</span>
         <div className="mt-0.5">{icon}</div>
       </div>
       <div>
-        <p className="text-xs font-semibold text-slate-300 mb-0.5">{title}</p>
-        <p className="text-[11px] text-slate-500 leading-relaxed">{description}</p>
+        <p className="text-xs font-semibold text-foreground/80 mb-0.5">{title}</p>
+        <p className="text-[11px] text-muted-foreground leading-relaxed">{description}</p>
       </div>
     </div>
   );

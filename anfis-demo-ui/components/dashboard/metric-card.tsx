@@ -38,7 +38,7 @@ const colorMap = {
   },
   neutral: {
     bg: 'from-slate-900/60 via-slate-900/40 to-slate-950/50',
-    border: 'border-slate-700/40',
+    border: 'border-border/40',
     text: 'text-slate-300',
     accent: 'text-slate-400',
   },

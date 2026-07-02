@@ -30,9 +30,9 @@ const LABEL_COLOR: Record<string, string> = {
 };
 
 function matchLabel(membership: number): { text: string; cls: string } {
-  if (membership > 0.5) return { text: 'HIGH', cls: 'bg-green-500/20 text-green-400 border-green-500/30' };
-  if (membership > 0.3) return { text: 'MED', cls: 'bg-blue-500/20  text-blue-400  border-blue-500/30' };
-  return { text: 'LOW', cls: 'bg-slate-700/50 text-slate-400 border-slate-600/30' };
+  if (membership > 0.5) return { text: 'HIGH', cls: 'bg-green-500/20 text-green-700 dark:text-green-400 border-green-500/30' };
+  if (membership > 0.3) return { text: 'MED', cls: 'bg-blue-500/20  text-blue-700 dark:text-blue-400  border-blue-500/30' };
+  return { text: 'LOW', cls: 'bg-muted text-muted-foreground border-border' };
 }
 
 // ─── Header legend ─────────────────────────────────────────────────────────────
@@ -40,11 +40,11 @@ function matchLabel(membership: number): { text: string; cls: string } {
 function MetricsLegend() {
   return (
     <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mb-3 px-0.5">
-      <p className="text-[9px] uppercase tracking-widest font-bold text-slate-600 shrink-0">Archetype match scores</p>
+      <p className="text-[9px] uppercase tracking-widest font-bold text-muted-foreground/70 shrink-0">Archetype match scores</p>
       <div className="flex items-center gap-2 ml-auto flex-wrap">
         <LegendItem color="bg-green-500/60" label="HIGH > 50%" />
         <LegendItem color="bg-blue-500/60" label="MED 30-50%" />
-        <LegendItem color="bg-slate-600/60" label="LOW < 30%" />
+        <LegendItem color="bg-muted-foreground/40" label="LOW < 30%" />
       </div>
     </div>
   );
@@ -54,7 +54,7 @@ function LegendItem({ color, label }: { color: string; label: string }) {
   return (
     <span className="flex items-center gap-1">
       <span className={`inline-block w-1.5 h-1.5 rounded-full ${color}`} />
-      <span className="text-[9px] font-mono text-slate-600">{label}</span>
+      <span className="text-[9px] font-mono text-muted-foreground/70">{label}</span>
     </span>
   );
 }
@@ -67,7 +67,7 @@ function ArchetypeCard({ cat }: { cat: BehaviorCategory }) {
 
   return (
     <div className={cn(
-      'relative overflow-hidden rounded-xl border bg-linear-to-br from-slate-800/60 to-slate-900/70 p-4 transition-all shadow-md',
+      'relative overflow-hidden rounded-xl border bg-card p-4 transition-all shadow-md',
       BORDER[cat.category], GLOW[cat.category]
     )}>
 
@@ -94,12 +94,12 @@ function ArchetypeCard({ cat }: { cat: BehaviorCategory }) {
 
       {/* Row 2: big membership % */}
       <div className="flex items-baseline gap-0.5 mb-0.5">
-        <span className="text-3xl font-black text-slate-100 font-mono tracking-tight tabular-nums leading-none">
+        <span className="text-3xl font-black text-foreground font-mono tracking-tight tabular-nums leading-none">
           {(cat.softMembership * 100).toFixed(0)}
         </span>
-        <span className="text-sm text-slate-500 font-mono leading-none">%</span>
+        <span className="text-sm text-muted-foreground font-mono leading-none">%</span>
       </div>
-      <p className="text-[9px] text-slate-500 mb-3 leading-tight">
+      <p className="text-[9px] text-muted-foreground mb-3 leading-tight">
         Archetype match -- how closely this player fits the {cat.category.toLowerCase()} pattern
       </p>
 
@@ -110,7 +110,7 @@ function ArchetypeCard({ cat }: { cat: BehaviorCategory }) {
         <div className="flex items-center gap-1">
           <HelpfulTooltip
             trigger={
-              <span className="flex items-center gap-0.5 text-slate-500 cursor-help hover:text-slate-300 transition-colors">
+              <span className="flex items-center gap-0.5 text-muted-foreground cursor-help hover:text-foreground transition-colors">
                 Activity
                 <HelpCircle className="w-2.5 h-2.5 opacity-60" />
               </span>
@@ -125,16 +125,16 @@ function ArchetypeCard({ cat }: { cat: BehaviorCategory }) {
             }
             interpretation="High % = player was busy with these actions. Activity is a raw average -- it differs from the Membership % which measures how well the pattern matches the cluster centroid."
           />
-          <span className="font-mono text-slate-200 font-bold">{cat.activityPercentage}%</span>
+          <span className="font-mono text-foreground font-bold">{cat.activityPercentage}%</span>
         </div>
 
-        <span className="text-slate-700">|</span>
+        <span className="text-border">|</span>
 
         {/* Confidence */}
         <div className="flex items-center gap-1">
           <HelpfulTooltip
             trigger={
-              <span className="flex items-center gap-0.5 text-slate-500 cursor-help hover:text-slate-300 transition-colors">
+              <span className="flex items-center gap-0.5 text-muted-foreground cursor-help hover:text-foreground transition-colors">
                 Conf
                 <HelpCircle className="w-2.5 h-2.5 opacity-60" />
               </span>
@@ -169,14 +169,14 @@ export function AnalyticsMetricsCards() {
   const { pipelineState } = usePipeline();
 
   return (
-    <div className="px-4 sm:px-6 pt-4 pb-3 border-b border-slate-700/30 bg-slate-900/20">
+    <div className="px-4 sm:px-6 pt-4 pb-3 border-b border-border/40 bg-card/40">
       <MetricsLegend />
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {pipelineState.behaviorCategories.map(cat => (
           <ArchetypeCard key={cat.category} cat={cat} />
         ))}
       </div>
-      <p className="text-[9px] text-slate-700 mt-2 text-center leading-relaxed">
+      <p className="text-[9px] text-muted-foreground/50 mt-2 text-center leading-relaxed">
         Large % = archetype match · Activity = raw action share · Conf = classification reliability -- click labels for details
       </p>
     </div>

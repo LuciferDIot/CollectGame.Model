@@ -3,11 +3,11 @@ import { TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { RuleInspectorDrawer } from './rule-inspector-drawer';
 
 export function AnalyticsTabsList() {
-  const triggerClass = "px-3 sm:px-4 rounded-lg py-2 text-[10px] xs:text-xs font-medium transition-all duration-300 data-[state=active]:bg-linear-to-br data-[state=active]:from-blue-600 data-[state=active]:to-blue-500 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-500/20 text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 whitespace-nowrap";
+  const triggerClass = "px-3 sm:px-4 rounded-lg py-2 text-[10px] xs:text-xs font-medium transition-all duration-300 data-[state=active]:bg-linear-to-br data-[state=active]:from-blue-600 data-[state=active]:to-blue-500 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-500/20 text-muted-foreground hover:text-foreground hover:bg-muted/60 whitespace-nowrap";
 
   return (
     <div className="px-2 sm:px-4 py-1.5 sm:py-2">
-      <TabsList className="w-full flex items-center justify-start bg-slate-950/60 backdrop-blur-md p-1 rounded-lg sm:p-1.5 sm:rounded-xl border border-slate-800/60 shadow-inner overflow-x-auto scrollbar-none gap-0.5">
+      <TabsList className="w-full flex items-center justify-start bg-muted/50 backdrop-blur-md p-1 rounded-lg sm:p-1.5 sm:rounded-xl border border-border shadow-inner overflow-x-auto scrollbar-none gap-0.5">
         <TabsTrigger value="behavior" className={triggerClass}>
           Behavior
         </TabsTrigger>
@@ -22,7 +22,7 @@ export function AnalyticsTabsList() {
         </TabsTrigger>
 
         {/* Separator for Rule Inspector - Hidden on mobile if cramped */}
-        <div className="hidden sm:block w-px h-6 bg-slate-800 mx-1.5" />
+        <div className="hidden sm:block w-px h-6 bg-border mx-1.5" />
 
         <div className="flex items-center px-1 shrink-0">
           <RuleInspectorDrawer />
