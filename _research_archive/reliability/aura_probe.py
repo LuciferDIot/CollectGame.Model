@@ -77,8 +77,11 @@ def _probe_once(url, timeout=10):
                     "status_code": status_code, "error": error, "body_preview": body_preview})
     return result
 
+_OUTPUT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "outputs")
+
 def _save_csv(rows, prefix):
-    fname = f"{prefix}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+    os.makedirs(_OUTPUT_DIR, exist_ok=True)
+    fname = os.path.join(_OUTPUT_DIR, f"{prefix}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv")
     with open(fname, "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=_RESULT_FIELDS)
         w.writeheader(); w.writerows(rows)
