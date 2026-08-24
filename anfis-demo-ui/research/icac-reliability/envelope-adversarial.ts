@@ -31,7 +31,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const OUTPUT_PATH = path.join(__dirname, 'envelope-adversarial-results.csv');
+const OUTPUT_PATH = path.join(__dirname, '../../../_research_archive/reliability/outputs/envelope-adversarial-results.csv');
 
 const SEED = 1337;
 
