@@ -33,7 +33,7 @@ def _make_payload():
 # so the fields below are pulled out of the response body rather than left
 # buried in a truncated preview.
 _RESULT_FIELDS = [
-    "timestamp", "latency_ms", "status_code", "error", "body_preview",
+    "timestamp", "latency_ms", "server_pipeline_ms", "status_code", "error", "body_preview",
     "target_multiplier", "multiplier_clamped",
     "delta_combat", "delta_collect", "delta_explore",
     "soft_combat", "soft_collect", "soft_explore",
@@ -55,6 +55,7 @@ def _probe_once(url, timeout=10):
             body_preview = raw_body.decode("utf-8", errors="replace")[:120]
             try:
                 parsed = json.loads(raw_body)
+                result["server_pipeline_ms"] = parsed.get("performance_timings", {}).get("total", "")
                 result["target_multiplier"] = parsed.get("target_multiplier", "")
                 result["multiplier_clamped"] = parsed.get("validation", {}).get("multiplier_clamped", "")
                 deltas = parsed.get("deltas", {})
@@ -79,9 +80,10 @@ def _probe_once(url, timeout=10):
 
 _OUTPUT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "outputs")
 
-def _save_csv(rows, prefix):
+def _save_csv(rows, prefix, label=None):
     os.makedirs(_OUTPUT_DIR, exist_ok=True)
-    fname = os.path.join(_OUTPUT_DIR, f"{prefix}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv")
+    suffix = f"_{label}" if label else ""
+    fname = os.path.join(_OUTPUT_DIR, f"{prefix}_{datetime.now().strftime('%Y%m%d_%H%M%S')}{suffix}.csv")
     with open(fname, "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=_RESULT_FIELDS)
         w.writeheader(); w.writerows(rows)
@@ -96,7 +98,7 @@ def _print_stats(rows):
         print(f"  Min:{min(latencies):.1f}  Max:{max(latencies):.1f}  Avg:{sum(latencies)/len(latencies):.1f}  p50:{p(.5):.1f}  p90:{p(.9):.1f}  p99:{p(.99):.1f} ms")
     print(f"{'='*50}\n")
 
-def run_latency(url, n):
+def run_latency(url, n, label=None):
     print(f"[LATENCY] {n} requests -> {url}")
     rows = []
     for i in range(1, n+1):
@@ -104,10 +106,10 @@ def run_latency(url, n):
         ef = f"  WARN: {r['error'][:60]}" if r["error"] else ""
         print(f"  [{i:>4}/{n}]  {r['latency_ms']:>8.1f} ms   HTTP {r['status_code'] or 'ERR'}{ef}")
     _print_stats(rows)
-    fname = _save_csv(rows, "latency")
+    fname = _save_csv(rows, "latency", label)
     print(f"Saved -> {os.path.abspath(fname)}\n")
 
-def run_continuity(url, minutes):
+def run_continuity(url, minutes, label=None):
     duration_s = minutes*60; interval_s = 30
     deadline = time.monotonic()+duration_s
     print(f"[CONTINUITY] {minutes:.0f}-min run -> {url}\n  Probe every {interval_s}s. Ctrl-C to stop.\n")
@@ -122,13 +124,15 @@ def run_continuity(url, minutes):
     except KeyboardInterrupt:
         print("\n  Stopped by user.")
     _print_stats(rows)
-    fname = _save_csv(rows, "continuity")
+    fname = _save_csv(rows, "continuity", label)
     print(f"Saved -> {os.path.abspath(fname)}\n")
 
 parser = argparse.ArgumentParser()
 sub = parser.add_subparsers(dest="mode", required=True)
 lat = sub.add_parser("latency"); lat.add_argument("--url", required=True); lat.add_argument("--n", type=int, default=100)
+lat.add_argument("--label", default=None)
 cont = sub.add_parser("continuity"); cont.add_argument("--url", required=True); cont.add_argument("--minutes", type=float, default=90)
+cont.add_argument("--label", default=None)
 args = parser.parse_args()
-if args.mode=="latency": run_latency(args.url, args.n)
-elif args.mode=="continuity": run_continuity(args.url, args.minutes)
+if args.mode=="latency": run_latency(args.url, args.n, args.label)
+elif args.mode=="continuity": run_continuity(args.url, args.minutes, args.label)
