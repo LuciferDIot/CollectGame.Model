@@ -28,6 +28,17 @@ this folder; writes to `outputs/latency_*.csv` / `outputs/continuity_*.csv`.
 All CSVs are raw, one row per trial/window -- no aggregation performed by
 the scripts themselves.
 
+### Live deployment configuration (as of 2026-08-24)
+
+Fluid Compute: **ON** (Vercel dashboard, Project Settings -> Functions).
+Fluid Compute keeps function instances warm and reuses execution contexts
+more aggressively than classic serverless, so `globalThis._anfisAdaptPipeline`
+getting wiped by a cold start should be less frequent than it would be with
+Fluid Compute off. That makes "deltas decay then stay flat for the full
+continuity run, no reset" the expected outcome under this configuration --
+a reset jump appearing anyway (see `outputs/continuity_*.csv`) would be the
+more notable finding, not the null result.
+
 ## Reproducing
 
 From `anfis-demo-ui/`:
